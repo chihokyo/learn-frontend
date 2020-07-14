@@ -1,0 +1,40 @@
+<!-- 排他案例 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- ul>li{$}*10 -->
+    <ul>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+        <li>6</li>
+        <li>7</li>
+        <li>8</li>
+        <li>9</li>
+        <li>10</li>
+    </ul>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+    <script>
+        // $("li").css("backgroundColor", "red")
+        // $("li").css("fontSize", "50px")
+        // $("li").css("color", "green")
+        // $("li").css("width", "100px")
+        // 可以直接修改多个样式写成对象的形式
+        $("li").css({
+            backgroundColor: "pink",
+            fontSize: "50px",
+            color: "green",
+            width: "100px"
+        })
+        console.log($("li").css("backgroundColor")) // rgb(255, 192, 203)
+        
+    </script>
+</body>
+</html>

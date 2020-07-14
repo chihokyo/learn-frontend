@@ -1,0 +1,40 @@
+<!-- 排他案例 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- ul>li{$}*10 -->
+    <ul>
+        <li>1</li>
+        <li>2</li>
+        <li>3</li>
+        <li>4</li>
+        <li>5</li>
+        <li>6</li>
+        <li>7</li>
+        <li>8</li>
+        <li>9</li>
+        <li>10</li>
+    </ul>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+    <script>
+        $(function(){
+            $li = $(".wrap>ul>li")
+            $li.mouseenter(function(){
+                $(this).css("opacity", 1).siblings().css("opacity", 0.4)
+            })
+
+            // 如何找到所有的li
+            // 这些方法不如一些原因是找的时候每次都要全局开始重新查找
+            $("li")
+            $(".wrap li")
+            $(".wrap>ul>li")
+            $(".wrap").find("li").
+        })
+    </script>
+</body>
+</html>

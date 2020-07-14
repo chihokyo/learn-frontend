@@ -1,0 +1,67 @@
+<!-- 排他案例 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .small {
+            font-size: 5px;
+        }
+        .big {
+            font-size: 200px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ul>li{$}*10 -->
+    <button id="makesmall" type="submit">增加变小类</button>
+    <button id="makebig" type="submit">增加变大类</button>
+    <button id="removebig" type="submit">移除变大类</button>
+    <button id="issmall" type="submit">判断变小类</button>
+    <button id="shiftclass" type="submit">切换类</button>
+    <div id="div1">1111</div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+    <script>
+        // js原生写法 这样写并不好维护，因为类名如果变了，那么js里也要修改
+        // let smallButton = document.getElementById("makesmall")
+        // let bigButton = document.getElementById("makebig")
+        // let divObj = document.getElementById("div1") //这里用id才行，tagName失败
+        // smallButton.onclick = function(){
+        //     divObj.className = "small"
+        // }
+
+        // bigButton.onclick = function(){
+        //     divObj.className = "big"
+        // }
+
+        // jq写法 
+        $("#makesmall").on("click", function(){
+            $("#div1").addClass("small")
+        })
+        $("#makebig").on("click", function(){
+            $("#div1").addClass("big")
+        })
+        $("#removebig").on("click", function(){
+            $("#div1").removeClass("big")
+        })
+        $("#issmall").on("click", function(){
+            console.log($("#div1").hasClass("small"))
+        })
+        // 写法1 切换
+        // $("#shiftclass").on("click", function(){
+        //     if($("#div1").hasClass("small")){
+        //         $("#div1").removeClass("small")
+        //     } else {
+        //         $("#div1").addClass("small")
+        //     }
+        // })
+        
+        // 写法2 切换 toggleClass
+        $("#shiftclass").on("click", function(){
+            $("#div1").toggleClass("small")
+        })
+    </script>
+</body>
+</html>
