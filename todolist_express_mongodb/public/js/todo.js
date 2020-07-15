@@ -113,10 +113,8 @@ taskBox.on('dblclick', 'label', function () {
     $(this).parent().siblings('input').focus()
 })
 
-// 修改内容
-taskBox.on('blur', '.edit', function () {
-    let newTaskName = $(this).val()
-    let id = $(this).siblings().find('button').attr('data-id')
+// 修改内容ajax
+function modifyAjax(id, newTaskName){
     $.ajax({
         url: '/modifyTask',
         type: 'post',
@@ -128,4 +126,20 @@ taskBox.on('blur', '.edit', function () {
             renderCal()
         }
     })
+}
+
+// 焦点修改
+taskBox.on('blur', '.edit', function () {
+    let newTaskName = $(this).val()
+    let id = $(this).siblings().find('button').attr('data-id')
+    modifyAjax(id,newTaskName)
+})
+
+// 回车键修改
+taskBox.on('keyup','.edit', function(e){
+    if (e.keyCode == 13) {
+        let newTaskName = $(this).val()
+        let id = $(this).siblings().find('button').attr('data-id')
+        modifyAjax(id,newTaskName)  
+    }
 })
