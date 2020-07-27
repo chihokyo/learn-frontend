@@ -1,0 +1,57 @@
+<html>
+
+<head>
+  <title>Vue练习 v-for数组和对象
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <ul>
+      <li v-for='(per,index) in personObj' :key='index'>
+        {{ per.name }} --- {{ per.age }} 
+        <button @click='deleteP(index)'>删除</button>
+        <button @click='updateP(index,{name:"newP",age:99})'>更新</button>
+      </li>
+    </ul>
+
+    <ul>
+      <!-- 按照位置，参数1是指，参数2是key -->
+      <li v-for="(value,key) in personAry" :key="key">
+        {{ key }}, {{ value }}
+      </li>
+    </ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+        el:"#app",
+        data: {
+          personObj: [
+            {name:'amy', age:18},
+            {name:'amy1', age:19},
+            {name:'amy2', age:28},
+            {name:'amy3', age:10},
+            {name:'amy4', age:100},
+          ],
+          personAry:{name:'amy', age:18}
+        },
+        methods : {
+          deleteP (index) { 
+            this.personObj.splice(index, 1)
+          },
+          // 参考：官方文档：变更方法。
+          // 在Vue中重新封装了几个方法用于渲染。
+          // Vue并不能检测到数组内部值的变化并重新渲染
+          updateP(index,newP){
+            // 不能直接修改掉
+            // this.personObj[index] = newP
+            this.personObj.splice(index, 1, newP)
+          }
+        }
+      })
+  </script>
+</body>
+
+</html>

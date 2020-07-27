@@ -1,0 +1,75 @@
+<html>
+
+<head>
+  <title>Vue练习 computed/watch
+  </title>
+</head>
+
+<body>
+  <div id="app">
+      姓：<input type="text" name="" id="" v-model='firstname'><br>
+      名：<input type="text" name="" id="" v-model='lastname'><br>
+      姓名单向compoted：<input type="text" name="" id="" v-model='fullName1'><br>
+      姓名单向watch：<input type="text" name="" id="" v-model='fullName2'><br>
+      姓名双向：<input type="text" name="" id="" v-model='fullName3'><br>
+
+      <!-- 这里只是执行了1次，其中原理就是缓存。 其中根据的就是fullname1就是key，结果就是value存储到缓存里
+    
+    getter:
+    setter -->
+    <p>{{ fullName1 }}</p>
+    <p>{{ fullName1 }}</p>
+    <p>{{ fullName1 }}</p>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+          el:"#app",
+          data: {
+              firstname:'A',
+              lastname:'B',
+              fullname1: '',
+              fullName2:'',
+          },
+          // 计算属性方法，方法的返回值作为属性值（可以减少运算和页面渲染，提高速度。
+          computed: {
+              // 这里直接定义函数
+              fullName1() {
+                  return this.firstname + ' ' + this.lastname
+              },
+              // 这里是对象
+              fullName3: {
+                // 计算并返回当前属性的值（回调函数 你定义 你没有调用 最终执行了 什么时候执行 用来做什么
+                // 当需要读取当前属性回调，根据相关的数据计算并返回属性的值
+                get(){
+                    return this.firstname + ' ' + this.lastname
+                },
+                // 回调函数 属性值发生改变回调，更新相关属性数据
+                // 是监视，并非设置
+                set(value){
+                    // value就是最新的属性值
+                    const name = value.split(' ')
+                    this.firstname = name[0] 
+                    this.lastname = name[1]
+                }
+              }
+          },
+          
+          watch: {
+              // 只要firstname这个属性值发生变化
+              firstname: function(newVal, oldVal){
+                  console.log(this)
+                  this.fullName2 =  newVal + ' ' + this.lastname
+              }
+          }
+      })
+      // 实例方法$watch
+      vm.$watch('lastname', function(newVal){
+        this.fullName2 = this.firstname + ' ' + newVal
+      })
+  </script>
+</body>
+
+</html>

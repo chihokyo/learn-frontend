@@ -1,0 +1,57 @@
+<html>
+
+<head>
+  <title>Vue练习 :class/:style
+  </title>
+  <style>
+    .aClass {
+      background-color: brown;
+    }
+
+    .bClass {
+      background-color: gray;
+    }
+
+    .cClass {
+      font-size: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <h2> 1 class 绑定的学习</h2>
+    <p :class="'a'">非绑定</p>
+    <p :class='a'>hello可以变色的</p>
+    <p :class="{ aClass: isA, bClass: isB}">我是对象</p>
+    <!-- <p :class="[ aClass,bClass ]">我是数组</p> -->
+
+    <h2> 2 style 绑定的学习</h2>
+    <button @click='change'>点我变色</button>
+    <p :style="{ color:activeColor, fontSize: fontSize +'px' }">学习style</p>
+    
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+        el:"#app",
+        data: {
+          a: 'aClass',
+          isA:true,
+          isB:false,
+          activeColor: 'yellow',
+          fontSize: 18
+        },
+        methods: {
+          change(){
+            //this.a = 'bClass'
+            this.isA = false,
+            this.isB = true
+          }
+        }
+      })
+  </script>
+</body>
+
+</html>

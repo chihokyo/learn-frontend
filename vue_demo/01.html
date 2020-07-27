@@ -1,0 +1,52 @@
+<html>
+
+<head>
+  <title>Vue练习 数据绑定
+  </title>
+</head>
+
+<body>
+  <div id="app">
+      <h2>{{ name }}</h2>
+      <h2>{{ name.toUpperCase() }}</h2>
+      <p v-text='url'></p>
+      <p v-html='url'></p>
+      <!-- 这里只是字符串 -->
+      <img src="imgUrl" alt="" srcset="">
+      <!-- 这里才是数据绑定 -->
+      <img v-bind:src="imgUrl" alt="" srcset="">
+      <img :src="imgUrl" alt="" srcset=""><br/>
+
+      <button v-on:click='test'>click1</button>
+      <button @click="test2('test with param')">click2</button>
+      <button @click="test3(imgUrl)">click3</button>
+
+
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+          el: "#app",
+          data:{
+              name:'amy',
+              url: '<a href="https://google.com">google!!</a>',
+              imgUrl: 'https://lh3.googleusercontent.com/-K_JC73Iq5PI/AAAAAAAAAAI/AAAAAAAAAAA/AMZuucm19ApWVxA44sf2zWeD_uC1NhzEWw/s48-c/photo.jpg'
+          },
+          methods: {
+              test () {
+                  alert('test')
+              },
+              test2 (param) {
+                  alert(param)
+              },
+              test3 (content) {
+                  alert(content)
+              }
+          }
+      })
+  </script>
+</body>
+
+</html>
