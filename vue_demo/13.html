@@ -1,0 +1,59 @@
+<html>
+
+<head>
+  <title>Vue练习 自定义指令
+  </title>
+</head>
+
+<body>
+  <!-- 指令的目的，操作标签 -->
+  <div id="app1">
+    <!-- 记一次脑残的失误，这里当初直接<p v-upper-text>{{ msg1 }}</p>
+    这样写根本指令没挂载到指定的data上，能显示个毛value -->
+    <p v-upper-text='msg1'>全局大写：{{ msg1 }}</p>
+    <p v-lower-text='msg1'>局部小写：{{ msg1 }}</p>
+  </div>
+  <div id="app2">
+    <p v-upper-text='msg2'>全局大写：{{ msg2 }}</p>
+    <p v-lower-text='msg2'>局部小写：{{ msg2 }}</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+
+    // 全局指令
+    Vue.directive('upper-text',function(el,binding){
+      // console.log(el,binding)
+      el.textContent = binding.value.toUpperCase()
+    })
+    
+    // 定义2个实例vm1 vm2
+      const vm1 = new Vue({
+        el:"#app1",
+        data: {
+         msg1: 'I love YOU'
+        },
+        // 局部指令 ！！！directives 复数
+        // 只在当前的vm实例中有效
+        directives:{
+          'lower-text':function(el,binding){
+            el.textContent = binding.value.toLowerCase()
+          }
+        }
+      })
+
+      const vm2 = new Vue({
+        el:"#app2",
+        data: {
+          msg2: 'I love YOU and YOU love ME'
+        },
+        directives:{
+          'lower-text':function(el,binding){
+            el.textContent = binding.value.toLowerCase()
+          }
+        }
+      })
+  </script>
+</body>
+
+</html>

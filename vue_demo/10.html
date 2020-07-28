@@ -1,0 +1,94 @@
+<html>
+
+<head>
+  <title>Vue练习 动画
+  </title>
+  <style>
+    /* 显示效果1 */
+    .trans-enter-active, .trans-leave-active {
+      transition: opacity 1s;
+    }
+    /* 隐藏效果1 */
+    .trans-enter,.trans-leave-to {
+      opacity: 0;
+    }
+     /* 显示过滤效果 */
+    .trans-right-enter-active {
+      transition: all 1s;
+    }
+    /* 隐藏过滤效果 */
+    .trans-right-leave-active {
+      transition: all 3s;
+    }
+    /* 隐藏样式 */
+    .trans-right-enter, .trans-right-leave-to {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+
+    /* 官方效果直接抄写在这里 */
+    .bounce-enter-active {
+      animation: bounce-in .5s;
+    }
+    .bounce-leave-active {
+      animation: bounce-in .5s reverse;
+    }
+    @keyframes bounce-in {
+      0% {
+        transform: scale(0);
+      }
+      50% {
+        transform: scale(1.5);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  
+  <div id="app">
+    <!-- 主要思想就是操作的css transition 和 animation 参考官网教程即可-->
+    <!-- 点击进行显示/隐藏 但没有任何效果 -->
+    <button @click='isShow1=!isShow1'>显示1</button>
+    <p v-show='isShow1'>Vue</p>
+    <br>
+
+    <button @click='isShow2=!isShow2'>显示2</button>
+    <transition name="trans">
+      <p v-show='isShow2' class="trans-enter-to">Vue2</p>
+    </transition>
+    <br>
+
+    <button @click='isShow3=!isShow3'>显示3</button>
+    <transition name="trans-right">
+      <p v-show='isShow3'>Vue3</p>
+    </transition>
+
+    <button @click='isShow4=!isShow4'>显示4</button>
+    <br>
+    <transition name="bounce">
+      <!-- 这里需要注意就是使用display: inline-block;" 用于修改盒子，改善效果显示（官方bug？ -->
+      <p v-show='isShow4' style="background-color: azure;display: inline-block;">Vue4</p>
+    </transition>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+        el:"#app",
+        data: {
+          isShow1: true,
+          isShow2: true,
+          isShow3: true,
+          isShow4: true
+        }
+      })
+  </script>
+</body>
+
+</html>

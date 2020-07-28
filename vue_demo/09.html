@@ -1,0 +1,103 @@
+<html>
+
+<head>
+  <title>Vue练习 生命周期
+  </title>
+</head>
+
+<body>
+    <!-- Vue的发展是有一个生命周期，按照官网的那张图来说。
+    初始化-更新-死亡 
+    常用阶段，mounted 发送ajax请求 启动定时器等等操作
+            beforeDestroy 收尾工作 清除定时器等等-->
+  <div id="app">
+    <button @click='destoryVM'>销毁 destory</button>
+    <p v-show='isShow'>chihokyo</p>
+    <!-- 在created里面的时候进行编译，批量
+    在内存中进行解析，并没有解析界面 然后最后挂载mounted到页面上 提高效率 -->
+    <p>{{ isShow }}</p>
+    <p>{{ isShow }}</p>
+    <p>{{ isShow }}</p>
+    <p>{{ isShow }}</p>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+        el:"#app",
+        data: {
+            isShow: true
+        },
+
+        /* 1. 初始化阶段 */
+
+        // 成立之前
+        beforeCreate(){
+            console.log('beforeCreate()')
+        },
+
+        // 成立之后
+        created(){
+            console.log('created()')
+        },
+
+        // 挂载之前
+        beforeMount(){
+            console.log('beforeMount()')
+        },
+
+        // 挂载 初始化显示之后立即调用【1次】
+        mounted () { 
+            // console.log(this) ==> window
+            // setInterval(function(){
+            //     this.isShow = !this.isShow
+            // },1000)
+            // console.log(this) ==> Vue实例，就是上面vm
+            // es6 箭头函数没有this
+            this.intervalId = setInterval(() => {
+                //console.log(this)
+                console.log('mounted()')
+                this.isShow = !this.isShow
+            }, 1000)
+        },
+
+        /* 2. 更新阶段 */
+
+        // 更新之前
+        beforeUpdate(){
+            console.log('beforeUpdate()')
+        },
+
+        // 更新之后
+        updated(){
+            console.log('updated()');
+        },
+
+
+        /* 3. 死亡阶段 */
+
+        // 死亡之前调用【1次】
+        beforeDestroy(){
+            // 需要给定时器一个ID this.intervalId
+            console.log('beforeDestroy()')
+            clearInterval(this.intervalId) //this别丢掉啦
+        },
+
+        destroyed(){
+            console.log('destroyed()')
+        },
+        methods: {
+            // 内存泄漏，这里并没有销毁【定时器】
+            // 只是销毁了这个vm实例而已
+            // 这时候需要在销毁实例前面进行清除定时器
+            destoryVM () {
+                this.$destroy()
+            }
+        }
+        
+      })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+<html>
+
+<head>
+  <title>Vue练习 插件
+  </title>
+</head>
+
+<!-- 新建插件的问题。 
+  插件是什么，js的插件其实就像是上以前写的，就是导入一个js文件然后谁都能直接用。
+  官方文档也有详细的写插件的写法和用法。
+  vue的基本原理感觉和jq差不多一样的。(function())()
+-->
+<body>
+  <div id="app">
+    <!-- 1. 我们自定义的指令my-directive -->
+    <p v-my-directive='msg'></p>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <!-- 引入插件 !! 要在Vue引入的下面 -->
+  <script type="text/javascript" src="./vue-myplugin.js"></script>
+  <script>
+    // ！！声明使用插件 就是vue-myplugin.js 里面暴露的变量
+    Vue.use(MyPlugin) // 内部会执行 MyPlugin.install(Vue)
+    
+    // 2. 自定义的全局方法
+    Vue.myGlobalMethod()
+    const vm = new Vue({
+      el:"#app",
+      data: {
+        msg:'my Plugin!!'
+      }
+    })
+
+    // 3. 自定义的实例方法$myMethod
+    vm.$myMethod()
+  </script>
+</body>
+
+</html>
