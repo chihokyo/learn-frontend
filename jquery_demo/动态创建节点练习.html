@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <div id="box" >okk</div>
+</head>
+<body>
+    <!-- 这里应该有个表格 -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>    
+    <script>
+        // 如果要创建一个节点 例如
+        // <a href="https://google.com" target="_blank">HELLO Google</a>
+        $(function(){
+            // JS写法
+            let box = document.getElementById("box")
+            let a = document.createElement("a")
+            box.appendChild(a)
+            a.setAttribute("href", "https://google.com")
+            a.setAttribute("target", "_blank")
+            a.innerHTML = "HELLO Google"
+
+            // JQ写法1
+            let a = "<a href='https://google.com' target='_blank'>HELLO Google</a>"
+            $("#box").append(a)
+            // JQ写法2
+            $a = $("<a href='https://google.com' target='_blank'>HELLO Google</a>")
+            $("#box").append($a)
+        })
+    </script>
+</body>
+</html>

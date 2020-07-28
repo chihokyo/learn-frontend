@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!-- 这里应该有个表格 -->
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+    <script>
+        
+        $(function(){
+            // 如果点了全选，下面所有的都全选
+            $("#j_cbAll").on("click", function(){
+                // $(this).prop("checked") 就表示全选框的那个状态。然后设置给下面的框
+                $("#j_tb input").prop("checked", $(this).prop("checked"))
+            })
+            // 下面的思路就是，只要下面的选中状态总数与选择框对象的数值相等就勾上，否则就不勾
+            // 选择框对象总数:
+            let checkAll = $("#j_tb input").length
+            // 选中总数:
+            let checkedAll = $("#j_tb input:checked").length
+            if(checkAll === checkedAll){
+                $("#j_cbAll").prop("checked",true)
+            } else {
+                $("#j_cbAll").prop("checked",false)
+            }
+        })
+    </script>
+</body>
+</html>

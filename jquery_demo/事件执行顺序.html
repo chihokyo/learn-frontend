@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            width: 100px;
+            height: 100px;
+            background-color: seagreen;
+        }
+    </style>
+</head>
+<body>
+    <button type="submit">点我添加</button>
+    <div><p> 我是老P </p></div>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>    
+    <script>
+        $("button").on("click",function(){
+            $("<p>我是新增的P</p>").appendTo("div")
+        })
+        $("div").on("click", function(){
+            console.log(this)
+            console.log("我是爸爸")
+        })
+        $("div").on("click", "p", function(){
+            console.log(this)
+            console.log("P元素委托事件")
+        })
+        $("p").on("click", function(){
+            console.log(this)
+            console.log("P元素自身事件")
+        })
+        // 点击新增的p <p>我是新增的P</p> // 元素委托事件 我是爸爸
+        // 点击老P P元素自身事件->P元素委托事件->我是爸爸
+    </script>
+</body>
+</html>

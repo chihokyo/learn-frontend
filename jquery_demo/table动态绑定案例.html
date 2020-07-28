@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button type="submit">添加一行</button>
+    <table border="1">
+        <caption>购物车</caption>
+        <thead>
+            <tr>
+                <th>水果</th>
+                <th>重量</th>
+                <th>单价</th>
+                <th>删除</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>苹果</td>
+                <td>3公斤</td>
+                <td>5元/公斤</td>
+                <td><a href="javascript:void(0);" class="delete">×</a></td>
+            </tr>
+            <tr>
+                <td>香蕉</td>
+                <td>2公斤</td>
+                <td>6元/公斤</td>
+                <td><a href="javascript:void(0);" class="delete">×</a></td>
+            </tr>
+        </tbody>
+    </table>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script>
+        // 正常创建元素 
+        // 会发现新增的行无法进行删除
+        $("button").on("click", function(){
+            $(`<tr>
+                <td>新的NEW香蕉</td>
+                <td>新的NEW2公斤</td>
+                <td>新的NEW6元/公斤</td>
+                <td><a href="javascript:void(0);" class="delete">×</a></td>
+            </tr>`).appendTo("tbody")
+        })
+        $(".delete").on("click", function(){
+            $(this).parent().parent().remove()
+        })
+
+        // 动态绑定 注意！这时候不能给 .delete这个类进行绑定，需要给共通的父元素。也就是tbody进行绑定
+        $("tbody").on("click", ".delete", function(){
+            //console.log(this) // 会发现这个this <a href="javascript:void(0);" class="delete">×</a>
+            $(this).parent().parent().remove() // 所以跟上面写法一模一样
+        })
+    </script>
+</body>
+</html>

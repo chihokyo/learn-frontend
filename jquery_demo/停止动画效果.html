@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .div1 {
+            width: 500px;
+            height: 500px;
+            background-color: brown;
+        }
+    </style>
+</head>
+<body>
+    <button id="start" type="submit">开始</button>
+    <button id="stop" type="submit">结束</button>
+    <div class="div1"></div>
+    <script src="https://code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
+    <script>
+        $(function(){
+            $("#start").on("click", function(){
+                $(".div1").slideDown(2000).slideUp(2000)
+            })
+            $("#stop").on("click", function(){
+                $(".div1").stop(true,true)
+            })
+        })
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五星好评哦亲</title>
+    <style>
+        * {
+          padding: 0;
+          margin: 0;
+        }
+        
+        .comment {
+          font-size: 40px;
+          color: #ff3516;
+        }
+        
+        .comment li {
+          float: left;
+        }
+        
+        ul {
+          list-style: none;
+        }
+    </style>
+</head>
+<body>
+    <ul class="comment">
+        <li>☆</li>
+        <li>☆</li>
+        <li>☆</li>
+        <li>☆</li>
+        <li>☆</li>
+    </ul>
+
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script>
+    $(function(){
+        let = starSolid = "★"
+        let = starHollow = "☆"
+        // $(".comment>li") 表示comment类下面所有li
+        // 鼠标经过，所有前面变成实心
+        $(".comment>li").on("mouseenter", function(){
+            // console.log($(this).text(starSolid))
+            // console.log($(this).text(starSolid).prevAll())
+            // console.log($(this).text(starSolid).prevAll().text(starSolid))
+            // $(this).text(starSolid).prevAll().text(starSolid)
+            // $(this).nextAll().text(starHollow)
+            // 解决这个问题其实还有一个方法。就是使用end()这个方法。
+            $(this).text(starSolid).prevAll().text(starSolid).end().nextAll().text(starHollow)
+
+        })
+
+        $(".comment").on("mouseleave", function(){
+            $(this).children().text(starHollow)
+            $("li.current").text(starSolid).prevAll().text(starSolid)
+        })
+
+        $(".comment>li").on("click", function(){
+            $(this).addClass("current").siblings().removeClass("current")
+        })
+    })
+</script>
+</body>
+</html>

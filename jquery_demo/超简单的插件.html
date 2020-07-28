@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单插件</title>
+</head>
+<body>
+    <p>hello</p>
+<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+<script>
+    // jQuery.prototype.plugins = function(){
+    //     console.log("自制插件")
+    // }
+    // // 简化版本
+    // //在js里可以查找到
+    // jQuery.fn = jQuery.prototype = {}
+    // $.fn.plugins = function(){
+    //     console.log("自制插件")
+    // }
+    // $(document).plugins()
+
+    // 实现一个插件,调用big字体就能变大到100px
+    //$("p").css("font-size", "100px")
+    $(function(){
+        $.fn.big = function(size){
+            // 这里this是JQ对象 console.log(this)
+            this.css("font-size", size+"px")
+        }
+        $("p").big(200)
+    })
+
+    $(function(){
+        $.fn.big = function(size){
+            this.css("font-size", size+"px")
+        }
+        return this
+    })
+</script>   
+</body>
+</html>
