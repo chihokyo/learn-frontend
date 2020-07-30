@@ -2,13 +2,15 @@
   <div>
     <h2>TodoList</h2>
     <ul>
-      <TodoItem
+      <!-- <TodoItem
         v-for="(todo, index) in todos"
         :key="index"
         :todo="todo"
         :index="index"
         :deleteTodo="deleteTodo"
-      ></TodoItem>
+      ></TodoItem>-->
+      <!-- 使用Pubsub订阅消息 -->
+      <TodoItem v-for="(todo, index) in todos" :key="index" :todo="todo" :index="index"></TodoItem>
     </ul>
   </div>
 </template>

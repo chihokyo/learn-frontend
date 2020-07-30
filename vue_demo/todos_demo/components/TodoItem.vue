@@ -11,11 +11,14 @@
 </template>
 
 <script>
+// 引入订阅消息用来发布
+import PubSub from "pubsub-js";
 export default {
   props: {
     todo: Object,
     index: Number,
-    deleteTodo: Function,
+    //普通写法
+    //deleteTodo: Function,
   },
   data() {
     return {
@@ -33,9 +36,12 @@ export default {
       }
     },
     deleteItem() {
-      const { todo, index, deleteTodo } = this;
+      const { todo, index } = this;
       if (window.confirm(`确认删除${todo.title}?`)) {
-        deleteTodo(index);
+        // 普通写法
+        //deleteTodo(index);
+        // 订阅写法
+        PubSub.publish("deleteTodo", index);
       }
     },
   },

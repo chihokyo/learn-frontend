@@ -27,8 +27,10 @@ export default {
         title,
         status: false,
       };
-
-      this.addTodo(todo);
+      // 2,3 $on和@事件通用触发事件写法
+      this.$emit("addTodo", todo);
+      // 1普通写法
+      //this.addTodo(todo)
       this.title = "";
     },
   },
