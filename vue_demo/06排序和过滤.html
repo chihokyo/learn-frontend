@@ -1,0 +1,72 @@
+<html>
+
+<head>
+  <title>Vue练习 排序和过滤
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    搜索栏：<input type="text" name="" id="" v-model="searchName">
+    <ul>
+      <li v-for="(per, index) in filterPersons" :key='index'>
+        {{ per.name}} === {{ per.age }}
+      </li>
+    </ul>
+
+    <button @click="setOrderType(1)">年龄升序</button><br>
+    <button @click="setOrderType(2)">年龄降序</button><br>
+    <button @click="setOrderType(0)">还原</button><br>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    const vm = new Vue({
+      el: "#app",
+      data: {
+        searchName: '',
+        orderType: 0,
+        persons: [
+          { name: 'jack', age: 19 },
+          { name: 'tom', age: 29 },
+          { name: 'kerry', age: 11 },
+          { name: 'taylor', age: 88 },
+          { name: 'rose', age: 3 },
+
+        ]
+      },
+      computed: {
+        // 函数
+        filterPersons() {
+          const { searchName, persons, orderType } = this
+          console.log(searchName)
+          let flpersons
+          // 这里的搜索方法需要研究一下 看以后都没有更好的
+          flpersons = persons.filter(p => p.name.indexOf(searchName) !== -1)
+          console.log(flpersons)
+
+          if (orderType !== 0) {
+            // sort的回调函数指定顺序
+            flpersons.sort(function (p1, p2) {
+              if (orderType == 2) {
+                return p2.age - p1.age
+              } else {
+                return p1.age - p2.age
+              }
+            })
+          }
+
+          return flpersons
+        }
+      },
+      methods: {
+        setOrderType(type) {
+          this.orderType = type
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

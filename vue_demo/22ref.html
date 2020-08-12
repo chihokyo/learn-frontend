@@ -1,0 +1,51 @@
+<html>
+
+<head>
+  <title>Vue ref
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 父组件开始监听事件并且触发 父组件 handleChange 事件 -->
+    <counter ref="one" @change='handleChange'></counter>
+    <counter ref="two" @change='handleChange'></counter>
+    <div>{{total}}</div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    Vue.component('counter',{
+      template: '<div @click="handleClick"> {{ number }}</div>',
+      data:function(){
+        return {
+          number:0
+        }
+      },
+      methods:{
+        handleClick:function(){
+          this.number++,
+          //子组件开始向父组件传递事件
+          this.$emit('change')
+        }
+      }
+    })
+      const vm = new Vue({
+        el:"#app",
+        data:{
+          total:0
+        },
+        methods:{
+          handleChange:function(){
+            // 需要使用dom啦
+            // 这里属于组件ref的话，这个时候获取的内容是counter子组件引用
+            one = this.$refs.one.number
+            two = this.$refs.two.number
+            this.total = one + two
+          }
+        }
+      })
+  </script>
+</body>
+
+</html>

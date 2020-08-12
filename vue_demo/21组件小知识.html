@@ -1,0 +1,51 @@
+<html>
+
+<head>
+  <title>Vue练习 组件小知识
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 这样写会有问题，就是不符合h5的table规范
+    <table>
+      <tbody>
+        <row></row>
+        <row></row>
+        <row></row>
+      </tbody>
+    </table>
+     -->
+
+     <table>
+       <tbody>
+         <tr is="row"></tr>
+         <tr is="row"></tr>
+         <tr is="row"></tr>
+       </tbody>
+     </table>
+    
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    // data这里必须写一个函数！不能是对象
+    // 一个子组件可以会被调用很多
+    // 因为子组件数据独立，不会有互相影响的情况
+    Vue.component('row',{
+      data:function(){
+        return {
+          content:'hello'
+        }
+      },
+      template:'<tr><td>{{content}}</td></tr>'
+    })
+
+    const vm = new Vue({
+      el:"#app",
+      
+    })
+  </script>
+</body>
+
+</html>

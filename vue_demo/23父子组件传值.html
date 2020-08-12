@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    Vue 父子组件传值
+  </title>
+</head>
+<body>
+
+  <div id="app">
+    <!-- 
+      加了冒号后面就不是一个单纯的字符串 而是一个js的表达式
+      表示的是数字
+      所以如果后面绑定的是一个数字类型的字符串的时候必须要加：冒号 
+    -->
+    <counter :count="0" @inc='handleInc'></counter>
+    <counter :count="0" @inc='handleInc'></counter>
+    <div> {{ total }}</div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+  // 错误示范子组件修改了父组件的数据
+  // let counter = {
+  //   // 接收父组件给的count
+  //   // 接收 count
+  //   props:['count'],
+  //   // 单向数据流的概念
+  //   template:'<div @click="handleClick"> {{ count }}</div>',
+  //   methods:{
+  //     // 单向数据流的概念 子组件不能去修改父组件中的数据
+  //     // 如果子组件修改了对象这些内容，引用型数据，可能会对其他子组件数据产生影响
+  //     // 如何解决这个问题可以在上面新增一个data属性
+  //     handleClick:function(){
+  //       this.count ++
+  //     }
+  //   }
+  // }
+
+  // 正确示范
+  let counter = {
+    props:['count'],
+    data:function(){
+      return {
+        number: this.count
+      }
+    },
+    template:'<div @click="handleClick"> {{ number }}</div>',
+    methods:{
+      handleClick: function(){
+        this.number = this.number + 2
+        // 向父组件触发事件
+        this.$emit('inc',2)
+      }
+    }
+  }
+
+  // 通用全局组件
+  const vm = new Vue({
+    el:'#app',
+    data:{
+      total:0
+    },
+    components:{
+      counter:counter
+    },
+    methods:{
+      handleInc: function(step){
+        this.total += step
+      }
+    }
+  })
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<html>
+
+<head>
+  <title>Vue 全局组件 局部组件 子传父 父传子
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <input id="textV" type="text" v-model="inputValue">
+    <button id="btn" @click='handleme'>submit</button>
+    <ul>
+      <todo-item v-bind:content='item'
+                  v-bind:index='index'
+                  v-for="(item,index) in list":key=index
+                  @delete='handleItemDelete'>
+      {{ item }}
+      </todo-item>
+    </ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    // // 全局组件
+    // // props和v-bind 传递参数
+    // // 驼峰命名，html用短横线
+    // Vue.component('TodoItem',{
+    //   props:['content'],
+    //   template: "<li> {{ content }}</li>"
+    // })
+    // const vm = new Vue({
+    //   el:"#app",
+    //   data: {
+    //     list : ['111','222'],
+    //     inputValue:' '         
+    //   },
+    //   methods: {
+    //     handleme:function(){
+    //       this.list.push(this.inputValue)
+    //       this.inputValue = ' '
+    //     }
+    //   }
+    // })
+
+    // 局部组件
+    let TodoItem = {
+      props:['content','index'],
+      template: "<li @click='handlClick'> {{ content }}</li>",
+      methods:{
+        handlClick:function(){
+          // 子传给父亲
+          // 其实传递的是一个事件
+          // 父组件监听
+          // 并且传递给了一个参数index
+          // 父传子 v-bind 和 props
+          // 子传父 $emit 事件
+          this.$emit("delete",this.index)
+        }
+      }
+    }
+    const vm = new Vue({
+      el:"#app",
+      data: {
+        list : ['111','222'],
+        inputValue:' '         
+      },
+      // 局部组件，通过对象注册
+      components:{
+        TodoItem:TodoItem
+      },
+      methods: {
+        handleme:function(){
+          this.list.push(this.inputValue)
+          this.inputValue = ' '
+        },
+        handleItemDelete:(index)=>{
+          this.list.splice(index,1)
+          
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

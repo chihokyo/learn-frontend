@@ -1,0 +1,67 @@
+<html>
+
+<head>
+  <title>Vue练习 常用指令
+  </title>
+  <style>
+    /* 属性选择器 */
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 
+      常用指令：
+      v-html  innerHTML
+      v-text  innerText
+      v-show  display控制
+      v-for   循环遍历数组对象
+      v-if    表示条件
+      v-else  false 和上面连用
+      v-bind  绑定数据 简写：
+      v-on    绑定事件 简写@
+      v-model 双向绑定
+      ref     指定唯一标识，vue对象通过$els属性访问
+      v-cloak 防止闪现 和css配合 [v-cloak]{display:none}
+     -->
+
+     <p ref='content'>我是天才</p>
+     <button @click='hint'>点击查看</button><br>
+     <!-- 从这里开始演示闪现 -->
+     <!-- 利用v-text的特性进行 -->
+     <!-- <p v-text='msg'>CHIHOKYO</p> -->
+     <!-- 上面写style的[属性选择器][v-cloak] -->
+     <!-- 利用原理 v指令在解析之前有，但是在解析之后不在，所以在解析之前设置为none，解析完之后显示了，所以也就完成任务了
+    解析之前：通过display none 进行隐藏
+    解析中： 显示{{}}
+    解析之后： v指令消失-->
+     <p v-cloak >{{ msg }}</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    // 这里可以检验闪现
+    // alert('hh')
+      const vm = new Vue({
+        el:"#app",
+        data: {
+          msg:'hello!!!'
+        },
+        methods: {
+          hint(){
+            // 通过唯一表示对象$refs进行获取
+            console.log(this.$refs) // 对象 {content: p}
+            console.log(this.$refs.content) // 标签本身 <p>我是天才</p>
+            console.log(this.$refs.content.innerText) // 标签内容 textContent也可以
+
+            alert(this.$refs.content.textContent)
+          }
+        }
+      })
+  </script>
+</body>
+
+</html>

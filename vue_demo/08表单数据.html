@@ -1,0 +1,83 @@
+<html>
+
+<head>
+  <title>Vue练习 表单数据
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 修改默认行为，不用提交上去 -->
+    <form action="" method="get" @submit.prevent='handleSubmit'>
+      <span>name</span>
+      <input type="text" name="name" id="" v-model='username'>
+      <span>password</span>
+      <input type="password" name="password" id="" v-model='pwd'>
+      <br>
+
+      <span>性别</span>
+      <input type="radio" name="" value="female" id="female" v-model='gender'>
+      <label for="female">女</label>
+      <input type="radio" name="" value="male" id="male" v-model='gender'>
+      <label for="male">男</label>
+      <br>
+
+      <span>爱好</span>
+      <input type="checkbox" name="" value="basket" id="basket" v-model='hobby'>
+      <label for="basket">篮球</label>
+      <input type="checkbox" value="footer" name="" id="footer" v-model='hobby'>
+      <label for="footer">足球</label>
+      <input type="checkbox" value="ping" name="" id="ping">
+      <label for="ping">乒乓球</label>
+      <br>
+
+      <span>城市</span>
+      <select name="" id="" v-model='cityId'>
+        <option value="">未选择</option>
+        <!-- :value这里必须要进行绑定才能选择默认！！！ -->
+        <option :value="city.id" v-for="(city, index) in allCity" :key='index'>
+          {{ city.name }}
+        </option>
+      </select>
+      <br>
+
+      <span>介绍</span>
+      <textarea name="" id="" cols="30" rows="10" v-model='intro'></textarea><br>
+
+      <input type="submit" value="提交">
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    const vm = new Vue({
+      el: "#app",
+      data: {
+        username: '',
+        pwd: '',
+        // 通过value进行默认选中
+        gender: 'female',
+        // 通过value进行默认选中
+        hobby: ['basket', 'footer'],
+        // 设计一个下拉框对象数组
+        allCity: [
+          { id: 1, name: '上海' },
+          { id: 2, name: '北京' },
+          { id: 3, name: '广州' },
+          { id: 4, name: '深圳' },
+        ],
+        // 默认下拉框选中
+        cityId: '4',
+        intro: ''
+      },
+      methods: {
+        handleSubmit() {
+          console.log(this.username + this.pwd + this.gender + this.hobby + this.allCity + this.intro)
+        }
+      }
+
+    })
+  </script>
+</body>
+
+</html>

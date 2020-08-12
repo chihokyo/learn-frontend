@@ -1,0 +1,43 @@
+<html>
+
+<head>
+  <title>Vue练习 过滤器(时间moment)
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 当需要对下面的数据进行格式上的修改时，使用自定义过滤器会比较好 -->
+    <h2>下面显示当前时间【未格式化】</h2>
+    <p>{{ currentTime }}</p>
+    <h2>下面显示当前时间【格式化】引入moment插件</h2>
+    <p>分享一个插件库 https://cdnjs.com/</p>
+    <p>{{ currentTime | dateFormat }}</p>
+    <p>{{ currentTime | dateFormat('MMMM') }}</p>
+    <p>{{ currentTime | dateFormat('MMM Do YY') }}</p>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <!-- 根据不同的地区，选择不同的时区和显示格式 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment-with-locales.min.js"></script>
+  
+  <script>
+    // 1 创建自定义过滤器
+    // 这里是函数对象进行使用 ① Vue是一个函数 ② 这里当对象用
+    // console.log(Vue.filter)
+    // Vue.filter('过滤器名字'，回调函数function（value表示输入值）{})
+    Vue.filter('dateFormat',function(value,format='llll'){
+
+      return moment(value).format(format)
+    })
+      const vm = new Vue({
+        el:"#app",
+        data: {
+          currentTime: new Date() // Tue Jul 28 2020 14:36:48 GMT+0900 (日本标准时间)
+        }
+      })
+  </script>
+</body>
+
+</html>

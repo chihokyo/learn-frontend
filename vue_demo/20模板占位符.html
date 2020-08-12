@@ -1,0 +1,37 @@
+<html>
+
+<head>
+  <title>Vue练习 模板占位符
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <!-- 这样就不用在多写一个div进行循环渲染了 -->
+    <template v-for="(user,index) in userData" :key='index'>
+      <div>
+        {{ user.id }}
+      </div>
+      <div>
+        {{ user.name }}
+      </div>
+    </template>
+    
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+        el:"#app",
+        data: {
+         userData:[
+           {id:11,name:'he1'},
+           {id:22,name:'he2'},
+           {id:33,name:'he3'},
+           ]
+        }
+      })
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<html>
+
+<head>
+  <title>Vue 计算属性的getattr和setattr
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    {{ fullname }}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+        el:"#app",
+        data: {
+          firstname:'chin',
+          lastname:'hokyo'
+        },
+        computed:{
+          // 写法1
+          // fullname:function() {
+          //   return this.firstname + '' +this.lastname
+          // }
+          // 写法2
+          fullname:{
+            get:function(){
+              return this.firstname + '====' + this.lastname
+            },
+            // 监听变化 双向绑定
+            set:function(value){
+              let arr = value.split(" ")
+              this.firstname = arr[0]
+              this.lastname = arr[1]
+            }
+          }
+        }
+      })
+  </script>
+</body>
+
+</html>

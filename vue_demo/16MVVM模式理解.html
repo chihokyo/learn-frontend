@@ -1,0 +1,66 @@
+<html>
+
+<head>
+  <title>Vue MVVM模式理解
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <input id="textV" type="text" v-model="inputValue">
+    <button id="btn" @click='handleme'>submit</button>
+    <ul id="ul">
+      <!-- 有顺序的 先value 后key -->
+      <li v-for="(item,index) in list" :key=item>{{ item }}</li>
+    </ul>
+
+  </div>
+
+  <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+  <script src="https://code.jquery.com/jquery-1.12.4.js" integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU=" crossorigin="anonymous"></script>
+  <script>
+    // // 操作数据，而不是dom
+    //   const vm = new Vue({
+    //     el:"#app",
+    //     data: {
+    //       list : ['111','222'],
+    //       inputValue:' '         
+    //     },
+    //     methods: {
+    //       handleme:function(){
+    //         this.list.push(this.inputValue)
+    //         this.inputValue = ' '
+    //       }
+    //     }
+    //   })
+      // MVP模式 jq写法
+      // V -- view DOM 视图
+      // P -- 控制器  通过P来控制V 这是最核心的
+      // 这里基本上都是dom操作，会越来越肥大
+      // M 模型层 ajax数据等等
+      function Page(){
+        
+      }
+
+      $.extend(Page.prototype,{
+        init: function(){
+          this.bindEvents()
+        },
+        bindEvents:function(){
+          var btn = $('#btn')
+          btn.on('click',$.proxy(this.handelBtn,this))
+        },
+        handelBtn: function(){
+          var input = $("#textV")
+          var inputValue = input.val()
+          var ul = $("#ul")
+          ul.append('<li>'+ inputValue +'</li>')
+          input.val('')
+        }
+      })
+      var page = new Page()
+      page.init()
+  </script>
+</body>
+
+</html>

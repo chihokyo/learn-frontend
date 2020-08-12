@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    Vue props传递属性
+  </title>
+</head>
+<body>
+
+  <div id="app">
+    <!--
+    这里是props特性 父传了，子就会接收。页面也不会显示有个
+    <child></child> 这样的属性
+    如果子组件并没有接收父组件传过来的数据，那么就会报错并且显示在页面的属性里面
+    <child parent="yess"></child>
+    -->
+    <child parent="yess"></child>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+  // 这样写会报错，原因是传递的变量名不能是parentData ,所以我改成parent
+  /*
+   Vue tip]: Prop "parentdata" is passed to component <Anonymous>, 
+    but the declared prop name is "parentData". 
+    Note that HTML attributes are case-insensitive and camelCased props need 
+    to use their kebab-case equivalents when using in-DOM templates. 
+    You should probably use "parent-data" instead of "parentData".
+  */
+  Vue.component('child',{
+    // props:['parent'],
+    // 对传递过来的数据进行约束
+    // props 后面就不是数组，而是一个对象，key就是传递过来的数据。
+    // 然后value就是写约束条件的地方
+    props:{
+      parent:{
+        type:String,//多选[Number,String]
+        required:false,
+        default:'helloo',
+        // 自定义叫校验器
+        validator:function(value){
+          return (value.length > 5)
+        }
+      }
+    },
+    template:'<div> {{ parent }}</div>'
+  })
+  const vm = new Vue({
+    el:'#app',
+  })
+</script>
+</body>
+</html>

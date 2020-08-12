@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>
+    Vue 事件修饰符&原生事件
+  </title>
+</head>
+<body>
+
+  <div id="app">
+    <!-- 这样写的话，就会被认为是自定义事件，并不会触发 -->
+    <!-- <child @click.native='handleClick'></child> -->
+    <!-- 这里属于的是原生事件,但必须使用native -->
+    <child @click.native='handleClick'></child>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+
+  Vue.component('child',{
+    // 这里点击才有效，外面是不会有效的，除非增加事件修饰符把上面的
+    // <child @click='handleClick'></child>
+    // <child @click.native='handleClick'></child> 修改成这样
+    template:'<div @click="handleClick">Child</div>',
+    methods:{
+      handleClick:function(){
+        alert('child alert')
+      }
+    }
+  })
+
+  const vm = new Vue({
+    el:'#app',
+    methods:{
+      handleClick:function(){
+        alert('out alert')
+      }
+    }
+  })
+</script>
+</body>
+</html>

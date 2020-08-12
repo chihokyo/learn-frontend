@@ -1,0 +1,36 @@
+<html>
+
+<head>
+  <title>Vue新练习 基本操作
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <h1> {{ content }}</h1>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+    // DOM操作
+    // var dom = document.getElementById("app")
+    // dom.innerHTML = 'yes'
+    // setTimeout(
+    //   ()=>dom.innerHTML = 'no',
+    //   1000)
+
+    // Vue操作
+    const vm = new Vue({
+      // 限制vue实例
+      el:"#app",
+      data: {
+        content:'hello'
+      }
+    })
+    setTimeout(()=> {
+      vm.content = 'yessss'
+    }, 1000);
+  </script>
+</body>
+
+</html>

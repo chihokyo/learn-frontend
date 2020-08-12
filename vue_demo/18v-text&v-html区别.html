@@ -1,0 +1,33 @@
+<html>
+
+<head>
+  <title>Vue练习 v-text/v-html区别
+  </title>
+</head>
+
+<body>
+  <div id="app">
+    <h1>有标签</h1>
+    <div v-text='name'></div>
+    <div v-html='name'></div>
+    <h1>没有标签</h1>
+    <div v-text='nameTag'></div>
+    <div v-html='nameTag'></div>
+    <h1>Vue标签语法</h1>
+    {{ name }}<br/>
+    {{ nameTag }}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      const vm = new Vue({
+        el:"#app",
+        data: {
+         name:'Vue Yes!',
+         nameTag:'<h2>h2 Yes!!</h2>'
+        }
+      })
+  </script>
+</body>
+
+</html>
