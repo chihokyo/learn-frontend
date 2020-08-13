@@ -36,7 +36,9 @@ module.exports = {
     rules: [
       // 顺序固定必须style-loader，css-loader
       // 但是会从后向前调用
-      { test: /\.css$/, use: ['style-loader', 'css-loader'] }
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
+      // less加载器设置
+      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] }
     ]
   }
 }
