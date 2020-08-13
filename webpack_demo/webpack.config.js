@@ -38,7 +38,10 @@ module.exports = {
       // 但是会从后向前调用
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
       // less加载器设置
-      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] }
+      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] },
+      // sass加载器设置 
+      // 注意，后缀名是scss，加载器是sass
+      { test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader'] }
     ]
   }
 }
