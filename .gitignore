@@ -1,3 +1,7 @@
 .DS_Store
 npm-debug.log*
 todolist_express_mongodb/node_modules
+node_modules*
+webpack_demo/dist/
+webpack_demo/.vscode
+.DS_Store*
