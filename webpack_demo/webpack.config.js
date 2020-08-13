@@ -4,6 +4,8 @@
  * webpack4.0 默认打包入口文件 src -> index.js
  * 默认打包出口文件 dist -> main.js
  * 预览页面插件 html-webpack-plugin
+ * 由于webpack默认只能处理js文件
+ * 所以需要处理css打包的时候需要加载器
  */
 
 // 导入nodejs里路径path模块
@@ -28,5 +30,13 @@ module.exports = {
     filename: 'bundle.js'
   },
   // 预览页面配置节点
-  plugins: [htmlPlugin]
+  plugins: [htmlPlugin],
+  // css打包加载器
+  module: {
+    rules: [
+      // 顺序固定必须style-loader，css-loader
+      // 但是会从后向前调用
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] }
+    ]
+  }
 }
