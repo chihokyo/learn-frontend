@@ -150,3 +150,9 @@ taskBox.on("keyup", function(){
         $(this).trigger("blur")
     }
 })
+
+taskBox,on("keyup", function(){
+    if (e.keyCode == 13) {
+        $(this).trigger("blur")
+    }
+})
