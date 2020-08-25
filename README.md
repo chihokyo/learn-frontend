@@ -28,14 +28,16 @@ Vue基础知识，项目练习。
     module.exports = {
     mode: 'development'
     }
-
 - 设置 package.json
 "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack"
   },
-
 - 启动 `npm run dev`进行打包
+
+### gulp_demo
+
+最基础的gulp入门实现编译 + 热更新网页
 
 ### 其他待定知识...
 
@@ -44,3 +46,8 @@ webpack,express,bable,sass,小工具，各种配置和脚手架预定。
 ## 2.部分更新日志
 
 2020/7/28 初稿
+
+2020/8/24 整理
+
+- 添加部分demo
+- 增加gulp入门用法
