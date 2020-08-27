@@ -135,24 +135,11 @@ taskBox.on('blur', '.edit', function () {
     modifyAjax(id,newTaskName)
 })
 
-// // 回车键修改
-// taskBox.on('keyup','.edit', function(e){
-//     if (e.keyCode == 13) {
-//         let newTaskName = $(this).val()
-//         let id = $(this).siblings().find('button').attr('data-id')
-//         modifyAjax(id,newTaskName)  
-//     }
-// })
-
-// 使用trigger 触发
-taskBox.on("keyup", function(){
-    if(e.keyCode == 13){
-        $(this).trigger("blur")
-    }
-})
-
-taskBox,on("keyup", function(){
+// 回车键修改
+taskBox.on('keyup','.edit', function(e){
     if (e.keyCode == 13) {
-        $(this).trigger("blur")
+        let newTaskName = $(this).val()
+        let id = $(this).siblings().find('button').attr('data-id')
+        modifyAjax(id,newTaskName)  
     }
 })
