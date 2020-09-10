@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>6.小案例，显示人员信息</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="test1"></div>    
+    <div id="test2"></div>    
+    <script type="text/babel">
+    // 正常的写法
+    // 1.定义组件
+    function Person(props){
+      return <ul>
+                <li>name == {props.name}</li>
+                <li>age == {props.age}</li>
+                <li>gender == {props.gender}</li>
+            </ul>
+    }
+
+    // 写点数据
+    const p1 = {
+      name:'kitty',
+      age:20,
+      gender:'女'
+    }
+
+    // 2.渲染组件标签
+    //ReactDOM.render(<Person name={p1.name} age={p1.age} gender={p1.gender}/>,document.getElementById('test1'))
+    ReactDOM.render(<Person {...p1}/>,document.getElementById('test1'))
+
+    // 指定默认属性值
+    // 写点数据
+    const p2 = {
+      name:'Tom'
+    }
+    // 指定默认值写法
+    Person.defaultProps = {
+      gender:'man',
+      age:18
+    }
+    // 这里是需要引入模块的 
+    // Person.propTypes = {
+    //   name: propTypes.string.isRequired,
+    //   age: propTypes.number
+    // }
+    // 2.渲染组件标签
+    ReactDOM.render(<Person name={p2.name}/>,document.getElementById('test2'))
+    </script>
+  </body>
+</html>

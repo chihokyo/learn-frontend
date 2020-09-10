@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>4.组件化初体验</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="test1"></div>    
+    <div id="test2"></div>    
+    <script type="text/babel">
+    /*  
+        1.定义组件
+        2.渲染组件标签。
+    */
+    
+    // 方式1 工厂函数(简单组件)
+    function MyComponent(){
+        // 既然渲染的是虚拟dom，所以这个时候return的就应该是虚拟dom
+        // return <h2>这个地方就是组件</h2>
+        return <h2>简单组件</h2>  
+    }
+    // 渲染组件标签
+    ReactDOM.render(<MyComponent/>, document.getElementById('test1'))
+
+    // 方式2 ES6类组件（复杂组件）
+
+    class MyComponentClass extends React.Component {
+        
+        render () {
+            // 组件实例对象
+            console.log(this)
+            return  <h2>复杂组件</h2>  
+        }
+    }
+
+    // 渲染组件标签
+    // 通过继承了一个react的class然后创建实例化一个对象，调用render方法
+    // 得到一个虚拟dom进行渲染
+    // 这就是这样一个过程
+    ReactDOM.render(<MyComponentClass/>, document.getElementById('test2'))
+
+    </script>
+  </body>
+</html>

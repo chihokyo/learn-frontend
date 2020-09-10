@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>5.小案例【喜欢】</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+      <!-- 需求
+      自定义组件
+      1 显示h2标题 初始文本我爱你
+      2 点击成为你爱我 -->
+    <div id="root"></div>    
+    <script type="text/babel">
+    // 1.定义组件
+    class Like extends React.Component {
+      
+      // es6语法 初始化
+      constructor (props) {
+        // 调用父类型的函数传递props
+        super(props)
+        // 初始化状态,这是一个对象
+        this.state = {
+          isLikeMe: true
+        }
+        // 将新增方法强制绑定为组件对象
+        // !!!这里最难理解
+        this.handleClick = this.handleClick.bind(this)
+      }
+
+      // 到这里是会报错的，因为这里的this并不是组件对象了
+      // 新增的方法this默认不是组件对象，而是undefined
+      // 为了改变这个状态，就在上面的handleclick里面bind到了this
+      // 这个时候handleClick并没有直接被调用，而是在初始化函数里被调用的，那么指向肯定就是没有问题
+      handleClick () {
+        console.log(this)
+        // 获取状态
+        console.log(this.state.isLikeMe)
+        const isLikeMe = !this.state.isLikeMe
+        console.log(isLikeMe)
+        // 更新状态
+        // this.setState({isLikeme:isLikeme}) ===>>> this.setState({isLikeme})
+        this.setState({isLikeMe})
+      }
+
+      render () {
+        console.log(this.state)
+          const {isLikeMe} = this.state
+          // 用的大写，用于区别原生点击事件 
+          // onClick PK onclick
+          // this：组件对象
+          return <h2 onClick={this.handleClick}>{isLikeMe?'你爱我':'我爱你'}</h2>
+      }
+    }
+
+
+    // 2.渲染组件标签
+    //  <Like/> ====>>>> <Like></Like>
+    ReactDOM.render(<Like/>, document.getElementById('root'))
+
+    </script>
+  </body>
+</html>
