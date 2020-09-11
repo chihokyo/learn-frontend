@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>TodoList</title>
+  <!-- 这个是核心库 -->
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <!-- 这里是拓展库 -->
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- 没有这个就无法解析jsx到js -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- 这个案例在父传子的时候整体缺少检查参数的方法
+    propTypes
+    需要导入，目前是html所以无法导入。
+    但是在子类里面检查父类传过来的参数的时候是要使用这个的 
+  -->
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+    class App extends React.Component {
+
+      constructor(props) {
+        super(props)
+        // 初始化 数据传到下面
+        this.state = {
+          todos: ['学习1', '学习2', '学习3', '学习4']
+        }
+
+        this.addTodo = this.addTodo.bind(this)
+      }
+
+      addTodo(todo) {
+        // this.state.todos.unshift(todo) 不能这么写
+        // 获取状态
+        const { todos } = this.state
+        // 添加到todos
+        todos.unshift(todo)
+        // 更新状态
+        this.setState({ todos })
+      }
+
+      render() {
+        return (
+          // 一个组件只能有一个根标签
+          // 必须要加this，不然当前作用域无法找到对象
+          <div>
+            <h1>TodoList</h1>
+            <Add count={this.state.todos.length} addTodo={this.addTodo} />
+            <List todos={this.state.todos} />
+          </div>
+        )
+      }
+    }
+
+    class Add extends React.Component {
+
+      constructor(props) {
+        super(props)
+
+        this.handleAdd = this.handleAdd.bind(this)
+      }
+
+      handleAdd() {
+        // 子组件不能直接改变父组件状态
+        // 状态在那个组件，更新的行为就应该在哪个组件
+        // 1读取输入的数据，2检查合法性，3添加 4清空输入栏
+        const todo = this.todoInput.value.trim()
+
+        if (!todo) {
+          return
+        }
+        this.props.addTodo(todo)
+        this.todoInput.value = ''
+      }
+
+      render() {
+        return (
+          <div>
+            <input type="text" ref={(input) => this.todoInput = input} />
+            <button onClick={this.handleAdd}> add {this.props.count + 1}</button>
+          </div>
+        )
+      }
+    }
+
+    class List extends React.Component {
+      render() {
+        return (
+          <ul>
+            {
+              this.props.todos.map((todo, index) => { return <li key={index}>{todo}</li> })
+            }
+          </ul>
+        )
+      }
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'))
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>9.显示信息小案例</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        class LoginForm extends React.Component {
+
+            constructor(props) {
+                super(props)
+                // 初始化状态
+                this.state = {
+                    pwd: ''
+                }
+                this.handleSubmit = this.handleSubmit.bind(this)
+                this.handleChange = this.handleChange.bind(this)
+            }
+
+            handleSubmit(event) {
+                const name = this.nameInput.value
+                const { pwd } = this.state
+                alert(`用户名是${name},密码是${pwd}`)
+                event.preventDefault()
+            }
+
+            handleChange(event) {
+                // 读取数值
+                const pwd = event.target.value
+                // 更新state里面pwd状态
+                // 这里切记要写{pwd}
+                this.setState({ pwd })
+            }
+
+            render() {
+                return (
+                    <form action="/" onSubmit={this.handleSubmit}>
+                        用户名：<input type="text" ref={input => this.nameInput = input} /> <br />
+                        密码：<input type="password" value={this.state.pwd} onChange={this.handleChange} /><br />
+                        <input type="submit" value="提交" />
+                    </form>
+                )
+            }
+        }
+
+        ReactDOM.render(<LoginForm />, document.getElementById('root'))
+
+    </script>
+</body>
+
+</html>

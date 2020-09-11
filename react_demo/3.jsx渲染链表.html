@@ -1,35 +1,38 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>3.jsx渲染链表</title>
-    <!-- 这个是核心库 -->
-    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-    <!-- 这里是拓展库 -->
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-    
-    <!-- 没有这个就无法解析jsx到js -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>    
-    <script type="text/babel">
-        /* 这里最重要的就是把name转换成一个带标签的name
-        ** 就使用了map的方法对数组的值进行遍历
-        */
-        // 创建虚拟DOM
-        // 但是标签和js是结合在一起的。这点UI应该是看不懂React的代码的
-        const nameArr = ['JQ','js','vue','react']
-        // 嵌套结构小括号
-        const ul = (
-            <ul>
-                {
-                    nameArr.map((name, index) => <li key={index}>{name}</li>)
-                }
-            </ul>
-        )
-        // 渲染
-        ReactDOM.render(ul,document.getElementById('root'))
-    </script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>3.jsx渲染链表</title>
+  <!-- 这个是核心库 -->
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <!-- 这里是拓展库 -->
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- 没有这个就无法解析jsx到js -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    /* 这里最重要的就是把name转换成一个带标签的name
+    ** 就使用了map的方法对数组的值进行遍历
+    */
+    // 创建虚拟DOM
+    // 但是标签和js是结合在一起的。这点UI应该是看不懂React的代码的
+    const nameArr = ['JQ', 'js', 'vue', 'react']
+    // 嵌套结构小括号
+    const ul = (
+      <ul>
+        {
+          nameArr.map((name, index) => <li key={index}>{name}</li>)
+        }
+      </ul>
+    )
+    // 渲染
+    ReactDOM.render(ul, document.getElementById('root'))
+  </script>
+</body>
+
 </html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>11.虚拟DOM和DIFF算法演示</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        class Time extends React.Component {
+
+            constructor(props) {
+                super(props)
+                this.state = {
+                    date: new Date()
+                }
+            }
+
+            componentWillMount() {
+                console.log('componentWillMount()')
+                setInterval(() => {
+                    this.setState({
+                        date: new Date()
+                    })
+                }, 1000)
+            }
+
+            render() {
+                console.log('render()')
+
+                return (
+                    <p>
+                        HelloWorld
+                        <input type="text" name="" id="" />
+                        <span> 现在时间是：{this.state.date.toTimeString()}</span>
+                    </p>
+                )
+            }
+
+        }
+
+        ReactDOM.render(
+            <Time />,
+            document.getElementById('root')
+        )
+    </script>
+</body>
+
+</html>

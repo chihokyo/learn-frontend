@@ -1,33 +1,35 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>2.虚拟dom渲染</title>
-    <!-- 这个是核心库 -->
-    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-    <!-- 这里是拓展库 -->
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-    
-    <!-- 没有这个就无法解析jsx到js -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  </head>
-  <body>
-    <div id="test1"></div>
-    <div id="test2"></div>
-    
-    <script type="text/javascript">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>2.虚拟dom渲染</title>
+  <!-- 这个是核心库 -->
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <!-- 这里是拓展库 -->
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- 没有这个就无法解析jsx到js -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="test1"></div>
+  <div id="test2"></div>
+
+  <script type="text/javascript">
     // 第一种渲染方式,text/javascript
     const msg1 = 'I like React1'
     const myid1 = 'chinhokyo1'
     // 1.创建虚拟dom
     // 这个是本质，最后都会转换到这里面向对象
-    const vDom1 = React.createElement('h2',{id:myid1.toLowerCase()},msg1.toUpperCase())
+    const vDom1 = React.createElement('h2', { id: myid1.toLowerCase() }, msg1.toUpperCase())
     debugger
     // 2.渲染
-    ReactDOM.render(vDom1,document.getElementById('test1'))
-    </script>
+    ReactDOM.render(vDom1, document.getElementById('test1'))
+  </script>
 
-    <script type="text/babel">
+  <script type="text/babel">
     // 第二种渲染方式,text/babel
     const msg2 = 'I like React2'
     const myid2 = 'chinhokyo2'
@@ -35,8 +37,9 @@
     const vDom2 = <h3 id={myid2.toLowerCase()}>{msg2.toUpperCase()}</h3>
     debugger
     // 2 渲染虚拟dom
-    ReactDOM.render(vDom2,document.getElementById('test2'))
+    ReactDOM.render(vDom2, document.getElementById('test2'))
 
-    </script>
-  </body>
+  </script>
+</body>
+
 </html>

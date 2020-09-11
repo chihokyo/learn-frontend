@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>10.案例生命周期</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+
+        class Life extends React.Component {
+
+            constructor(props) {
+                super(props)
+                // 初始化状态
+                this.state = {
+                    opacityStatus: 1
+                }
+
+                this.handlePause = this.handlePause.bind(this)
+            }
+
+            handlePause() {
+                // 这里会直接删除节点
+                // 定时器会造成内存泄漏
+                console.log('开始删除node节点')
+                ReactDOM.unmountComponentAtNode(document.getElementById('root'))
+            }
+
+            // 【生命周期】挂载之前 执行1次，用于初始化
+            componentWillMount() {
+                console.log('生命周期[挂载之前]：componentWillMount（）')
+            }
+
+            // 【生命周期】挂载 执行1次，用于初始化
+            componentDidMount() {
+                console.log('生命周期[挂载了]：componentDidMount（）')
+                console.log('定时器开始执行')
+                this.intervalId = setInterval(function () {
+                    /*
+                        紧急注意! 因为是定时器，所以默认的this指向为window
+                        这里如果要改变指向2种做法
+                        1 使用箭头函数
+                        2 bind(this) ==>> 这个this就是生命周期函数的this componentDidMount
+                    */
+                    console.log('定时器执行了')
+                    let opacityStatus = this.state.opacityStatus
+                    opacityStatus -= 0.1
+                    if (opacityStatus <= 0) {
+                        opacityStatus = 1
+                    }
+                    // 这里一定要记得更新状态
+                    this.setState({ opacityStatus })
+                }.bind(this), 200)
+            }
+
+            // 【生命周期】将要更新
+            componentWillUpdate() {
+                console.log('生命周期[将要更新]：componentWillUpdate（）')
+            }
+
+            // 【生命周期】已经更新
+            componentDidUpdate() {
+                console.log('生命周期[已经更新]：componentDidUpdate（）')
+            }
+
+            // 将要卸载 执行1次，用于死亡
+            // 清理定时器
+            componentWillUnmount() {
+                console.log('生命周期：componentWillUnmount（）')
+                clearInterval(this.intervalId)
+            }
+
+
+            render() {
+                console.log('生命周期：render（）')
+                // const {opacity} = this.state
+                const opacity = this.state.opacityStatus
+                return (
+                    <div>
+                        <h3 style={{ opacity: opacity }}>{this.props.msg}</h3>
+                        <button onClick={this.handlePause}>暂停</button>
+                    </div>
+                )
+            }
+        }
+        ReactDOM.render(<Life msg="react easy" />, document.getElementById('root'))
+    </script>
+</body>
+
+</html>
