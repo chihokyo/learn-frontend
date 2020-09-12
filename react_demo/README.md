@@ -97,7 +97,7 @@ JavaScript ＋ XML = JSX。**浏览器无法直接识别jsx**，所以需要babe
 
 也都是为了对应日益复杂增大的项目本身所拆分出来的思想。
 
-## 3.面向组件
+## 3. 面向组件
 
 面向过程，面向对象，面向模块，面向组件。
 
@@ -241,9 +241,393 @@ const arr2 = [6,1,2,3,9] =====>>> const arr2 = [6,...arr1,9]
 
 ### 3.refs
 
-这里参考一下案例7，感觉就是跟vue一样，是用来定位
+这里参考一下案例7，感觉就是跟vue一样，是用来标识定位
 
 看网上教程，这个refs又有了新的用法。但是本质还是没变的。
 
 这些框架的API经常变化，但其实事实上只是用法上稍微有了点变化，想要实现的原理几乎不会变化。比如要取特定的实例的值，要获得这个实例，那么基本上就是围绕着这个目的进行的变化，更简便的写而已。
+
+状态是组件内部状态state，props是外部的，外部的数据，写标签的时候进行传递的。
+
+无论是内部还是外部改变，那么组件本身都要改变。
+
+## 4. 组件化Code思路
+
+> 1 **拆分组件**，看看页面有几个组件这样。
+>
+> 2 **实现静态组件**，静态的先实现。
+>
+> 3 **实现动态组件**。
+>
+> 动态显示初始化数据
+>
+> 交互功能（监听事件）
+
+如果是以todolist做例子的话。
+
+### 第1步。拆分组件，拆分成三个部分
+
+```javascript
+class App extends React.Component {
+        render () {
+          return ()
+        }
+      }
+
+      class Add extends React.Component {
+        render () {
+          return ()
+        }
+      }
+
+      class List extends React.Component {
+        render () {
+          return ()
+        }
+      }
+
+ReactDOM.render(<App />, document.getElementById('root'))
+```
+
+### 第2步。静态呈现。
+
+```javascript
+class App extends React.Component {
+        render () {
+          return (
+            // 一个组件只能有一个根标签
+            <div>
+              <h1>TodoList</h1>
+              <Add />
+              <List />
+            </div>
+          )
+        }
+      }
+
+      class Add extends React.Component {
+        render () {
+          return (
+            <div>
+              <input type="text" name="" id="" />
+              <button> add #</button>
+            </div>
+          )
+        }
+      }
+
+      class List extends React.Component {
+        render () {
+          return (
+            <ul>
+              <li>jq</li>
+              <li>js</li>
+              <li>vue</li>
+              <li>react</li>
+            </ul>
+          )
+        }
+      }
+
+      ReactDOM.render(<App />, document.getElementById('root'))
+```
+
+### 第3步。动态组件
+
+那么数据存储在哪个组件上呢，因为这个模式是列表，所以数据应该放在APP，因为APP是相同的父组件
+
+看组件是某个组件需要，还是某些组件需要。如果是某些组件，那么就要找共同的父亲。
+
+此处放个代码连接。
+
+## 5. 获取表单
+
+几乎就都实现了。
+
+原生onchange事件在失去焦点触发
+
+但是React里面不是。
+
+受控组件 表单项输入数据自动继承状态
+
+非受控组件 需要手动读取表单输入框的 数据
+
+非受控组件自己读取。所以在操作的时候是**读取**
+
+```javascript
+用户名：<input type="text" ref={input => this.nameInput = input} /> <br/>
+```
+
+受控组件自己去控制状态
+
+```javascript
+密码：<input type="password" value={this.state.pwd} onChange={this.handleChange}/><br/>
+```
+
+## 6. 组件生命周期
+
+**官方文档**：https://zh-hans.reactjs.org/docs/react-component.html
+
+官方这里有图谱，描述了生命周期的整个过程。
+
+https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/
+
+是对象的生命周期
+
+jq就是那种命令式编程。所有的工作都要你来做，都是你自己控制没有自己执行。
+
+但是react这些框架就是生命编程。其实已经定义好了整个流程，生命的阶段，你几乎不用控制这些。
+
+所以才有了生命周期。
+
+什么是生命周期函数，也成为钩子。在特定时间进行调用。
+
+回调函数就是你定义的，你没有调用，但最终执行了。
+
+render方法是你定义的，但是你没有调用，但最终执行了
+
+这里是一个完成的React生命周期。
+
+!(https://raw.githubusercontent.com/chihokyo/image_host/master/20200911155155.png)
+
+其实最主要的就是挂载前，挂载中，挂载后。
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20200911154242.png)
+
+补充一个写法问题
+
+一般类组件里面
+
+*render*写在最下面
+
+*constructor*写在最上面
+
+生命周期跟写的函数顺序无关，就是框架执行顺序而已。有部分生命周期函数并没有写，因为涉及其他父子组件传递数据问题。
+
+```javascript
+class Life extends React.Component {
+
+    constructor(props) {
+        super(props)
+        // 初始化状态
+        this.state = {
+            opacityStatus: 1
+        }
+
+        this.handlePause = this.handlePause.bind(this)
+    }
+
+    handlePause() {
+        // 这里会直接删除节点
+        // 定时器会造成内存泄漏
+        console.log('开始删除node节点')
+        ReactDOM.unmountComponentAtNode(document.getElementById('root'))
+    }
+    
+    // 【生命周期】挂载之前 执行1次，用于初始化
+    componentWillMount() {
+        console.log('生命周期[挂载之前]：componentWillMount（）')
+    }
+
+    // 【生命周期】挂载 执行1次，用于初始化
+    componentDidMount() {
+        console.log('生命周期[挂载了]：componentDidMount（）')
+        console.log('定时器开始执行')
+        this.intervalId = setInterval(function () {
+            /*
+                紧急注意! 因为是定时器，所以默认的this指向为window
+                这里如果要改变指向2种做法
+                1 使用箭头函数
+                2 bind(this) ==>> 这个this就是生命周期函数的this componentDidMount
+            */
+            console.log('定时器执行了')
+            let opacityStatus = this.state.opacityStatus
+            opacityStatus -= 0.1
+            if (opacityStatus <= 0) {
+                opacityStatus = 1
+            }
+            // 这里一定要记得更新状态
+            this.setState({ opacityStatus })
+        }.bind(this), 200)
+    }
+
+    // 【生命周期】将要更新
+    componentWillUpdate() {
+        console.log('生命周期[将要更新]：componentWillUpdate（）')
+    }
+    
+     // 【生命周期】已经更新
+    componentDidUpdate(){
+        console.log('生命周期[已经更新]：componentDidUpdate（）')
+    }
+
+    // 将要卸载 执行1次，用于死亡
+    // 清理定时器
+    componentWillUnmount() {
+        console.log('生命周期：componentWillUnmount（）')
+        clearInterval(this.intervalId)
+    }
+
+
+    render() {
+        console.log('生命周期：render（）')
+        // const {opacity} = this.state
+        const opacity = this.state.opacityStatus
+        return (
+            <div>
+                <h3 style={{ opacity: opacity }}>{this.props.msg}</h3>
+                <button onClick={this.handlePause}>暂停</button>
+            </div>
+        )
+    }
+}
+ReactDOM.render(<Life msg="react easy" />, document.getElementById('root'))
+```
+
+## 7. 虚拟DOM&DIFF()
+
+虚拟dom的目的就是为了更少的去操作真实dom
+
+diff就是一种判断算法，看哪里需要更新，哪里不需要更新。
+
+在组件进行render的时候会计算哪些区域需要更新，哪些区域不需要更新。
+
+```javascript
+class Time extends React.Component {
+
+            constructor(props) {
+                super(props)
+                this.state = {
+                    date: new Date()
+                }
+            }
+
+            componentWillMount() {
+                console.log('componentWillMount()')
+                setInterval(() => {
+                    this.setState({
+                        date: new Date()
+                    })
+                }, 1000)
+            }
+
+            render() {
+                console.log('render()')
+
+                return (
+                    <p>
+                        HelloWorld
+                        <input type="text" name="" id="" />
+                        <span> 现在时间是：{this.state.date.toTimeString()}</span>
+                    </p>
+                )
+            }
+
+        }
+
+        ReactDOM.render(
+            <Time />,
+            document.getElementById('root')
+        )
+```
+
+这些
+
+ 【初期显示】
+
+创建虚拟DOM树→真实DOM树→绘制页面显示
+
+【更新显示】
+
+*setState()*更新状态→重新创建虚拟DOM树
+
+→新旧对比差异 =====>>>>  **这里就需要DIFF算法，做到最小范围内的重绘**→
+
+→更新差异对应真实DOM→局部重新绘制
+
+查找全局下载根目录
+
+```shell
+$ npm root -g
+/usr/local/lib/node_modules
+$ cd /usr/local/lib/node_modules
+```
+
+## 8. 项目安装
+
+```shell
+npx create-react-app my-app
+cd my-app
+npm start
+```
+
+关于这个文件的解释
+
+```javascript
+import * as serviceWorker from './serviceWorker';
+serviceWorker.unregister();
+
+/*service worker是在后台运行的一个线程，可以用来处理离线缓存、消息推送、后台自动更新等任务。
+registerServiceWorker就是为react项目注册了一个service worker，用来做资源的缓存，这样你下次访问时，就可以更快的获取资源。而且因为资源被缓存，所以即使在离线的情况下也可以访问应用（此时使用的资源是之前缓存的资源）。
+但有一点要注意，registerServiceWorker注册的service worker 只在生产环境中生效（process.env.NODE_ENV === 'production'），所以开发的时候，可以注释掉。
+当然了，在生产环境中，你也可以选择使用或者不适用这个功能.
+*/
+```
+
+接下来是App.js
+
+```javascript
+import React from 'react';
+import logo from './logo.svg';
+import './App.css';
+
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+
+// // 下面这个写法也可以
+// import React from 'react'
+// // import React, { Component } from 'react'
+// import logo from './logo.svg'
+// import './App.css'
+
+// class App extends React.Component {
+//   render () {
+//     return (
+//       <div className="App">
+//         <header className="App-header">
+//           <img src={logo} className="App-logo" alt="logo" />
+//           <h1 className="App-title">
+//             Hello React
+//           </h1>
+//         </header>
+//         <p className="App-intro">
+//           to!!
+//         </p>
+//       </div>
+//     )
+//   }
+// }
+
+// export default App
+```
 
