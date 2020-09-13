@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>12.使用GithubAPI搜索ajax</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- axios异步通信插件 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.20.0/axios.js"
+        integrity="sha512-nqIFZC8560+CqHgXKez61MI0f9XSTKLkm0zFVm/99Wt0jSTZ7yeeYwbzyl0SGn/s8Mulbdw+ScCG41hmO2+FKw=="
+        crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        class MostStarGithub extends React.Component {
+            // 定义内部变量
+            state = {
+                githubName: '',
+                githubUrl: ''
+            }
+            componentDidMount() {
+                // 发送请求
+                const url = 'https://api.github.com/search2/repositories?q=re&sort=stars'
+                axios.get(url)
+                    .then(response => {
+                        const result = response.data
+                        // console.log(result.items[0])
+                        const { name, html_url } = result.items[0]
+                        this.setState({ githubName: name, githubUrl: html_url })
+                    })
+                    //这里是异常写法
+                    .catch((error) => {
+                        alert(error.message)
+                    })
+            }
+            render() {
+                const { githubName, githubUrl } = this.state
+                if (!githubName) {
+                    return <h2> Loading... </h2>
+                } else {
+                    return <h3> Most Star in Github repo is <a href={githubUrl}>{githubName}</a></h3>
+                }
+            }
+        }
+        ReactDOM.render(<MostStarGithub />, document.getElementById('root'))
+    </script>
+</body>
+
+</html>
