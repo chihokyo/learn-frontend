@@ -67,7 +67,7 @@ JavaScript ＋ XML = JSX。**浏览器无法直接识别jsx**，所以需要babe
 
 在测试的时候可能需要编译会有延迟慢的反应，但是在项目中发布的时候一般都是提前编译好的。所以就不是很慢。
 
-## 模块化
+## 3. 模块化
 
 ### 模块
 
@@ -97,7 +97,7 @@ JavaScript ＋ XML = JSX。**浏览器无法直接识别jsx**，所以需要babe
 
 也都是为了对应日益复杂增大的项目本身所拆分出来的思想。
 
-## 3. 面向组件
+## 4. 面向组件
 
 面向过程，面向对象，面向模块，面向组件。
 
@@ -109,7 +109,7 @@ React就是一个面向组件化的构成。
 
 定义组件
 
-方式1 工厂函数适用于简单组件（如果不需要状态state，使用简单模式更简洁。效率高，无需创建对象）
+方式1 : 工厂函数适用于简单组件（如果不需要状态state，使用简单模式更简洁。效率高，无需创建对象）
 
 ```javascript
 // 方式1 工厂函数(简单组件)
@@ -122,7 +122,7 @@ return <h2>lalalal</h2>
 ReactDOM.render(<MyComponent/>, document.getElementById('root'))
 ```
 
-方式2 类组件适用于复杂组件
+方式2 : 类组件适用于复杂组件
 
 这个相对复杂，因为要。创建实例。这个复杂功能多厚重。
 
@@ -139,9 +139,9 @@ class MyComponentClass extends React.Component {
 ReactDOM.render(<MyComponentClass/>, document.getElementById('test2'))
 ```
 
-## 三大属性
+## 5. 三大属性
 
-### 1.state
+### 1. state
 
 类型对象，组件又是状态机。
 
@@ -207,7 +207,7 @@ class Like extends React.Component {
 
 **话说，任何的框架都是套路。明白了套路，就是知道了框架。至于框架的实现，其实就是拿基础语言 + 自己定义的套路**
 
-### 2.props
+### 2. props
 
 *props*是三大属性之一。都是对象类型。
 
@@ -239,7 +239,7 @@ const arr1 = [1,2,3]
 const arr2 = [6,1,2,3,9] =====>>> const arr2 = [6,...arr1,9]
 ```
 
-### 3.refs
+### 3. refs
 
 这里参考一下案例7，感觉就是跟vue一样，是用来标识定位
 
@@ -251,7 +251,7 @@ const arr2 = [6,1,2,3,9] =====>>> const arr2 = [6,...arr1,9]
 
 无论是内部还是外部改变，那么组件本身都要改变。
 
-## 4. 组件化Code思路
+## 6. 组件化Code思路
 
 > 1 **拆分组件**，看看页面有几个组件这样。
 >
@@ -340,7 +340,7 @@ class App extends React.Component {
 
 此处放个代码连接。
 
-## 5. 获取表单
+## 7. 获取表单
 
 几乎就都实现了。
 
@@ -364,7 +364,7 @@ class App extends React.Component {
 密码：<input type="password" value={this.state.pwd} onChange={this.handleChange}/><br/>
 ```
 
-## 6. 组件生命周期
+## 8. 组件生命周期
 
 **官方文档**：https://zh-hans.reactjs.org/docs/react-component.html
 
@@ -484,7 +484,7 @@ class Life extends React.Component {
 ReactDOM.render(<Life msg="react easy" />, document.getElementById('root'))
 ```
 
-## 7. 虚拟DOM&DIFF()
+## 9. 虚拟DOM&DIFF()
 
 虚拟dom的目的就是为了更少的去操作真实dom
 
@@ -553,7 +553,7 @@ $ npm root -g
 $ cd /usr/local/lib/node_modules
 ```
 
-## 8. 项目安装
+## 10. 项目安装
 
 ```shell
 npx create-react-app my-app
@@ -630,4 +630,3 @@ export default App;
 
 // export default App
 ```
-
