@@ -4,6 +4,7 @@ import React, { Component, Fragment } from 'react';
 // import React from 'react'
 // const Component = React.Component
 
+import axios from 'axios'
 import TodoItem from './TodoItem'
 // 脚手架里面可以直接引入css
 import './style.css'
@@ -60,26 +61,30 @@ class TodoList extends Component {
     // })
 
     // 优化后2
-    const value = e.target.value  
-    this.setState(()=>({
+    const value = e.target.value
+    this.setState(() => ({
       inputValue: value
     }))
-    
+
   }
 
   handleBtnClick() {
+
+    // this.setState({
+    //   // 展开运算符
+    //   list: [...this.state.list, this.state.inputValue],
+    //   inputValue: ''
+    // })
+
     // preveState 修改数据之前的数据
     // 其实就等于 preveState = this.state
-    // this.setState((preveState) => ({
-    //   list: [...preveState.list, preveState.inputValue],
-    //   inputValue: ''
-    // }))
-
-    this.setState({
-      // 展开运算符
-      list: [...this.state.list, this.state.inputValue],
+    this.setState((preveState) => ({
+      list: [...preveState.list, preveState.inputValue],
       inputValue: ''
+    }), () => {
+      console.log(this.ul.querySelectorAll('div').length)
     })
+
   }
 
   handleItemDelete(index) {
@@ -109,15 +114,15 @@ class TodoList extends Component {
      * 下面是优化写法
      */
 
-     this.setState((preveState)=>{
-       const list = [...preveState.list]
-       list.splice(index, 1)
-       return {list}
-     })
+    this.setState((preveState) => {
+      const list = [...preveState.list]
+      list.splice(index, 1)
+      return { list }
+    })
 
   }
   // 优化实现
-  getTodoItem(){
+  getTodoItem() {
     return this.state.list.map((item, index) => {
       return (
 
@@ -144,23 +149,23 @@ class TodoList extends Component {
           {
             // for ==>>> htmlFor 防止jsx认错 
           }
-          <label htmlFor='area' >输入内容</label>
+          <label htmlFor='area' >输入内容</label><br />
           {/* 这样就绑定了 但是这样输入框的值会一直不变，所以绑定了onchange*/}
-          <input
-           id='area'
+          输入框1：<input
+            id='area'
             className='input'
             value={this.state.inputValue}
             onChange={this.handleChange}
-            ref={(input)=>{this.input = input}}
+            ref={(input) => { this.input = input }}
           />
-          <input
+          输入框2：<input
             className='input'
             value={this.state.inputValue}
-            onChange={this.handleChange2.bind(this)} 
-          />
+            onChange={this.handleChange2.bind(this)}
+          /><br />
           <button onClick={this.handleBtnClick.bind(this)}>提交</button>
         </div>
-        <ul>
+        <ul ref={(ul) => { this.ul = ul }}>
           {
             this.getTodoItem()
           }
@@ -168,6 +173,48 @@ class TodoList extends Component {
       </Fragment>
     )
   }
+
+  /**
+  * 这里开始写生命周期函数
+  */
+
+  componentWillMount() {
+    console.log('componentWillMount')
+  }
+
+  componentDidMount() {
+    console.log('componentDidMount')
+    // 这里适合发送异步请求ajax
+    // 目前使用的是charlesproxy进行模拟数据
+    axios.get('/api/todolist.json')
+      .then((res) => {
+        this.setState(() => ({
+          list: [...res.data]
+        }))
+      })
+      .catch(() => { alert('error') })
+  }
+
+  shouldComponentUpdate() {
+    console.log('shouldComponentUpdate')
+    // 必须要指定Boolen
+    // 决定是否要被更新
+    return true
+  }
+
+  componentWillUpdate() {
+    console.log('componentWillUpdate')
+  }
+
+  componentDidUpdate() {
+    console.log('componentDidUpdate')
+  }
+
+  componentWillUnmount() {
+    console.log('componentWillUnmount')
+  }
 }
+
+
 
 export default TodoList;
