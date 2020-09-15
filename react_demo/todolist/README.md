@@ -142,7 +142,7 @@ react 其实可以和JQ并存 因为react 只接管一个根节点 id：root
 
 ### 视图层框架
 
-视图层框架： 视图层框架就是指的是 MVVM
+视图层框架： 只是视图层，就是没有包含数据，组件通信起来很麻烦。→ 需求出来Redux表示数据层。
 
 这篇文章可以参考一下：[前端框架架构模式](https://juejin.im/entry/6844903521221869575)
 
@@ -343,3 +343,291 @@ handleBtnClick() {
   }
 ```
 
+## 6. 生命周期
+
+生命周期函数 是指在某一个时刻会自动执行的函数。属于异步的回调函数。
+
+render是一个周期函数，当props和state发生改变就会自动执行。
+
+组件即将挂载到页面自动执行。
+
+![Image for post](https://miro.medium.com/max/1400/1*fdGC22mqWBAQ7jOFPPAvIg.png)
+
+不分父子，只要是组件，就有生命周期。
+
+关于生命周期的一个小点，可以优化的地方。
+
+```javascript
+/**
+* 父组件render(),子组件也会render()
+* 所以为了避免这个问题，可以使用这个方法，在子组件里进行优化。
+* 只有不同的时候才进行更新渲染
+*/
+// nextProps：将要改变成的props
+// nextState：将要改变成的state
+shouldComponentUpdate (nextProps, nextState) {
+    console.log('shouldComponentUpdate')
+    // 避免子组件多余的渲染
+    if (nextProps.itemPasstoChild !== this.props.itemPasstoChild) {
+      return true
+    } else {
+      return false
+    }  
+}
+```
+
+Ajax请求放在componentDidMount(){
+
+}
+
+render函数会被反复执行，不应该放在这里。这样就获取很多次数据。
+
+componentWillMount() →这里会发生一些冲突
+
+componentDidMount →只会在挂载一次，所以这里是最好发送axios请求的地方。
+
+*constructor* → 虽然可以，但不是最好的选择。
+
+### 关于优化性能的几个点
+
+*setState()*
+
+*bind(this)*
+
+### 如何模拟接口
+
+Charles 进行模拟数据接口
+
+```javascript
+componentDidMount(){
+    console.log('componentDidMount')
+    // 这里适合发送异步请求ajax
+    axios.get('/api/todolist.json')
+      .then((res)=>{
+        this.setState(()=>{
+          return {
+            list: res.data
+          }
+        })
+      })
+      .catch(()=>{alert('error')})
+  }
+// 稍微优化下写法
+componentDidMount(){
+    console.log('componentDidMount')
+    // 这里适合发送异步请求ajax
+    axios.get('/api/todolist.json')
+      .then((res)=>{
+        this.setState(()=>{
+          return {
+            list: res.data
+          }
+        })
+      })
+      .catch(()=>{alert('error')})
+  }
+```
+
+## 7. 关于动画（非重点，忽略）
+
+```css
+.input {
+    border: 2px solid gray;
+}
+
+label {
+    font-size: 2em;
+}
+
+.show {
+    opacity: 1;
+    transition: all 1s ease-in;
+}
+
+.hide {
+    animation: hide-item 2s ease-in forwards;
+}
+
+@keyframes hide-item {
+    0% {
+        opacity: 1;
+        color: red;
+    }
+
+    50% {
+        opacity: 0.5;
+        color: pink;
+    }
+
+    100% {
+        opacity: 0;
+        color: orange;
+    }
+}
+```
+
+### 使用 react-transition-group
+
+## 8. Redux(重点)
+
+store 放在这里。不同的组件可以绕过父子，可以直接拿到store里的数据感知变化。
+
+Redux = Reducer + Flux（最初推出的数据层）
+
+### 工作流程
+
+React Component → Actions Creators → Store → Reducers
+
+发起人 →发起请求→中间人→中间人就去查找依据（记录本）
+
+*store.js*
+
+```javascript
+import { createContext } from 'react'
+import { createStore } from 'redux'
+
+// 引入全部数据文件
+import reducer from './reducer'
+
+// 参数为reducer 相当于可以查看所有数据了
+const store = createStore(reducer)
+export default store
+```
+
+*reducer.js*
+
+必须返回函数，里面都是数据。
+
+```javascript
+export default (state = defaultState, action) => {
+    // action ：表示传过来的action
+    // state ：整个store的全部数据
+    console.log(state, action)
+    if (action.type === 'changeInputValue') {
+        // 深拷贝
+        // 因为reducer只能接受state，决不能修改state
+        const newState = JSON.parse(JSON.stringify(state))
+        newState.inputValue = action.value
+        // → 这里返回给了store
+        return newState
+    }
+
+    if (action.type === 'addListValue') {
+        const newState = JSON.parse(JSON.stringify(state))
+        newState.list.push(newState.inputValue)
+        newState.inputValue = ''
+        return newState
+    }   
+    return state
+}
+```
+
+在使用的时候
+
+*NewTodolist.js*
+
+```javascript
+// 引入数据
+import store from './store/index'
+
+constructor (props) {
+    super(props)
+  	// 重新获得数据 store.getState()
+    console.log(store.getState())
+    this.state = store.getState()
+    console.log(this.state)
+   	// 订阅最新，一旦store发生改变就进行调用
+	  store.subscribe(this.handleStoreChange)
+}
+
+handleStoreChange = () => {
+    // 一旦感知到了数据store的变化，就重新从store里面获取最新的数据
+    // 替换掉之后就是最新的数据
+    this.setState(store.getState())
+}
+
+```
+
+发生事件，调用函数的时候
+
+```javascript
+handleBtnClick = () => {
+    const action = {
+      type: 'addListValue'
+    }
+    // 发送信号 → reducer.js 参数action
+    store.dispatch(action)
+  }
+```
+
+action记得定义成常量
+
+*actionTypes.js*
+
+```javascript
+export const CHANGE_INPUT_VALUE = 'changeInputValue'
+export const ADD_LIST_VALUE = 'addListValue'
+export const DELETE_LIST_VALUE = 'deleteListValue' 
+```
+
+但其实action这样分散着写并不科学，基本上一般都使用*actionCreator.js*
+
+其实就相当于这个函数返回来一个**对象**
+
+`{
+    type: CHANGE_INPUT_VALUE,
+    value
+}`
+
+这个对象包含在了action里面，这样就可以直接用了。
+
+```javascript
+import { CHANGE_INPUT_VALUE } from './actionTypes'
+
+// 帮忙创建一个type等于CHANGE_INPUT_VALUE的action
+export const getInputChangeAction = (value) => ({
+    type: CHANGE_INPUT_VALUE,
+    value
+})
+
+//
+
+handleInputChange = (e) => {
+    // // 初级用法
+    // const action = {
+    //   type: CHANGE_INPUT_VALUE,
+    //   value: e.target.value
+    // }
+    // // store会自动穿法给reducer
+    // store.dispatch(action)
+
+    // 进阶用法
+    const action = getInputChangeAction(e.target.value)
+    store.dispatch(action)
+
+  }
+```
+
+### redux设计三原则
+
+- 只有一个store
+- 只有store能改变自己内容（reducer只是拷贝一份，然后给store，store拿到返回的数据，自身更新）
+- reducer必须是纯函数
+
+what is 纯函数
+
+给固定的输入，就会有一定的输出，不会有副作用。
+
+无论何时。所以里面有ajax请求，时间操作，就不能直接放进去。
+
+#### 核心函数
+
+`createStore()`
+
+`store.dispatch()`
+
+`store.getState()`
+
+`store.subscribe()`
+
+**以上就是Redux的基础**。
