@@ -3,6 +3,7 @@ import React from 'react';
 // 挂载到root节点下
 import ReactDOM from 'react-dom';
 import Todolist from './TodoList';
+import NewTodolist from './NewTodolist';
 
 // PWA 
 // 用网页来写手机app应用
@@ -14,6 +15,7 @@ import Todolist from './TodoList';
 ReactDOM.render(
   <React.StrictMode>
     <Todolist />
+    <NewTodolist />
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -192,7 +192,7 @@ class TodoList extends Component {
           list: [...res.data]
         }))
       })
-      .catch(() => { alert('error') })
+      .catch(() => { return })
   }
 
   shouldComponentUpdate() {
