@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Input, Button, List } from 'antd';
+
+import TodoListUI from './TodoListUI'
 // 引入数据
 import store from './store/index'
 // 引入antd样式
@@ -15,9 +16,9 @@ class NewTodolist extends Component {
   constructor(props) {
     super(props)
     // store.getState() 获得最新数据
-    console.log(store.getState())
+    // console.log(store.getState())
     this.state = store.getState()
-    console.log(this.state)
+    // console.log(this.state)
     // 订阅了 store的改变 handleStoreChange 自动执行
     store.subscribe(this.handleStoreChange)
   }
@@ -65,24 +66,13 @@ class NewTodolist extends Component {
 
   render() {
     return (
-      <div>
-        <h1>我是新的 New List</h1>
-        <div>
-          <Input
-            value={this.state.inputValue}
-            placeholder={this.state.inputValue}
-            style={{ width: '300px', marginRight: '10px' }}
-            onChange={this.handleInputChange}
-          />
-          <Button type="primary" onClick={this.handleBtnClick}>提交</Button>
-          <List
-            style={{ width: '300px', marginTop: '10px' }}
-            bordered
-            dataSource={this.state.list}
-            renderItem={(item, index) => (<List.Item onClick={this.handleDeleteItem.bind(this, index)}>{item}</List.Item>)}
-          />
-        </div>
-      </div>
+    <TodoListUI 
+      inputValue = {this.state.inputValue}
+      list = {this.state.list}
+      handleInputChange = {this.handleInputChange}
+      handleBtnClick = {this.handleBtnClick}
+      handleDeleteItem = {this.handleDeleteItem}
+    />
     )
   }
 }
