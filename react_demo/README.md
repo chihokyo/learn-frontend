@@ -376,11 +376,11 @@ https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/
 
 jq就是那种命令式编程。所有的工作都要你来做，都是你自己控制没有自己执行。
 
-但是react这些框架就是生命编程。其实已经定义好了整个流程，生命的阶段，你几乎不用控制这些。
+但是react这些框架就是声明编程。其实已经定义好了整个流程，声明的阶段，你几乎不用控制这些。
 
-所以才有了生命周期。
+**所以才有了生命周期。**
 
-什么是生命周期函数，也成为钩子。在特定时间进行调用。
+什么是生命周期函数，也称为钩子。在特定时间进行调用。
 
 回调函数就是你定义的，你没有调用，但最终执行了。
 
@@ -630,3 +630,23 @@ export default App;
 
 // export default App
 ```
+
+## Redux
+
+redux其实是一个js库（并不是**React**专用的库）
+
+angular和vue都可以用，是一个状态管理的js库
+
+用于管理多个组件中共享状态。
+
+在大型项目中，redux这种状态管理比较适用。
+
+### 读取状态
+
+React Component → Store
+
+### 更新状态
+
+React Component →  ActionCreators → Store → Reducer
+
+分发对象 dispatch()

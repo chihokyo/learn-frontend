@@ -631,3 +631,166 @@ what is 纯函数
 `store.subscribe()`
 
 **以上就是Redux的基础**。
+
+## 9. UI组件 PK 容器组件 PK 无状态组件
+
+UI组件 → 傻瓜组件 不处理逻辑，只负责UI
+
+容器组件 → 聪明组件 只负责逻辑
+
+无状态组件 → 当一个组件只有render()函数的时候，就可以拿方法替换掉原来的普通组件。
+
+> 提高性能。因为本质上无状态就是一个函数。
+>
+> 而普通的那种类组件会包含很多生命周期函数这些不必要的函数，所以性能会比较高。
+>
+> 所以UI组件**一般**采用无状态这种。
+
+```javascript
+// 无状态组件
+
+class TodoListUI extends Component {
+  render() {
+    return <div></div>
+  }
+}
+
+const TodoListUI = () => {
+  return  <div></div>
+}
+```
+
+### 关于 React-thunk 中间件
+
+Github官方库 https://github.com/reduxjs/redux-thunk
+
+这个中间件是redux的中间件，而不是react的，所以一定要配合redux进行使用。
+
+知道了 使用了这个中间件
+
+即使action不是一个对象，而是一个函数也可以通过action发给store进行处理。
+
+为什么要把异步通信放在action里而不是直接在生命周期函数里面，是因为随着项目复杂度的提升，如果所以逻辑都写在生命周期函数里面。这个函数会越来越肥大。
+
+**thunk可以把一些复杂的处理交给action来处理。因为action原来只能接收对象，现在也可以接收函数了。**
+
+本质上就是对dispatch()的封装，升级。中间件有很多很多。
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/master/20200917144458.png)
+
+### Redux-saga中间件
+
+太难，不看了。
+
+比上面的也就是说，saga在大项目里用。然后异步请求会单独拆分在*sage,js*文件里
+
+## 10. React-Redux
+
+上面写的都是redux，而不是react里面的redux，所以现在有一个库。就是结合了react和redux特点的。
+
+react-redux
+
+#### 核心API：Provider *index.js*
+
+```javascript
+import { Provider } from 'react-redux'
+import store from './store'
+
+// Provider内部的组件可以使用store
+const App = (
+  <Provider store={store}>
+    <TodoList />
+  </Provider>
+)
+ReactDOM.render(App, document.getElementById('root'))
+```
+
+#### 核心API：connect *TodoList.js*
+
+```javascript
+import { connect }  from 'react-redux'
+import { Component } from 'react';
+// Provider内部的组件可以使用store
+
+class TodoList extends Component {
+  render(){
+    return (
+      <div>
+      </div>
+    )
+  }
+}
+// todolist和store进行连接
+export default connect(null, null)(TodoList)
+```
+
+进行映射 state  → props 
+
+```javascript
+class TodoList extends Component {
+  render(){
+    return (
+      <div>
+        <input value={this.props.inputValue} />
+      </div>
+    )
+  }
+}
+// 将组件的state → 映射成 → props 
+// 所以上面的 {this.state.inputValue} 要变成 → {this.props.inputValue}
+const mapStateToProps = (state) => {
+  return {
+    inputValue: state.inputValue
+  }
+}
+
+export default connect(mapStateToProps, null)(TodoList)
+```
+
+进行映射 Dispatch  → props 
+
+```javascript
+class TodoList extends Component {
+  render(){
+    return (
+      <div>
+        <input value={this.props.inputValue} onChange={this.props.changeInputValue}/>
+      </div>
+    )
+  }
+}
+
+handleInputChange = (e) => {
+  console.log(e.target.value)
+}
+
+// 将组件的state → 映射成 → props
+const mapStateToProps = (state) => {
+  return {
+    inputValue: state.inputValue
+  }
+}
+
+// dispath映射给了props
+const mapDispatchToProps = (dispatch) => {
+  return {
+    changeInputValue(e) {
+      console.log(e.target.value)
+      const action = {
+        type: 'change_input_value',
+        value: e.target.value
+      }
+      // 直接调用
+      dispatch(action)
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TodoList)
+```
+
+所以上本质
+
+`connect(mapStateToProps, mapDispatchToProps)(TodoList)`
+
+这个方法就是 `connect(业务逻辑)(UI组件（不包含逻辑，只渲染）) ` 这样拼接成了一个容器组件。所以最后export default导出的就是一个容器组件。
