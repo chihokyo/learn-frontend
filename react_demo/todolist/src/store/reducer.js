@@ -1,5 +1,9 @@
+/**
+ * 本事这个模块是一个对象。包含了无数个状态
+ */
+
 // 引入store → action 自定义常量
-import { CHANGE_INPUT_VALUE, ADD_LIST_VALUE, DELETE_LIST_VALUE } from './actionTypes'
+import { CHANGE_INPUT_VALUE, ADD_LIST_VALUE, DELETE_LIST_VALUE, INIT_LIST_ACTION } from './actionTypes'
 
 const defaultState = {
     inputValue: '',
@@ -30,6 +34,12 @@ export default (state = defaultState, action) => {
     if (action.type === DELETE_LIST_VALUE) {
         const newState = JSON.parse(JSON.stringify(state))
         newState.list.splice(action.index, 1)
+        return newState
+    }
+
+    if (action.type === INIT_LIST_ACTION ) {
+        const newState = JSON.parse(JSON.stringify(state))
+        newState.list = action.data
         return newState
     }
 

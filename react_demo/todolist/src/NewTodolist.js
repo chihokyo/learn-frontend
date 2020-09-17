@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-
 import TodoListUI from './TodoListUI'
 // 引入数据
 import store from './store/index'
 // 引入antd样式
 import 'antd/dist/antd.css';
 
-import { getInputChangeAction, getBtnClickAction, getdeleteItemAction } from './store/actionCreator'
+import { getInputChangeAction, getBtnClickAction, getdeleteItemAction, getTodoList } from './store/actionCreator'
 
 // 引入正常使用方法 actionCreator
 // import { getInputChangeAction } from './store/actionCreator'
@@ -18,6 +17,7 @@ class NewTodolist extends Component {
     // store.getState() 获得最新数据
     // console.log(store.getState())
     this.state = store.getState()
+    this.setState({})
     // console.log(this.state)
     // 订阅了 store的改变 handleStoreChange 自动执行
     store.subscribe(this.handleStoreChange)
@@ -61,6 +61,22 @@ class NewTodolist extends Component {
     // }
 
     const action = getdeleteItemAction(index)
+    store.dispatch(action)
+  }
+
+  // 处理异步ajax请求
+  componentDidMount () {
+    // axios.get('/api/todolist.json')
+    // .then((res)=>{
+    //   const data = res.data
+    //   const action = initListAction(data)
+    //   store.dispatch(action)
+    // })
+    // .catch((error)=>{
+    //   console.log('error')
+    // })
+    const action = getTodoList()
+    // action里面的函数会被自动执行。
     store.dispatch(action)
   }
 
