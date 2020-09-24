@@ -6,19 +6,19 @@
 
 ## 1.主要目录结构
 
-### js_demo
+### js
 
 JavaScript基础，高级，难点，随便记录。
 
-### jquery_demo
+### jquery
 
 jQuery基本复习，小案例。
 
-### vue_demo
+### vue
 
 Vue基础知识，项目练习。
 
-### webpack_demo
+### webpack
 
 主要写的是webpack最基本的用法
 
@@ -35,11 +35,11 @@ Vue基础知识，项目练习。
   },
 - 启动 `npm run dev`进行打包
 
-### gulp_demo
+### gulp
 
 最基础的gulp入门实现编译 + 热更新网页
 
-### koa_demo
+### koa
 
 最基础的Koa入门知识。主要是通过对路由的封装进行精简的框架。
 
@@ -71,3 +71,7 @@ webpack,express,bable,sass,小工具，各种配置和脚手架预定。
 - react基本框架学习
 - 通过todolist案例巩固基础复习
 
+### 2020/9/24
+
+- 修改库结构（大改）
+- 以后多一门技术就开始一个新的**branch**
