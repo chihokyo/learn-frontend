@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>函数的call/apply/bind()</title>
+    <script src="../call.js"></script>
+    <script src="../apply.js"></script>
+    <script src="../bind.js"></script>
+</head>
+
+<body>
+    <script>
+        // 声明一个函数
+        function add(a, b) {
+            console.log(this);
+            console.log(arguments);
+            // 这里的this 是为了看清指向的是谁
+            return a + b + this.c;
+        }
+
+        // 声明一个对象
+        let obj = {
+            c: 100
+        }
+
+        // 全局属性
+        window.c = 200;
+
+        // 执行call函数
+        console.log("执行call函数")
+        console.log(call(add, obj, 10, 20)); // 130
+        console.log(call(add, null, 10, 20)); // 230
+
+        // 执行apply函数
+        console.log("执行apply函数")
+        console.log(apply(add, obj, [99, 88]));
+        console.log(apply(add, null, [99, 88]));
+
+        // 执行bind函数
+        // bind和上面2个不同的是 bind新建一个函数 不执行 前面俩执行的
+
+        console.log("执行bind函数")
+        let fn = bind(add, obj, 10, 20);
+        console.log(fn()); // 130
+
+        let fn2 = bind(add, obj);
+        console.log(fn2(11, 22)); // 133
+
+
+        let fn3 = add.bind(add, obj, 1, 2);
+        console.log(fn3(11, 22)); // 103 事实上这个11和22 并不参与运算的
+
+    </script>
+</body>
+
+</html>
