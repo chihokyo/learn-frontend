@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>函数节流与函数防抖</title>
+    <script src="../throttle.js"></script>
+    <script src="../debounce.js"></script>
+    <style>
+        body {
+            height: 2000px;
+            background-color: burlywood;
+        }
+    </style>
+</head>
+    <input type="text" name="" id="demo">
+    <button>防抖测试</button>
+<body>
+    <script>
+
+        /****************************/
+        // 没有节流函数之前的滚动操作 喷血式输出
+        // window.addEventListener('scroll', ()=>{
+        //     console.log(Date.now());
+        // })
+
+        // 有了节流之后的滚动操作 会发现1秒钟（1000毫秒）才有操作
+        window.addEventListener('scroll', throttle((e) => {
+            console.log(Date.now());
+        }, 1000))
+
+
+        /****************************/
+        // 没有防抖
+        // let input = document.querySelector("input");
+        // input.onkeydown = (e) => {
+        //     console.log(e.keyCode);
+        // }
+
+        // 有了防抖 在
+        let input = document.querySelector("input");
+        input.onkeydown = debounce((e)=>{
+            console.log(e.keyCode);
+        }, 500)
+
+
+    </script>
+</body>
+
+</html>
