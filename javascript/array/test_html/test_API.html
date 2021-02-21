@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页测试</title>
+    <script src="../declares.js"></script>
+</head>
+
+<body>
+    <script>
+
+        /**********测试一下map*************/
+        const arrMap = [1, 8, 9, 18];
+        const resultMap = mapA(arrMap, (item, index) => {
+            return item * 2;
+        })
+        console.log("Map: " + resultMap);
+
+
+
+        // /**********测试一下reduce*************/
+        // 原生的
+        // const arr = [1, 2, 3];
+        // let result = arr.reduce((res, value)=>{
+        //     return res + value;
+        // }, 100)
+        // console.log(result);
+
+        // 自己封装的
+        const arrReduce = [1, 8, 9, 18];
+        let resultReduce = reduce(arrReduce, (res, value) => {
+            return res + value;
+        }, 10);
+        console.log("Reduce: " + resultReduce)
+
+        // /**********测试一下filter*************/
+        // 原生的
+        // const arr = [1, 2, 7, 19];
+        // let result = arr.filter(item => item % 2 === 1);
+        // console.log(result);
+
+        // 自己封装的
+        const arrFilter = [1, 8, 9, 16];
+        const resultFilter = filter(arrFilter, item =>
+            item % 2 === 1
+        )
+        console.log(resultFilter)
+
+    </script>
+</body>
+
+</html>
