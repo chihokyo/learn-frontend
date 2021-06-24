@@ -505,6 +505,36 @@ $("p").on("click", function(){
 ## 13. 冒泡和默认行为
 
 冒泡。自己干的老子也要连累触发的东西。
+
+比如
+
+```html
+<html>
+  <div id="content">
+    外层元素
+    <span>内层元素</span>
+    外层元素
+  </div>
+</html>
+<script src="jquery.min.js" type="text/javascript"></script>
+<script>
+$(function(){
+ $("#content").click(function(){
+   alert("我是div")
+ })
+  $("span").click(function(){
+   alert("我是span")
+    // 解决冒泡 不加就会传递给父类
+    // return false
+ })
+})
+  </script>
+```
+
+> 这个时候你发现点了*span*可是div也照样触发了。
+> **如何解决？**
+> 直接在子元素事件内*return false*
+
 默认行为。标签自带属性。比如a就是点击跳转。
 
 ```html
