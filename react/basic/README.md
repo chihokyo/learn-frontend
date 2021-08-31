@@ -1,6 +1,8 @@
 # React初级入门
 
-## 8月30日再开
+## ⭐️新总结
+
+## 1. React特点
 
 组件化模式 
 
@@ -15,7 +17,7 @@ bable的作用
 - ES6 → ES5
 - JSX → JS
 
-核心库
+### 核心库
 
 1. react.js：React核心库。　**引入核心库，要先引入**
 
@@ -60,7 +62,7 @@ ReactDOM.render(VDOM2,document.getElementById('test'))
 
 上面的操作不是追加，而成了替换。
 
-创建虚拟DOM2种
+### 创建虚拟DOM2种
 
 - JS
 
@@ -239,9 +241,9 @@ ReactDOM.render(VDOM,document.getElementById('test'))
 
 组件 → 更加细分代码+资源（html+css+js+img..）实现组件复用。
 
-## 组件
+## 2. 组件
 
-### 函数式组件
+### 函数式组件（简单组件）
 
 这里的函数这样直接进行渲染写**不行**
 
@@ -276,7 +278,7 @@ ReactDOM.render(<MyComponent/>,document.getElementById('test'))
 */
 ```
 
-### 类式组件
+### 类式组件（复杂组件）
 
 **类名就是组件名**
 
@@ -317,12 +319,14 @@ ReactDOM.render(<MyComponent/>,document.getElementById('test'))
 因为和上面一样，找到了组件名(`<MyComponent/>`)之后→随后React帮你new出来了该类的实例，并通过该实例调用到原型上的`render()`方法。
 
 > **如果你的组件有状态，那么就是复杂组件，没有就是简单组件。**
+>
+> 人 的 状态 影响 行为
+>
+> 组件 的 状态 驱动 页面
 
-人 的 状态 影响 行为
+类组件，也就是复杂组件才有状态，类有属性，实例化之后，才有状态。
 
-组件 的 状态 驱动 页面
-
-## 组件实例三大个核心属性
+## 3. 组件实例三大个核心属性
 
 组件实例对象，不是类身上，而是实例身上的。
 
@@ -330,7 +334,927 @@ class 定义的 才有 → 实例 → 才有 →属性
 
 上面的function不能，但最新的hooks有。后面再说。
 
-### state
+### 3.1 state
+
+1. state是组件对象最重要的**属性**, **值是对象**(可以包含多个key-value的组合)
+
+2. 组件被称为"状态机", 通过更新组件的state来更新对应的页面显示(重新渲染组件，每一次调用render都在渲染)
+
+#### **如何初始化state？**
+
+对类的初始化操作 → 需要`constructor()`
+
+```jsx
+constructor(props){
+    super(props)
+    this.state = true
+    this.handleClick = this.handleClick.bind(this);
+}
+```
+
+如果有多个数据，就需要用对象来获取
+
+```jsx
+constructor(props){
+    super(props)
+    this.state = {
+        isLike:true
+    }
+    this.handleClick = this.handleClick.bind(this);
+}
+```
+
+#### **如何读取state？**
+
+直接看js语法，就从实例里面获取属性。
+
+```jsx
+render() {
+    const { isLikeMe } = this.state
+    return <h2>{isLikeMe ? '你爱我' : '我爱你'}</h2>
+}
+```
+
+#### **那么如何触发点击状态？**
+
+首先看原生事件绑定
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Document</title>
+	</head>
+	<body>
+		<button id="btn1">按钮1</button>
+		<button id="btn2">按钮2</button>
+		<button onclick="demo()">按钮3</button>
+
+		<script type="text/javascript" >
+             // 方法1
+			const btn1 = document.getElementById('btn1')
+			btn1.addEventListener('click',()=>{
+				alert('按钮1被点击了')
+			})
+			// 方法2
+			const btn2 = document.getElementById('btn2')
+			btn2.onclick = ()=>{
+				alert('按钮2被点击了')
+			}
+			// 方法3
+			function demo(){
+				alert('按钮3被点击了')
+			}
+
+		</script>
+	</body>
+</html>
+```
+
+React怎么实现呢
+
+原生：onclick → React：onClick
+
+ **变成首字母大写**
+
+错误写法1
+
+```js
+render(){
+    const {isLike} = this.state
+    return <h1 onClick="demo()"><h1/>
+}
+// 因为这里根本就是原生的js，所以原生的js写法错误        
+```
+
+错误写法2
+
+```js
+render(){
+    const {isLike} = this.state
+    return <h1 onClick={demo()}><h1/>
+}
+// 因为这属于赋值，相当于把demo()给调用，并且把undefined返回值给了onClick  
+```
+
+推导出来到了正确的写法
+
+```js
+render(){
+    const {isLike} = this.state
+    return <h1 onClick={demo}><h1/>
+}
+```
+
+调用的问题解决了，接下来就是如何修改isLike状态的问题。
+
+错误写法1
+
+```js
+class Like extends React.Component {
+    render(){
+        const {isLike} = this.state
+        return <h1 onClick={demo}><h1/>
+    }
+}
+            
+function demo(){
+   console.log(this) // 这里的undefined 因为这个是你自定义的函数，在babel的严格模式下，这里的this就是这个。如果非严格模式下，也就是<script type="text/javascript">，那就是window。所以当然拿不到state
+}
+```
+
+错误写法2 这个写法错误是因为代码结构上问题
+
+因为上面写法错误的原因因为是丢了this，所以在这里多增加个that呢？
+
+```js
+<script type="text/babel">
+    let that // ①在最外面定义个全局变量
+    class Like extends React.Component {
+        constructor(props){
+            super(props)
+            this.state = {
+                isLike: true
+            }
+            that = this // ②在最外面定义个全局变量
+        }
+
+        render(){
+            const { isLike } = this.state
+            return <h2 onClick={demo}>{isLikeMe ? '你爱我' : '我爱你'}</h2>
+        }
+    }
+	funcion demo (){
+        console.log(that.state.isLike)
+    }
+</script>
+```
+
+上面虽然可以，但是这样that和下面的函数根本都不是类组件里面的！
+
+错误写法3
+
+```js
+<script type="text/babel">
+    class Like extends React.Component {
+        constructor(props){
+            super(props)
+            this.state = {
+                isLike: true
+            }
+        }
+        render(){
+            const { isLike } = this.state
+            return <h2 onClick={this.demo}>{isLikeMe ? '你爱我' : '我爱你'}</h2>
+        }
+        funcion demo (){
+        	console.log(that.state.isLike) // 这里总没错了吧
+    	}
+    }
+	
+</script>
+```
+
+但结果，为什么会错误？
+
+因为`demo()`这里并不是Like实例调用的,可以看下面的代码。
+
+```js
+class Person {
+    constructor(name){
+        this.name = name
+    }
+    study(){
+        conso.log(this)
+    }
+}
+const p1 = new Person("Amy")
+p1.study()
+const x = p1.study
+x() // 这里就相当于直接调用，那么严格模式下，就是undefined，而函数里面默认是严格模式。
+```
+
+由于demo是作为onClick回调，所以不是通过实例调用的，是直接调用的，而类又开启了严格模式，所以这里还是错误的。
+
+最后一句话解决
+
+```js
+this.demo = this.demo.bind(this)
+```
+这里需要分析
+
+![image-20210831001136142](https://raw.githubusercontent.com/chihokyo/image_host/develop/20210831001138.png)
+
+通过上面的一行代码成功就把原型上的对象，挂在了实例自身上。成功上位！`bind()`这个函数还是应该多深入学点。下面是按照上面的原理，重新更换了名字写的正确代码。因为这样可以看出来清晰的结构。
+```js
+<script type="text/babel">
+    class Like extends React.Component {
+        constructor(props){
+            super(props)
+            this.state = {
+                isLike: true
+            }
+            this.yes = this.test.bind(this)
+        }
+        render(){
+            const { isLike } = this.state
+            return <h2 onClick={this.yes}>{isLikeMe ? '你爱我' : '我爱你'}</h2>
+        }
+        funcion test (){
+        	console.log(that.state.isLike) // 这里总没错了吧
+    	}
+    }
+	
+</script>
+```
+
+#### 状态不可直接更改
+
+调用解决了，那么如何修改里面的数据呢？下面的直接修改是绝对不允许的。
+
+```
+//严重注意：状态(state)不可直接更改，下面这行就是直接更改！！！
+//this.state.isHot = !isHot //这是错误的写法
+```
+
+必须要用`setState()` ，并且这个函数是合并，并不是替换，就算你只修改了一个属性，其他属性也不会消失。
+
+```js
+<script type="text/babel">
+    //1.创建组件
+    class Weather extends React.Component{
+
+        //构造器调用几次？ ———— 1次
+        constructor(props){
+            console.log('constructor');
+            super(props)
+            //初始化状态
+            this.state = {isHot:false,wind:'微风'}
+            //解决changeWeather中this指向问题
+            this.changeWeather = this.changeWeather.bind(this)
+        }
+
+        //render调用几次？ ———— 1+n次 1是初始化的那次 n是状态更新的次数
+        render(){
+            console.log('render');
+            //读取状态
+            const {isHot,wind} = this.state
+            return <h1 onClick={this.changeWeather}>今天天气很{isHot ? '炎热' : '凉爽'}，{wind}</h1>
+        }
+
+        //changeWeather调用几次？ ———— 点几次调几次
+        changeWeather(){
+            //changeWeather放在哪里？ ———— Weather的原型对象上，供实例使用
+            //由于changeWeather是作为onClick的回调，所以不是通过实例调用的，是直接调用
+            //类中的方法默认开启了局部的严格模式，所以changeWeather中的this为undefined
+
+            console.log('changeWeather');
+            //获取原来的isHot值
+            const isHot = this.state.isHot
+            //严重注意：状态必须通过setState进行更新,且更新是一种合并，不是替换。
+            this.setState({isHot:!isHot})
+            console.log(this);
+
+            //严重注意：状态(state)不可直接更改，下面这行就是直接更改！！！
+            //this.state.isHot = !isHot //这是错误的写法
+        }
+    }
+//2.渲染组件到页面
+ReactDOM.render(<Weather/>,document.getElementById('test'))
+
+</script>
+```
+
+#### state完整写法
+
+首先把上面的注释和输出都给去掉的完整写法是这样的。
+
+```js
+<script type="text/babel">
+    class Weather extends React.Component{
+
+        constructor(props){
+            super(props)
+            this.state = {isHot:false,wind:'微风'}
+            this.changeWeather = this.changeWeather.bind(this)
+        }
+
+        render(){
+            const {isHot,wind} = this.state
+            return <h1 onClick={this.changeWeather}>今天天气很{isHot ? '炎热' : '凉爽'}，{wind}</h1>
+        }
+
+        changeWeather(){
+            const isHot = this.state.isHot
+            this.setState({isHot:!isHot})
+        }
+    }
+ReactDOM.render(<Weather/>,document.getElementById('test'))
+
+</script>
+```
+
+为什么可以简写？首先`<Weather/>`这样生成的`new Weather()`只会帮你调用`render()`，其他的你自定义的函数是不会帮你的。自定义函数是通过回调函数来调用的，所以并不是this触发的，那么岂不是每一次都要`this.changeWeather = this.changeWeather.bind(this)`来绑定。那么在构造器`constructor()`的函数里其实有一个js基础知识点。
+
+关于状态上的精简原理
+
+```js
+class Dog {
+    constructor(legs){
+        this.legs = legs
+    }
+    legs = 4;
+}
+// 类可以直接写赋值语句，相当于直接添加一个大家都可以用属性。
+// 所以可以改成这样
+ class Weather extends React.Component{
+
+     constructor(props){
+         super(props)
+         // this.state = {isHot:false,wind:'微风'}
+         this.changeWeather = this.changeWeather.bind(this)
+     }
+     state = {isHot:false,wind:'微风'}
+ }
+```
+
+那么函数是不是也可以这样做呢。通过给匿名函数赋值成一个属性。
+
+```js
+class Weather extends React.Component{
+
+    constructor(props){
+        super(props)
+        // this.state = {isHot:false,wind:'微风'}
+        // this.changeWeather = this.changeWeather.bind(this)
+    }
+    changeWeather = function(){
+        const isHot = this.state.isHot
+        this.setState({isHot:!isHot})
+    }
+}
+```
+
+但是这样其实就涉及了箭头函数和普通函数区别的基础知识，结论就是你只是把这个`changeWeather()`挂在了`Weather`上，但真正点击触发调用的其实并不是`Weather.changeWeather()`。而箭头函数没有自己的this，一直指向的就是距离自己对象。[ES6 - 箭头函数、箭头函数与普通函数的区别](https://juejin.cn/pos/6844903805960585224)
+
+#### state精简写法
+
+按照上面的演变过程，最后的结果就是
+
+```js
+<script type="text/babel">
+    class Weather extends React.Component{
+
+        state = {isHot:false,wind:'微风'}
+
+        render(){
+            const {isHot,wind} = this.state
+            return <h1 onClick={this.changeWeather}>今天天气很{isHot ? '炎热' : '凉爽'}，{wind}</h1>
+        }
+
+        changeWeather = () => {
+            const isHot = this.state.isHot
+            this.setState({isHot:!isHot})
+        }
+    }
+ReactDOM.render(<Weather/>,document.getElementById('test'))
+
+</script>
+```
+
+#### 注意事项
+
+- 组件中render方法中的this为组件实例对象
+- 状态数据，不能直接修改或更新（`setState()`）
+- 组件自定义的方法中this为undefined，如何解决？
+  - 强制绑定this: 通过函数对象的bind()
+  -  箭头函数
+
+### 3.2 props
+
+state只能用于1个组件内的数据，如果和外面交互呢。多个组件内交换信息呢。可以看出来，state局限性。
+
+```jsx
+class Person extends React.Component {
+    state = {name:"tom",age:18}
+    render(){
+        return (
+            <ul>
+                <li>{this.state.name}</li>
+                <li>{this.state.age}</li>
+            </ul>
+        )
+    }
+}
+ReactDom.render(<Person />, document.getElementById('test1'));
+ReactDom.render(<Person />, document.getElementById('test2'));
+ReactDom.render(<Person />, document.getElementById('test3'));
+```
+
+所以props横空出世了。可以从组件外部传递值，动态的传递进去。
+
+```jsx
+class Person extends React.Component {
+    state = {name:"tom",age:"18"}
+    render(){
+        return (
+            <ul>
+                <li>{this.props.name}</li>
+                <li>{this.props.age}</li>
+            </ul>
+        )
+    }
+}
+ReactDom.render(<Person name="Amy" age="19"/>, document.getElementById('test1'));
+ReactDom.render(<Person name="Tom" age="99"/>, document.getElementById('test2'));
+ReactDom.render(<Person name="Can" age="18"/>, document.getElementById('test3'));
+```
+
+但是这样写还是太繁琐了，所以有**解构赋值**。
+
+```jsx
+class Person extends React.Component {
+    state = {name:"tom",age:18}
+    render(){
+        const {name, age} = this.props
+        return (
+            <ul>
+                <li>{name}</li>
+                <li>{age}</li>
+            </ul>
+        )
+    }
+}
+ReactDom.render(<Person name="Amy" age="19"/>, document.getElementById('test1'));
+ReactDom.render(<Person name="Tom" age="99"/>, document.getElementById('test2'));
+ReactDom.render(<Person name="Can" age="18"/>, document.getElementById('test3'));
+```
+
+以上就是最基本的使用方式。
+
+但是如果信息特别多呢，下面的模式是不是就捉襟见肘了。
+
+#### 批量传递
+
+```jsx
+ReactDom.render(<Person name="Amy" age="19"......./>, document.getElementById('test1'));
+```
+
+于是，这里就有个**展开运算符**。
+
+```jsx
+class Person extends React.Component {
+    state = {name:"tom",age:18}
+    render(){
+        const {name, age} = this.props
+        return (
+            <ul>
+                <li>{name}</li>
+                <li>{age}</li>
+            </ul>
+        )
+    }
+}
+const p = {name:"Amy", age:"18"}
+// ReactDom.render(<Person name="Amy" age="19"/>, document.getElementById('test1'));
+ReactDom.render(<Person {...p}/>, document.getElementById('test1'));
+```
+
+#### 展开运算符复习向
+
+```js
+let arr = [1, 2, 3]
+// 展开数组
+consol.log(arr) // [1,2,3] 
+consol.log(...arr) // 1,2,3
+// 连接数组
+let arr2 = [4,5,6]
+let arr3 = [...arr, ...arr2]
+console.log(arr3) // [1,2,3,4,5,6] 
+// 传递不定参数
+function sum(...numbers) {
+    return numbers.reduce((pre, cur) => {
+        return pre + cur;
+    })
+}
+// 但是展开运算符不适用于对象
+let person = {name: "Amy", age:"18"}
+// let person2 = person 这里只是引用传递并不是复制
+// console.log(...person) 报错，展开运算符不能展开对象
+let person2 = {...person} // 这里就是赋值，构造字面量对象时使用展开语法
+// 并且可以合并
+let person3 = {...person, name:"bob"} // 成功修改属性
+```
+
+原生是不可以遍历对象的，但是bable+react是可以遍历的。虽然可以展开，但是只可以适用于标签属性的传递、
+
+```jsx
+ReactDom.render(<Person {...p}/>, document.getElementById('test1'));
+```
+
+#### props的限制
+
+数字可以这样改
+
+```jsx
+ReactDom.render(<Person name="Amy" age={19}/>, document.getElementById('test1'));
+```
+
+所以如何对传递过来的值进行**类型+范围+默认值设置**这些修改呢？
+
+#### props完整写法
+
+```js
+<script type="text/babel">
+    //创建组件
+    class Person extends React.Component{
+        render(){
+            // console.log(this);
+            const {name,age,sex} = this.props
+            //props是只读的
+            //this.props.name = 'jack' //此行代码会报错，因为props是只读的
+            return (
+                <ul>
+                    <li>姓名：{name}</li>
+                    <li>性别：{sex}</li>
+                    <li>年龄：{age+1}</li>
+                </ul>
+    		)
+    	}
+    }
+// 对标签属性进行类型、必要性的限制
+// 注意propTypes 写法 PropTypes 大小写也一样
+Person.propTypes = {
+    name:PropTypes.string.isRequired, //限制name必传，且为字符串
+    sex:PropTypes.string,//限制sex为字符串
+    age:PropTypes.number,//限制age为数值
+    speak:PropTypes.func,//限制speak为函数
+}
+//指定默认标签属性值
+Person.defaultProps = {
+    sex:'男',//sex默认值为男
+    age:18 //age默认值为18
+}
+//渲染组件到页面
+ReactDOM.render(<Person name={100} speak={speak}/>,document.getElementById('test1'))
+ReactDOM.render(<Person name="tom" age={18} sex="女"/>,document.getElementById('test2'))
+
+const p = {name:'老刘',age:18,sex:'女'}
+// console.log('@',...p);
+// ReactDOM.render(<Person name={p.name} age={p.age} sex={p.sex}/>,document.getElementById('test3'))
+ReactDOM.render(<Person {...p}/>,document.getElementById('test3'))
+
+function speak(){
+    console.log('我说话了');
+}
+</script>
+```
+
+版本16之前还是`React.PropTypes`后面觉得React背负了太多 就直接PropTypes了
+所以需要引入这个包(**prop-types.js**)，这样就引入了PropTypes对象
+
+```html
+<!-- 引入prop-types，用于对组件标签属性进行限制 -->
+<script type="text/javascript" src="../js/prop-types.js"></script>
+```
+
+传入函数的话，就需要`func` 为什么不是`function`，因为会和关键字冲突，为什么`string number`就可以，因为这俩在js里是`String,Number`
+
+```jsx
+speak:PropTypes.func, //限制speak为函数
+ReactDOM.render(<Person name={100} speak={speak}/>,document.getElementById('test1'))
+function speak(){
+    console.log('我说话了');
+}
+```
+
+props是**只读**的，不允许改。
+
+```jsx
+// props是只读的
+// this.props.name = 'jack' //此行代码会报错，因为props是只读的
+// 但是下面的运算是可以的
+{age + 1}
+```
+
+#### props精简写法
+
+仔细看结构，会发现所有和这个**组件相关的限制还是放在类里面**比较好。
+
+![image-20210831170003662](https://raw.githubusercontent.com/chihokyo/image_host/develop/20210831170004.png)
+
+所以结论就是给这个类本身增加属性。使用`static`
+
+```jsx
+//创建组件
+class Person extends React.Component{
+
+    constructor(props){
+        //构造器是否接收props，是否传递给super，取决于：是否希望在构造器中通过this访问props
+        // console.log(props);
+        super(props)
+        console.log('constructor',this.props);
+    }
+
+    //对标签属性进行类型、必要性的限制
+    static propTypes = {
+        name:PropTypes.string.isRequired, //限制name必传，且为字符串
+        sex:PropTypes.string,//限制sex为字符串
+        age:PropTypes.number,//限制age为数值
+    }
+
+    //指定默认标签属性值
+    static defaultProps = {
+        sex:'男',//sex默认值为男
+        age:18 //age默认值为18
+    }
+
+    render(){
+        // console.log(this);
+        const {name,age,sex} = this.props
+        //props是只读的
+        //this.props.name = 'jack' //此行代码会报错，因为props是只读的
+        return (
+            <ul>
+                <li>姓名：{name}</li>
+                <li>性别：{sex}</li>
+                <li>年龄：{age+1}</li>
+            </ul>
+        )
+    }
+}
+```
+
+以上，就完成了简写。
+
+#### 构造器问题
+
+接下来开始整一下构造器问题。在最前面构造器初始化的时候可以看到参数是`constructor(props){}`
+
+**Q1：传入不传入`super(props)`有什么区别?**
+
+在输出实例自身的props的时候
+
+```js
+//  不传入
+constructor(){
+    super()
+    console.log('constructor',this.props); // undefined
+}
+//  传入
+constructor(props){
+    super(props)
+    console.log('constructor',this.props); // 能获取到自身实例
+}
+```
+
+所以结论就是 <u>**构造器是否接收props，是否传递给super，取决于：是否希望在构造器中通过this访问props**</u>。
+
+**Q2：类中构造器有什么作用?**
+
+- 给`this.state`初始化
+- 为事件处理函数绑定实例 → `this.changeWeather = this.changeWeather.bind(this)`
+
+```jsx
+//创建组件
+class Person extends React.Component{
+
+    constructor(props){
+        //构造器是否接收props，是否传递给super，取决于：是否希望在构造器中通过this访问props
+        // console.log(props);
+        super(props)
+        console.log('constructor',this.props);
+    }
+
+    //对标签属性进行类型、必要性的限制
+    static propTypes = {
+        name:PropTypes.string.isRequired, //限制name必传，且为字符串
+        sex:PropTypes.string,//限制sex为字符串
+        age:PropTypes.number,//限制age为数值
+    }
+
+    //指定默认标签属性值
+    static defaultProps = {
+        sex:'男',//sex默认值为男
+        age:18 //age默认值为18
+    }
+
+    render(){
+		....
+    }
+}
+```
+
+#### 函数式组件使用props
+
+函数式组件里虽然不能用到以上(state，refs，但这么说也不严谨。后面hooks也可以了state)的属性，但是`props`却能用到。因为函数可以接受参数。
+
+```jsx
+//创建组件
+function Person (props){
+    const {name,age,sex} = props
+    return (
+        <ul>
+            <li>姓名：{name}</li>
+            <li>性别：{sex}</li>
+            <li>年龄：{age}</li>
+        </ul>
+    )
+}
+Person.propTypes = {
+    name:PropTypes.string.isRequired, //限制name必传，且为字符串
+    sex:PropTypes.string,//限制sex为字符串
+    age:PropTypes.number,//限制age为数值
+}
+
+//指定默认标签属性值
+Person.defaultProps = {
+    sex:'男',//sex默认值为男
+    age:18 //age默认值为18
+}
+//渲染组件到页面
+ReactDOM.render(<Person name="jerry"/>,document.getElementById('test1'))
+```
+
+#### props总结
+
+- 标签属性可以通过`props`传递数据 → `ReactDOM.render(<Person name="tom" age={18} sex="女"/>,document.getElementById('test2'))`
+- 简写的原理就是通过`static`关键字从类外部转移到了内部
+
+### 3.3. refs
+
+**Q1：什么是？为什么要用？**
+
+组件内的标签可以定义ref属性来标识自己 快速定位呗
+
+**Q2：取得的是真实的DOM还是虚拟的DOM？**
+
+真实的DOM 可以通过`debugger`验证
+
+#### 字符串形式refs
+
+下面是字符串形式的refs 
+
+```jsx
+class Demo extends React.Component {
+    showData = () => {
+        console.log(this)
+        debugger
+		const {input1} = this.refs // 复数
+    }
+    showData2 = () => {
+        const {input1} = this.refs
+    }
+    render(){
+        return (
+            <div>
+                <input ref="input1" type="text" value="" />
+                <button onClick={this.showData}></button>
+                <input ref="input2" onBlur={this.showData2} type="text" value="" />
+            </div>
+        )
+    }
+}
+```
+注意，根据官网的描述，这个API已经快过时了。**因为效率不高**
+[过时 API：String 类型的 Refs](https://zh-hans.reactjs.org/docs/refs-and-the-dom.html)
+
+> 过时 API：String 类型的 Refs 
+>
+> 如果你之前使用过 React，你可能了解过之前的 API 中的 string 类型的 ref 属性，例如 `"textInput"`。你可以通过 `this.refs.textInput` 来访问 DOM 节点。我们不建议使用它，因为 string 类型的 refs 存在 [一些问题](https://github.com/facebook/react/pull/8333#issuecomment-271648615)。它已过时并可能会在未来的版本被移除。
+>
+> > 注意
+> >
+> > 如果你目前还在使用 `this.refs.textInput` 这种方式访问 refs ，我们建议用[回调函数](https://zh-hans.reactjs.org/docs/refs-and-the-dom.html#callback-refs)或 [`createRef` API](https://zh-hans.reactjs.org/docs/refs-and-the-dom.html#creating-refs) 的方式代替。
+
+#### 回调形式refs
+
+- 我定义了一个函数
+- 我没有调用它
+- 它执行了
+
+用这个可以验证，回调函数返回值跟调用者有关。这里返回的就是a所在的节点`<input ref={(a)=>{console.log(a)}} `
+
+所以就可以这样写↓` <input ref={(curNode)=>{this.input1 = curNode}} type="text" value="" />`
+
+这样的结果，就是把a所在的节点挂在了this.input1上，这里的this也就是箭头函数最近的实例Demo
+
+```jsx
+class Demo extends React.Component {
+    showData = () => {
+        console.log(this)
+        debugger
+		const {input1} = this.refs // 复数
+    }
+    showData2 = () => {
+        const {input1} = this.refs
+    }
+    render(){
+        return (
+            <div>
+                <input ref={c =>this.input1 = c} type="text" value="" />
+                <button onClick={this.showData}></button>
+            </div>
+        )
+    }
+}
+```
+
+回调次数问题
+
+官方说明内联函数问题 → [关于回调 refs 的说明](https://zh-hans.reactjs.org/docs/refs-and-the-dom.html#caveats-with-callback-refs)
+
+```jsx
+//  内联形式
+{/*<input ref={(c)=>{this.input1 = c;console.log('@',c);}} type="text"/><br/><br/>*/}
+<input ref={this.saveInput} type="text"/><br/><br/> 
+// 绑定形式
+saveInput = (c)=>{
+    this.input1 = c;
+    console.log('@',c);
+}
+```
+
+所以下面会有一个非内联的，绑定的。但这两者*无关紧要*，不用过于纠结。
+
+```jsx
+//创建组件
+class Demo extends React.Component{
+state = {isHot:false}
+showInfo = ()=>{
+    const {input1} = this
+    alert(input1.value)
+}
+
+changeWeather = ()=>{
+    //获取原来的状态
+    const {isHot} = this.state
+    //更新状态
+    this.setState({isHot:!isHot})
+}
+
+saveInput = (c)=>{
+    this.input1 = c;
+    console.log('@',c);
+}
+
+render(){
+    const {isHot} = this.state
+    return(
+        <div>
+            <h2>今天天气很{isHot ? '炎热':'凉爽'}</h2>
+            {/*<input ref={(c)=>{this.input1 = c;console.log('@',c);}} type="text"/><br/><br/>*/} 内联形式
+            <input ref={this.saveInput} type="text"/><br/><br/>  绑定形式
+            <button onClick={this.showInfo}>点我提示输入的数据</button>
+            <button onClick={this.changeWeather}>点我切换天气</button>
+        </div>
+    )
+}
+}
+```
+
+#### createRef()形式
+
+官方写的很清楚。[创建 Refs](https://zh-hans.reactjs.org/docs/refs-and-the-dom.html#creating-refs)
+
+**要注意，这里的创建方式并不是通过回调函数，而是官方的API。**
+
+创建 `myRef = React.createRef()`
+
+获取`this.myRef.current.value`
+
+他的局限性就是，专人专用，一个萝卜一个坑。而且用几个容器就要创建几个，代码稍微要写多点。
+
+```jsx
+//创建组件
+class Demo extends React.Component{
+    /* 
+		React.createRef调用后可以返回一个容器，该容器可以存储被ref所标识的节点,该容器是“专人专用”的
+	*/
+myRef = React.createRef()
+myRef2 = React.createRef()
+//展示左侧输入框的数据
+showData = ()=>{
+    alert(this.myRef.current.value);
+}
+//展示右侧输入框的数据
+showData2 = ()=>{
+    alert(this.myRef2.current.value);
+}
+render(){
+    return(
+        <div>
+            <input ref={this.myRef} type="text" placeholder="点击按钮提示数据"/>&nbsp;
+            <button onClick={this.showData}>点我提示左侧的数据</button>&nbsp;
+            <input onBlur={this.showData2} ref={this.myRef2} type="text" placeholder="失去焦点提示数据"/>&nbsp;
+        </div>
+    )
+}
+}
+//渲染组件到页面
+ReactDOM.render(<Demo a="1" b="2"/>,document.getElementById('test'))
+```
 
 
 
@@ -352,15 +1276,11 @@ class 定义的 才有 → 实例 → 才有 →属性
 
 
 
+------------
 
 
 
-
-
-
---------------
-
-
+>  **以下内容都是以前的总结，不是很全。**
 
 ## 1. 环境安装
 
