@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>事件处理-受控组件</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      class Login extends React.Component {
+
+            state = {
+                username:'',
+                password:''
+            }
+
+            handleSubmit = (event) => {
+                event.preventDefault()
+                const {username, password} = this
+                alert(`username:${username},pass:${password}`)
+            }
+
+            saveUsername = (event) => {
+                this.setState({
+                    username:event.target.value
+                })
+            }
+
+            savePassword = (event) => {
+                this.setState({
+                    password:event.target.value
+                })
+            }       
+
+            render(){
+                return (
+                    <form action="#" method="get" onSubmit={this.handleSubmit}>
+                    <input
+                        onChange={this.saveUsername}
+                        type="text"
+                        name="username"
+                        id=""
+                    />
+                    <input
+                        onChange={this.savePassword}
+                        type="password"
+                        name="password"
+                        id=""
+                    />
+                    <button>login</button>
+                    </form>
+                )
+            }
+      }
+
+      ReactDOM.render(<Login />, document.getElementById("root"));
+    </script>
+  </body>
+</html>

@@ -1134,7 +1134,7 @@ class Demo extends React.Component {
 - 我没有调用它
 - 它执行了
 
-用这个可以验证，回调函数返回值跟调用者有关。这里返回的就是a所在的节点`<input ref={(a)=>{console.log(a)}} `
+用这个可以验证，**回调函数返回值跟调用者有关**。这里返回的就是a所在的节点`<input ref={(a)=>{console.log(a)}} `
 
 所以就可以这样写↓` <input ref={(curNode)=>{this.input1 = curNode}} type="text" value="" />`
 
@@ -1256,9 +1256,416 @@ render(){
 ReactDOM.render(<Demo a="1" b="2"/>,document.getElementById('test'))
 ```
 
+## 4. 事件处理
 
+事件委托的原理就是事件冒泡
 
+**发生事件的事件源和操作的元素相同的情况下，不要过度使用refs。反正都是自身。**
 
+比如下面这个输入框失去焦点就可以不用写
+
+```jsx
+// 使用ref写的
+myRef2 = React.createRef();
+showData2 = () => {
+    alert(this.myRef2.current.value)
+}
+
+<input onBlur={this.showData} ref={this.myRef2} type="text" placeholder"失去焦点" />
+
+// 不使用
+showData2 = (event) => {
+    alert(this.event.target.value)
+}
+
+<input onBlur={this.showData} type="text" placeholder"失去焦点" />
+```
+
+如果事件源和需要的数据不是一个DOM，就不行了哦。
+
+**Q:为什么不是用原生的事件(`onclikc()`)处理，还是使用的自己封装的(`onClick()`)？**
+
+为了考虑兼容性问题和效率。
+
+### 4.1 非受控组件 VS 受控组件
+
+首先无论是受控组件还是非受控组件，这个概念都是针对表单而言的。
+
+非受控组件，顾名思义，不用你主动去控制，帮你收集数据。是通过**ref**来实现的。
+
+- 受控组件 很像vue双向绑定 可以省略ref
+- 非受控组件 直接使用ref操作dom
+
+[React 之受控组件和非受控组件](https://juejin.cn/post/6844903629493633038)
+
+[受控和非受控组件真的那么难理解吗？(React实际案例详解)](https://juejin.cn/post/6858276396968951822)
+
+案例，收集一个表单数据并输出。
+
+#### 非受控组件代码演示
+
+```jsx
+class Login extends React.Component {
+
+    handleSubmit = () => {
+        event.preventDefault() // 阻止表单提交，不然就会有刷新提交动作。
+        const { username, password } = this;
+        // alert(username) // 这里拿的就是一个节点而已 {c => this.username = c} 是节点
+        alert(username.value) // 所以要这样写 然后下面是一个嵌套模板字符串 ${ }
+        alert(`输入的用户名：${username.value},输入的密码：${password.value}`)
+    }
+
+    render(){
+
+        return (
+            <form action="#" method="get" onSubmit={this.handleSubmit}>
+                <input ref={c => this.username = c} type="text" name="username" id="" />
+                <input ref={c => this.password = c} type="password" name="password" id="" />
+                <button>login</button>
+            </form>
+        )
+    }
+}
+
+ReactDOM.render(<Login />, document.getElementById('root'))
+```
+
+注意点
+
+- 阻止默认事件提交行为
+- ref定义箭头函数取得节点
+- 在`handleSubmit()`里如何取值
+- 嵌套模板字符串
+
+#### 受控组件代码演示
+
+这种可以在state状态里根据你输入框的变化取出来的就是一大特点。
+
+上面的是表单统一获取，下面的这个受控的，就是可以控制了。那么通过什么控制呢，就是`onChange()`。vue不是有一个双向绑定的概念吗，你输入什么就同步可以显示出来，react这里需要自己写。所以就先写第一阶段。
+
+```jsx
+class Login extends React.Component {
+	
+    // 初始化状态
+    state = {
+        username:'',
+        password:''
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault()
+        const {username, password} = this
+        alert(`username:${username},pass:${password}`)
+    }
+	
+    // 这里就是受控组件
+    saveUsername = (event) => {
+        this.setState({
+            username:event.target.value
+        })
+    }
+	// 这里就是受控组件
+    savePassword = (event) => {
+        this.setState({
+            password:event.target.value
+        })
+    }       
+
+    render(){
+        return (
+            <form action="#" method="get" onSubmit={this.handleSubmit}>
+                <input
+                    // 受控组件下需要onChange()函数，这里传入onChange的是一个函数
+                    // 所以不能写this.saveUsername() 加了括号就是直接调用了
+                    onChange={this.saveUsername}
+                    type="text"
+                    name="username"
+                    id=""
+                    />
+                <input
+                    onChange={this.savePassword}
+                    type="password"
+                    name="password"
+                    id=""
+                    />
+                <button>login</button>
+            </form>
+        )
+    }
+}
+```
+
+上面的受控组件写完了，但是还有很多重复的部分。比如一个输入框就要写一个onchange，是不是太麻烦了？能不能通过一个通用的函数然后根据参数来判断呢？比如下面这个样
+
+```jsx
+saveFormData = (event) => {
+    this.setState({
+        username:event.target.value
+    })
+}
+
+<input onChange={this.saveFormData('username')} type="text" name="username" id="" />
+<input onChange={this.saveFormData('password')} type="text" name="password" id="" />
+```
+
+这样是不行的，因为上面也已经写了。如果是加了括号并且有了参数，这样就相当于触发事件之后我们直接就调用了`saveFormData('username')`函数，**那么此时onChange接受的就是这个函数的返回值，而不是这个函数！**这样就造成了无论你怎么调用，出来的都是undefined的，如果说加了括号就相当于调用的是返回值的话，那么如何解决呢？
+
+<u>结论。让函数的返回值是一个函数不就好了？</u>
+
+```jsx
+saveFormData = (event) => {
+    // this.setState({
+    //    username:event.target.value
+    // })
+    return () => {
+ 		console.log("test")       
+    }
+}
+```
+
+这样的话，你每次调用的输出的都是test了。可以见得，回调函数这个返回值就不再是undefined的了。
+
+又由于onChange里的函数是谁来调用的呢，是React实例来调用的，那么在这里面就可以写上event，也就是可以取得你想要的state的值了
+
+```jsx
+saveFormData = (event) => {
+    // this.setState({
+    //    username:event.target.value
+    // })
+    return (event) => {
+		console.log(event.target.value)
+    }
+}
+```
+
+于是，总和一下，加上了可以判断的参数，那么就是这样写的
+
+```jsx
+saveFormData = (dataType) => {
+    return (event) => {
+		this.setState({
+		// dataType:event.target.value 错误写法，因为这里的datatype就是一个变量，对象直接写变量就是会变成一个字符串了。这里是js的语法基础，当dateType是一个变量，你想取出来。要通过方括号
+            [dataType]:evnet.target.value
+        })
+    }
+}
+```
+
+上面那个js基础可以看这个
+
+```js
+let a = "name";
+le obj = {}
+obj.a = "Amy";
+console.log(obj) // 这里输出的就是a:Amy
+// 比如要这样
+obj[a] = "Ayy";
+console.log(obj) // 这里输出的就是name:Amy
+```
+
+上面的写法还能不能进行优化呢。比如写一个共通的函数`this.saveFormData()`
+
+因为如果你单纯的只是写了一个共通函数对数据类型进行判断的话，肯定是不对的。
+
+```jsx
+class Login extends React.Component {
+    state = {
+        username: "",
+        password: "",
+    };
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        const { username, password } = this;
+        alert(`username:${username},pass:${password}`);
+    };
+	
+	// 这里可以测试出来你写的不对
+    saveFormData = (event) => {
+        console.log(event);
+    };
+
+    render() {
+        return (
+            <form action="#" method="get" onSubmit={this.handleSubmit}>
+                <input
+                    // 如果这样写的话，其实就是把this.saveFormData("username")这个函数返回值给了onChange回调
+                    onChange={this.saveFormData("username")}
+                    type="text"
+                    name="username"
+                    id=""
+                    />
+                <input
+                    onChange={this.saveFormData("password")}
+                    type="password"
+                    name="password"
+                    id=""
+                    />
+                <button>login</button>
+            </form>
+        );
+    }
+}
+```
+
+那么怎么写才可以呢。首先要保证
+
+- 需要返回一个真正的回调函数
+- 需要把2个参数进行合并
+
+下面就是高阶函数的世界了。**函数的柯里化。**
+
+### 4.2 函数柯里化
+
+```
+高阶函数，如果一个函数满足以下2个规范中任意一个规范，那么这个函数就是高阶函数
+	①若A函数，接受的参数是一个函数。那么A就是高阶函数。
+	②若A函数，调用的返回值仍然是一个函数，那么A就是高阶函数。
+常见的高阶函数，Promise，setTimeout，arr.map()，感觉回调函数都是高阶函数
+
+函数的柯里化：通过函数调用继续返回函数的方式，实现多次接受的参数最后统一处理的函数编码形式
+```
+
+比如以下
+
+```js
+// 没有柯里化
+funtion sum(a, b, c) {
+    return a + b + c
+}
+const res = sum(1, 2, 3) // 6
+// 函数柯里化
+funtcion sum(a) {
+    return (b) => {
+        return (c) => {
+            return a + b + c
+        }
+    }
+}
+const res2  = sum(1)(2)(3) // 6
+```
+
+使用了柯里化函数之后的实现
+
+```jsx
+class Login extends React.Component {
+    state = {
+        username: "",
+        password: "",
+    };
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        const { username, password } = this;
+        alert(`username:${username},pass:${password}`);
+    };
+	
+	// 主要是这里 dataType 和 event 进行的统一处理
+    saveFormData = (dataType) => {
+        // 这里才是React帮你调用的函数，所以拿到了event
+        return (event) => {
+            this.setState({
+                [dataType]: event.target.value,
+            });
+        };
+    };
+
+    render() {
+        return (
+            <form action="#" method="get" onSubmit={this.handleSubmit}>
+                <input
+                    // 这里
+                    onChange={this.saveFormData("username")}
+                    type="text"
+                    name="username"
+                    id=""
+                    />
+                <input
+                    onChange={this.saveFormData("password")}
+                    type="password"
+                    name="password"
+                    id=""
+                    />
+                <button>login</button>
+            </form>
+        );
+    }
+}
+```
+
+#### 不用函数柯里化
+
+如果不用函数柯里化就不能写了吗？
+
+下面当然可以，如果说onChange只是需要一个函数的话，那么就传给她一个函数`() => {}`
+
+然后因为调用这个匿名函数的是React，那么参数event肯定是能取到的，然后在调用`saveFormData()`。顺理成章。
+
+```jsx
+saveFormData = (dataType, value) => {
+    this.setState({
+        [dataType]: value,
+    });
+};
+
+render() {
+    return (
+        <form action="#" method="get" onSubmit={this.handleSubmit}>
+            <input
+                onChange={(event) => {
+                    this.saveFormData("username", event.target.value);
+                }}
+                type="text"
+                name="username"
+                id=""
+                />
+            <input
+                onChange={(event) => {
+                    this.saveFormData("password", event.target.value);
+                }}
+                type="password"
+                name="password"
+                id=""
+                />
+            <button>login</button>
+        </form>
+    );
+}
+```
+
+这样也可以
+
+```jsx
+saveFormData = (dataType, event) => {
+    this.setState({
+        [dataType]: event.target.value,
+    });
+};
+
+render() {
+    return (
+        <form action="#" method="get" onSubmit={this.handleSubmit}>
+            <input
+                onChange={ event => 
+                    this.saveFormData("username", event);
+                }
+                type="text"
+                name="username"
+                id=""
+                />
+            <input
+                onChange={ event => 
+                    this.saveFormData("password", event);
+                }
+                type="password"
+                name="password"
+                id=""
+                />
+            <button>login</button>
+        </form>
+    );
+}
+```
 
 
 

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>事件处理-非受控组件</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      class Login extends React.Component {
+        handleSubmit = () => {
+          event.preventDefault(); // 阻止表单提交，不然就会有刷新提交动作。
+          const { username, password } = this;
+          // alert(username) // 这里拿的就是一个节点而已 {c => this.username = c} 是节点
+          alert(username.value); // 所以要这样写 然后下面是一个嵌套模板字符串 ${ }
+          alert(
+            `输入的用户名：${username.value},输入的密码：${password.value}`
+          );
+        };
+
+        render() {
+          return (
+            <form action="#" method="get" onSubmit={this.handleSubmit}>
+              <input
+                ref={(c) => (this.username = c)}
+                type="text"
+                name="username"
+                id=""
+              />
+              <input
+                ref={(c) => (this.password = c)}
+                type="password"
+                name="password"
+                id=""
+              />
+              <button>login</button>
+            </form>
+          );
+        }
+      }
+
+      ReactDOM.render(<Login />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
