@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>一次错误的计时器演示</title>
+    <!-- 这个是核心库 -->
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <!-- 这里是拓展库 -->
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- 没有这个就无法解析jsx到js -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      class Life extends React.Component {
+        state = {
+          opacity: 1,
+        };
+
+        death = () => {
+          ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+        };
+
+        render() {
+          // 写一个定时器
+          setInterval(() => {
+            let { opacity } = this.state;
+            opacity -= 0.1;
+            if (opacity <= 0) opacity = 1;
+            this.setState({ opacity });
+          }, 200);
+
+          return (
+            <div>
+              <h2 style={{opacity:this.state.opacity}}>React好难</h2>
+              <button onClick={this.death}>DEATH</button>
+            </div>
+          );
+        }
+      }
+
+      ReactDOM.render(<Life />, document.getElementById("root"));
+    </script>
+  </body>
+</html>

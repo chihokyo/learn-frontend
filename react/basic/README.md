@@ -1667,6 +1667,505 @@ render() {
 }
 ```
 
+## 5. 生命周期
+
+为什么要学生命周期，因为这个是React最重要的概念。
+
+组件放到页面叫 比如设置定时器 → 挂载mount
+
+组件被清除掉 比如清除定时器 → 卸载unmount
+
+下面有一个无限循环错误实现
+
+```jsx
+class Life extends React.Component {
+    state = {
+        opacity: 1,
+    };
+
+    death = () => {
+        ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+    };
+
+    render() {
+        // 写一个定时器
+        setInterval(() => {
+            let { opacity } = this.state;
+            opacity -= 0.1;
+            if (opacity <= 0) opacity = 1;
+            // 因为这里有更新，那么就是不停的render，只要每一次render那么就有一个定时器
+            // 无限下去就是指数级增长 所以定时器放在这里不合适
+            this.setState({ opacity });
+        }, 200);
+
+        return (
+            <div>
+                <h2 style={{opacity:this.state.opacity}}>React好难</h2>
+                <button onClick={this.death}>DEATH</button>
+            </div>
+        );
+    }
+}
+
+ReactDOM.render(<Life />, document.getElementById("root"));
+```
+
+所以就引出了一个生命周期`componentDidMount()`，这个函数是React实例自己调用的，其他函数都是事件回调调用的，而这个函数是React自己调用的，**组件完成挂载！**
+
+`componentDidMount()` → 组件挂载完毕，只调用1次
+
+`render()` → 初始化渲染1次 + 每次更新n次
+
+所以接着写。
+
+```jsx
+class Life extends React.Component {
+    state = {
+        opacity: 1,
+    };
+
+    death = () => {
+        ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+    };
+	// 因为只调用1次，所以在这里写比较安全
+    componentDidMount() {
+        // 写一个定时器
+        setInterval(() => {
+            let { opacity } = this.state;
+            opacity -= 0.1;
+            if (opacity <= 0) opacity = 1;
+            this.setState({ opacity });
+        }, 200);
+    }
+
+    render() {
+        return (
+            <div>
+                <h2 style={{ opacity: this.state.opacity }}>React好难</h2>
+                <button onClick={this.death}>DEATH</button>
+            </div>
+        );
+    }
+}
+
+ReactDOM.render(<Life />, document.getElementById("root"));
+```
+
+虽然安全了，但是引出了全新的错误。那就是在点DEATH的时候会发现报错
+
+```
+Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
+    in Life
+```
+
+意思就是说，组件已经被卸载了，就无法更新(`render()`)了。但是定时器还在运行呢，所以必须要找个时间清空定时器。
+
+比如下面这样
+
+```jsx
+class Life extends React.Component {
+        state = {
+          opacity: 1,
+        };
+
+        death = () => {
+            // 在这里清除
+            clearInterval(this.timer);
+          ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+        };
+
+        componentDidMount() {
+          // 写一个定时器
+          this.timer = setInterval(() => {
+            let { opacity } = this.state;
+            opacity -= 0.1;
+            if (opacity <= 0) opacity = 1;
+            this.setState({ opacity });
+          }, 200);
+        }
+
+        render() {
+          return (
+            <div>
+              <h2 style={{ opacity: this.state.opacity }}>React好难</h2>
+              <button onClick={this.death}>DEATH</button>
+            </div>
+          );
+        }
+      }
+```
+
+但是为了更好的时机的话，可以使用生命周期的函数组件将要卸载`componentWillUnmount()`
+
+```jsx
+death = () => {
+    ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+};
+
+componentDidMount() {
+    this.timer = setInterval(() => {
+        let { opacity } = this.state;
+        opacity -= 0.1;
+        if (opacity <= 0) opacity = 1;
+        this.setState({ opacity });
+    }, 200);
+}
+componentWillUnmount() {
+    // 在这里清除更好
+    clearInterval(this.timer)
+}
+```
+
+这里开始写旧的生命周期。
+
+### 生命周期【旧】
+
+但首先要明白，生命周期函数是按照顺序调用的，跟你写的前后顺序无关。这也就是为什么可以在组件内直接写函数，不需要像你自己写的函数那样还要`this.method()`。
+
+**生命周期回调函数 == 生命周期钩子函数 == 生命周期函数 == 生命周期钩子** 都是一个意思
+
+`componentDidMount()`
+
+`componentWillUnmount()`
+
+`render()`
+
+这是上面接触过的
+
+下面写一个案例来看一下。
+
+```jsx
+class Count extends React.Component {
+
+    // 组件初始化的时候
+    constructor(props) {
+        console.log("Count---constructor");
+        super(props)
+        this.state = {count: 0}
+
+    }
+
+    // 组件将要挂载的钩子
+    componentWillMount(){
+        console.log("Count---componentWillMount");
+    }
+
+    // 组件挂载完毕
+    componentDidMount(){
+        console.log("Count---componentDidMount");
+    }
+
+    add = () => {
+        const {count} = this.state
+        this.setState({count:count+1})
+    }
+
+    // 组件渲染or再次更新的时候
+    render () {
+        console.log("Count---render");
+        const {count}  = this.state
+        return (
+            <div>
+                <h2>当前点击：{count}</h2>
+                <button onClick={this.add}>Click Me +1</button>
+            </div>
+        )
+    }
+}
+```
+
+上面的首次刷新，什么都不做的情况下会输出
+
+```
+Count---constructor
+Count---componentWillMount
+Count---render
+Count---componentDidMount
+```
+
+![image-20210906224504402](https://raw.githubusercontent.com/chihokyo/image_host/develop/20210906224511.png)
+
+也就是走完了上面的流程。
+
+接下来写一个卸载组件的小函数`death()`
+
+```jsx
+// 卸载组件按钮的回调
+death = () => {
+    ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+}
+
+// 组件挂载完毕
+componentWillUnmount(){
+    console.log("Count---componentWillUnmount");
+}
+
+
+// 组件渲染or再次更新的时候
+render () {
+    console.log("Count---render");
+    const {count}  = this.state
+    return (
+        <div>
+            <h2>当前点击：{count}</h2>
+            <button onClick={this.add}>Click Me +1</button>
+            <button onClick={this.death}>Click DEATH</button>
+        </div>
+    )
+}
+```
+
+上面点击DEATH之后就是**Count---componentWillUnmount**
+
+接下来再看右边部分，分为3条线。先看第②条黄线
+
+#### 第②条线
+
+![image-20210906225223605](https://raw.githubusercontent.com/chihokyo/image_host/develop/20210906225224.png) 
+
+当更新的时候首先要更新setState，然后在判断我应该不应该更改状态的时候，就看`shouldComponentUpdate()`，这个函数返回的是**true**就可以更新，如果是**false**就②那条线到此结束。之前没写的时候，就直接`render()`也可以啊，因为这个钩子默认永远返回的是**true**，除非你自己写。
+
+接下来你自己写了一个
+
+```jsx
+shouldComponentUpdate(){
+    console.log("Count---shouldComponentUpdate");
+}
+```
+
+你在刷新页面会发现，调用了但是会报错。
+
+```
+Count---shouldComponentUpdate
+Warning: Count.shouldComponentUpdate(): Returned undefined instead of a boolean value. Make sure to return true or false.    in Count
+```
+
+所以你写上了true
+
+```jsx
+shouldComponentUpdate(){
+    console.log("Count---shouldComponentUpdate")
+    return true
+}
+```
+
+然后点击clickme！会发现结果就是
+
+```
+Count---shouldComponentUpdate
+Count---render
+```
+
+如果你写的是false
+
+```
+shouldComponentUpdate(){
+    console.log("Count---shouldComponentUpdate")
+    return false
+}
+```
+
+点击click me你会发现页面会输出你点击次数的Count---shouldComponentUpdate，但是没任何反应。**为什么呢？因为是false之后下面那条线就完全不会向下走了，自然就不会有任何效果。**
+
+于是你接下来继续执行②那条线，写代码。
+
+```jsx
+// 卸载组件按钮的回调
+death = () => {
+    ReactDOM.unmountComponentAtNode(document.getElementById("root"));
+}
+
+// 组件挂载完毕
+componentWillUnmount(){
+    console.log("Count---componentWillUnmount");
+}
+
+// 控制组件更新的阀门 false就停止
+shouldComponentUpdate(){
+    console.log("Count---shouldComponentUpdate");
+    return true
+}
+
+// 组件将要完成更新的钩子
+componentWillUpdate(){
+    console.log("Count---componentWillUpdate");
+}
+
+// render
+
+
+// 组件已经完成了更新的钩子
+componentDidUpdate(){
+    console.log("Count---componentDidUpdate");
+}
+```
+
+会发现结果就是
+
+```
+Count---shouldComponentUpdate
+Count---componentWillUpdate
+Count---render
+Count---componentDidUpdate
+```
+
+接下来看第③条线
+
+#### 第③条线
+
+第③条线起始点是一个`forceUpdate()`，表示强制更新。
+
+正常的更新肯定是要对状态进行修改`setState()`，如果不想更新状态就是想更新怎么办。于是就有了强制更新。其实就是比正常的更新少了个阀门`shouldComponentUpdate()`，**但是这种情况用的并不多。**
+
+代码实现
+
+```jsx
+force = () => {
+    this.forceUpdate()
+}
+<div>
+    <h2>当前点击：{count}</h2>
+    <button onClick={this.add}>Click Me +1</button>
+    <button onClick={this.death}>Click DEATH</button>
+    <button onClick={this.force}>JUST UPDATE</button>
+</div>
+```
+
+输出的结果
+
+```
+Count---componentWillUpdate
+Count---render
+Count---componentDidUpdate
+```
+
+上面即使`shouldComponentUpdate()`返回的是**false**，也是可以强制更新的哦。
+
+接下来继续看第①条线
+
+#### 第①条线
+
+首先，先创建一个有父子关系的组件。**并且A组件里面的数据交给B组件来展示，于是就使用了标签属性传递。**
+
+```jsx
+class A extends React.Component {
+
+    state = { carName: 'toyoda'}
+    changeCar = () => {
+        this.setState({
+            carName: 'honda'
+        })
+    }
+    render(){
+        return (
+            <div>
+                <div>A</div>
+                <button onClick={this.changeCar}>Change</button>
+                <B carName={this.state.carName}/>
+            </div>
+        )
+    }
+}
+
+class B extends React.Component {
+    render(){
+        return (
+            <div>
+                B,接收到了A的：{this.props.carName}
+            </div>
+        )
+    }
+}
+ReactDOM.render(<A />, document.getElementById("root"));
+```
+
+B组件将要接受`componentWillReceiveProps()`,但是这个钩子有个问题就是你第一次刷新的时候会发现根本不会调用，必须你点击之后才会调用。所以有人提议应该是`componentWillReceiveNewProps()`才对。按照常理第一次B组件其实已经接受了父组件的props。但其实调用的时候，父组件已经是第二次渲染了。
+
+```jsx
+componentWillReceiveProps(props){
+    console.log("B----componentWillReceiveProps", props);
+}
+```
+
+
+
+> 上面的全部【旧】生命周期的钩子函数都结束了，上面都是旧的。
+>
+> -  初始化阶段: 由ReactDOM.render()触发---初次渲染
+>           									1.	constructor()
+>           									2.	componentWillMount()
+>           									3.	render()
+>           									4.	**componentDidMount() =====> 常用一般在这个钩子中做一些初始化的事，例如：开启定时器、发送网络请求、订阅消息****
+> -  更新阶段: 由组件内部this.setSate()或父组件render触发
+>           									1.	shouldComponentUpdate()
+>           									2.	componentWillUpdate()
+>           									3.	**render() =====> 必须使用的一个**
+>           									4.	componentDidUpdate()
+> - 卸载组件: 由ReactDOM.unmountComponentAtNode()触发
+>   									1.	**componentWillUnmount()  =====> 常用 一般在这个钩子中做一些收尾的事，例如：关闭定时器、取消订阅消息**
+
+### 生命周期【新】
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -2091,7 +2590,7 @@ render方法是你定义的，但是你没有调用，但最终执行了
 
 *constructor*写在最上面
 
-生命周期跟写的函数顺序无关，就是框架执行顺序而已。有部分生命周期函数并没有写，因为涉及其他父子组件传递数据问题。
+**生命周期跟写的函数顺序无关，就是框架执行顺序而已。有**部分生命周期函数并没有写，因为涉及其他父子组件传递数据问题。
 
 ```javascript
 class Life extends React.Component {
