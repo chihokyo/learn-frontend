@@ -2091,22 +2091,261 @@ componentWillReceiveProps(props){
 
 > 上面的全部【旧】生命周期的钩子函数都结束了，上面都是旧的。
 >
-> -  初始化阶段: 由ReactDOM.render()触发---初次渲染
->           									1.	constructor()
->           									2.	componentWillMount()
->           									3.	render()
->           									4.	**componentDidMount() =====> 常用一般在这个钩子中做一些初始化的事，例如：开启定时器、发送网络请求、订阅消息****
-> -  更新阶段: 由组件内部this.setSate()或父组件render触发
->           									1.	shouldComponentUpdate()
->           									2.	componentWillUpdate()
->           									3.	**render() =====> 必须使用的一个**
->           									4.	componentDidUpdate()
-> - 卸载组件: 由ReactDOM.unmountComponentAtNode()触发
->   									1.	**componentWillUnmount()  =====> 常用 一般在这个钩子中做一些收尾的事，例如：关闭定时器、取消订阅消息**
+> -  初始化阶段: 由`ReactDOM.render()`触发---初次渲染
+>      -  constructor()
+>      -  componentWillMount()
+>      -  render()
+>      -  **componentDidMount() =====> 常用一般在这个钩子中做一些初始化的事，例如：开启定时器、发送网络请求、订阅消息**
+> -  更新阶段: 由组件内部`this.setSate()`或父组件`render()`触发
+>      -  shouldComponentUpdate()
+>      -  componentWillUpdate()
+>      -  **render() =====> 必须使用的一个**
+>      -  componentDidUpdate()
+> -  卸载组件: `由ReactDOM.unmountComponentAtNode()`触发
+>      -  **componentWillUnmount()  =====> 常用 一般在这个钩子中做一些收尾的事，例如：关闭定时器、取消订阅消息**
 
 ### 生命周期【新】
 
+省略ing
 
+### DIFF算法
+
+- 虚拟DOM检测到变化的最小粒度是节点（一个标签） 。
+
+- 算法对比了多层。不一定标签里面嵌套标签。标签内也是递归进行对比的，所以即使下面的这个例子也只会更新span，而不会更新input
+
+```jsx
+class Time extends React.Component {
+    state = {date: new Date()}
+
+    componentDidMount () {
+        setInterval(() => {
+            this.setState({
+                date: new Date()
+            })
+        }, 1000)
+    }
+
+    render () {
+        return (
+            <div>
+                <h1>hello</h1>
+                <input type="text"/>
+                <span>
+                    现在是：{this.state.date.toTimeString()}
+                    <input type="text"/>
+                </span>
+            </div>
+        )
+    }
+}
+```
+
+**Q：为什么key最好不要用index？**
+
+因为**可能**会出现一些问题。首先diff算法是根据index来判断key的
+
+此处需要添加一些规则
+
+**使用index作为key的案例**
+
+因为这里是从前面添加的，react会发现这个所有的index都发生了改变。所以整体的虚拟DOM都被替换了。
+
+```jsx
+class Person extends React.Component {
+    state = {
+        persons: [
+            { id: 1, name: "amy", age: "19" },
+            { id: 2, name: "tom", age: "20" },
+        ],
+    };
+
+    add = () => {
+        const {persons} = this.state
+        const p = {id:persons.length + 1, name:"wangwang", age:"30"}
+        // 这里是从前面开始添加的，所以新添加的这个wangwangkey应该是3
+        this.setState({
+            persons:[p,...persons]
+        })
+    }
+
+    render () {
+        return (
+            <div>
+                <h2>展示人员</h2>
+                <button onClick={this.add}>click</button>
+                <ul>
+                    {
+                        this.state.persons.map((personObj, index)=>{
+                            return <li key={index}>{personObj.name} --- {personObj.age}</li>
+                        })
+                    }
+                </ul>
+            </div>
+        )
+    }
+}
+
+ReactDOM.render(<Person />, document.getElementById("root"));
+</script>
+```
+
+那么怎么才能解决这个问题呢。
+
+**不适用index作为key的案例**
+
+会发现这里并不会全部替换，只会增加wangwang
+
+```jsx
+class Person extends React.Component {
+    state = {
+        persons: [
+            { id: 1, name: "amy", age: "19" },
+            { id: 2, name: "tom", age: "20" },
+        ],
+    };
+
+    add = () => {
+        const {persons} = this.state
+        const p = {id:persons.length+1, name:"wangwang", age:"30"}
+        this.setState({
+            persons:[p,...persons]
+        })
+    }
+
+    render () {
+        return (
+            <div>
+                <h2>展示人员用index</h2>
+                <button onClick={this.add}>click</button>
+                <ul>
+                    {
+                        this.state.persons.map((personObj, index)=>{
+                            return <li key={index}>{personObj.name} --- {personObj.age}</li>
+                        })
+                    }
+                </ul>
+                <h1></h1>
+
+                <h2>展示人员用id</h2>
+                <ul>
+                    {
+                        this.state.persons.map((personObj)=>{
+                            return <li key={personObj.id}>{personObj.name} --- {personObj.age}</li>
+                        })
+                    }
+                </ul>
+            </div>
+        )
+    }
+}
+```
+
+如何验证会出现问题呢。比如在显示里面加入了输入框，把以上代码的这一行替换成下面
+
+```jsx
+// 替换前
+return <li key={personObj.id}>{personObj.name} --- {personObj.age}</li>
+// 替换后
+return <li key={personObj.id}>{personObj.name} --- {personObj.age}</li>
+```
+
+![Sep-07-2021 18-05-58](https://raw.githubusercontent.com/chihokyo/image_host/develop/20210907180640.gif)
+
+```
+慢动作回放----使用index索引值作为key
+    初始数据：
+        {id:1,name:'小张',age:18},
+        {id:2,name:'小李',age:19},
+    初始的虚拟DOM：
+        <li key=0>小张---18<input type="text"/></li>
+        <li key=1>小李---19<input type="text"/></li>
+
+	更新后的数据：
+        {id:3,name:'小王',age:20},
+        {id:1,name:'小张',age:18},
+        {id:2,name:'小李',age:19},
+	更新数据后的虚拟DOM：
+        <li key=0>小王---20<input type="text"/></li>
+        <li key=1>小张---18<input type="text"/></li>
+        <li key=2>小李---19<input type="text"/></li>
+
+慢动作回放----使用id唯一标识作为key
+
+    初始数据：
+        {id:1,name:'小张',age:18},
+        {id:2,name:'小李',age:19},
+    初始的虚拟DOM：
+        <li key=1>小张---18<input type="text"/></li>
+        <li key=2>小李---19<input type="text"/></li>
+
+    更新后的数据：
+        {id:3,name:'小王',age:20},
+        {id:1,name:'小张',age:18},
+        {id:2,name:'小李',age:19},
+    更新数据后的虚拟DOM：
+        <li key=3>小王---20<input type="text"/></li>
+        <li key=1>小张---18<input type="text"/></li>
+        <li key=2>小李---19<input type="text"/></li>
+```
+
+
+
+为什么上面用index的发生错乱了呢。因为这里在做比较的时候li的内容react发现了虚拟dom有了改变，所以是进行了替换，这个时候由于input这里react还是没能识别出有虚拟DOM有任何不同的地方，因为react不会连value也能识别到并且做出判断。所以就这么渲染到了真实dom，但是真实dom这个时候已经有我输入框输入的value了。所以就发生了错乱。（本质就是li已经替换了，但是input并没有替换）
+
+但是在id里面，id是统一的，react发现全部都没有问题，li没有发生替换，input也没有发生替换。所以新增加了新的id的那个节点。
+
+### DIFF总结
+
+```
+经典面试题:
+① react/vue中的key有什么作用？（key的内部原理是什么？）
+② 为什么遍历列表时，key最好不要用index?
+
+一. 虚拟DOM中key的作用：
+    1. 简单的说: key是虚拟DOM对象的标识, 在更新显示时key起着极其重要的作用。
+    2. 详细的说: 当状态中的数据发生变化时，react会根据【新数据】生成【新的虚拟DOM】,随后React进行【新虚拟DOM】与【旧虚拟DOM】的diff比较，比较规则如下：
+        a. 旧虚拟DOM中找到了与新虚拟DOM相同的key：
+            (1).若虚拟DOM中内容没变, 直接使用之前的真实DOM
+            (2).若虚拟DOM中内容变了, 则生成新的真实DOM，随后替换掉页面中之前的真实DOM
+        b. 旧虚拟DOM中未找到与新虚拟DOM相同的key
+        		根据数据创建新的真实DOM，随后渲染到到页面
+
+二. 用index作为key可能会引发的问题：
+    1. 若对数据进行：逆序添加、逆序删除等破坏顺序操作:
+    	会产生没有必要的真实DOM更新 ==> 界面效果没问题, 但效率低。
+    2. 如果结构中还包含输入类的DOM：
+    	会产生错误DOM更新 ==> 界面有问题。
+    3. 注意！如果不存在对数据的逆序添加、逆序删除等破坏顺序操作，
+    	仅用于渲染列表用于展示，使用index作为key是没有问题的。
+
+三. 开发中如何选择key?:
+    1. 最好使用每条数据的唯一标识作为key, 比如id、手机号、身份证号、学号等唯一值。
+    2. 如果确定只是简单的展示数据，用index也是可以的。
+```
+
+## 6. 工程化
+
+关于工程化的解说，工程化怎么说呢。就是有一个脚手架，便于你开发。模块化，组件化，工程化。感觉工程化就是把后端的一些管理包工具，什么兼容性，还有压缩，编译，检查代码这些零零碎碎的等等规范起来一起就是工程化。这个概念貌似后端经常用。
+
+工程化那就不能跟上面一样用个html就打发了，就需要在本地安装环境。
+
+首先检查一下本地环境有没有安装这些。
+
+```
+node -v
+npm -v
+```
+
+然后直接安装就可以了。官方安装参考[Create React App](https://zh-hans.reactjs.org/docs/create-a-new-react-app.html#create-react-app)
+
+```
+npx create-react-app my-app
+cd my-app
+npm start
+```
+
+<u>貌似用yarn会比较好，因为yarn也是Facebook出的？</u>
 
 
 
