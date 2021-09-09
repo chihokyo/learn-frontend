@@ -2347,23 +2347,354 @@ npm start
 
 <u>貌似用yarn会比较好，因为yarn也是Facebook出的？</u>
 
+### 三大文件
+
+首先看最重要的三个文件
+
+![image-20210908145854573](https://raw.githubusercontent.com/chihokyo/image_host/develop/20210908145856.png)
+
+下面详解下面三个文件，首先看主页面`index.html`
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+		<meta charset="utf-8" />
+		<!-- %PUBLIC_URL%代表public文件夹的路径 -->
+		<link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+		<!-- 开启理想视口，用于做移动端网页的适配 -->
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- 用于配置浏览器页签+地址栏的颜色(仅支持安卓手机浏览器) -->
+    <meta name="theme-color" content="red" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+		/>
+		<!-- 用于指定网页添加到手机主屏幕后的图标 -->
+		<link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+		<!-- 应用加壳时的配置文件 -->
+		<link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <title>React App</title>
+  </head>
+  <body>
+		<!-- 浏览器不支持js则展示标签中的内容 -->
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
+
+```
+
+再来看 入口文件 → `index.js` 
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+// 引入css
+import './index.css';
+// 引入App.js组件，后缀js可以不写
+import App from './App';
+// --- 页面性能分析文件(需要web-vitals库的支持)
+import reportWebVitals from './reportWebVitals';
+
+ReactDOM.render(
+   // 开启严格模式，这样对一些显而易见的错误都会有提醒
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+reportWebVitals();
+```
+
+ **App**组件 → `App.js`
+
+webpack的理念，一切皆组件。所以图片css这些静态资源也当组件跟引入进来了。
+
+```jsx
+import logo from './logo.svg';
+import './App.css';
+
+function App() {
+  return (
+     // 为了区别js关键字class，所有的html class属性都被写成了classXxx的形式
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+
+```
+
+**这里会有个疑问，为什么App.js可以被index.js给识别到。**
+
+- index.js里面导入了App.js
+- App.js通过es6的默认暴露`export default App;`，给暴露出来了。
+
+如果不写默认暴露，这样写也是可以实现的。
+
+创建 + 暴露
+
+```jsx
+export default function App() {
+  return (
+    <div className="App">
+      Learn React!!!
+    </div>
+  );
+}
+```
+
+创建组件和暴露分别
+
+```jsx
+function App() {
+  return (
+    <div className="App">
+      Learn React!!!
+    </div>
+  );
+}
+export default App;
+```
+
+#### 随便写一个组件
+
+小Tips
+
+> 一般会把入口的index.js和App.js主要组件写成js，虽然说App.jsx也可以识别的。但是一般把这种主要的写成js，其他组件都会写成`.jsx`
+
+*Hello.jsx*
+
+```jsx
+import React, { Component } from 'react'
+
+export default class Hello extends Component {
+    render() {
+        return (
+            <div>
+                我是Hello
+            </div>
+        )
+    }
+}
+```
+
+*App.js*
+
+```jsx
+import './App.css';
+// 引入默认暴露的Hello组件
+import Hello from './Hello'
+
+function App() {
+  return (
+    <div className="App">
+      Learn React!!!
+      <Hello />
+    </div>
+  );
+}
+
+export default App
+```
+
+#### 一些项目不同的框架思路
+
+**写法1**
+
+上面的*Hello.js*是我直接生成在src这个目录下的。其实也可以这样写。新建一个组件文件夹，在下一层新建组件名的文件夹，然后写，这样统一。然后在*App.js*引入的时候要注意别写错了。
+
+![image-20210908152513716](https://raw.githubusercontent.com/chihokyo/image_host/develop/20210908152515.png)
+
+```jsx
+import './App.css';
+// 注意引入的路径
+import Hello from './Component/Hello/Hello'
+
+function App() {
+  return (
+    <div className="App">
+      Learn React!!!
+      <Hello />
+    </div>
+  );
+}
+
+export default App
+```
+
+其实还有一种写法，也很常见的。这样看起来很清晰，但是也造成了一个问题，就是难以一眼看出来到底是哪个组件的`index.js`
+
+**写法2**
+
+`Hello.jsx` → `index.jsx`
+
+```
+import Hello from './Component/Hello/Hello'
+import Hello from './Component/Hello/'
+```
+
+![image-20210908153053788](https://raw.githubusercontent.com/chihokyo/image_host/develop/20210908153055.png)
+
+```jsx
+import './App.css';
+import Hello from './Component/Hello'
+
+function App() {
+  return (
+    <div className="App">
+      Learn React!!!
+      <Hello />
+    </div>
+  );
+}
+
+export default App
+```
+
+样式的模块化
+
+为了解决导出都是有css，导致css冲突的情况。
+
+```css
+/* Hello.css */
+.title {
+
+}
+/* Hello.css2 */
+.title {
+
+}
+```
+
+**解决方法1 → 使用less**
+
+```less
+.hello {
+    .title{
+        
+    }
+}
+.hello2 {
+    .title{
+        
+    }
+}
+```
+
+**解决方法2 → webpack形式的样式模块化**
+
+- index.css → index.module.css
+- 引入修改 
+
+```jsx
+import hello from './index.module.css'
+import './index.css'
+```
+
+- 对象书写
+
+```jsx
+<h2 className="title">Hello!!</h2>
+<h2 className={hello.title}>Hello!!</h2>
+```
+
+### 组件化基本流程
+
+① 拆完页面 → 抽取组件 → 写几个jsx，怎么命名
+
+② 实现静态的（没有交互）→ 写html，css，图片等。
+
+③ 实现动态的 → 写需要什么数据，组织数据，写事件。
+
+大概就是这样
+
+```
+1. 拆分组件: 拆分界面,抽取组件
+2. 实现静态组件: 使用组件实现静态页面效果
+3. 实现动态组件
+        3.1 动态显示初始化数据
+                3.1.1 数据类型
+                3.1.2 数据名称
+                3.1.3 保存在哪个组件?
+        3.2 交互(从绑定事件监听开始)
+```
 
 
 
+## 脚手架的代理配置
 
+主要解决的是是跨域请求，比如React项目是3000端口，请求server，5000的端口怎么办。2种解决方法。
 
+### 方法一
 
+> 在package.json中追加如下配置
 
+```json
+"proxy":"http://localhost:5000"
+```
 
+说明：
 
+1. 优点：配置简单，前端请求资源时可以不加任何前缀。
+2. 缺点：不能配置多个代理。
+3. 工作方式：上述方式配置代理，当请求了3000不存在的资源时，那么该请求会转发给5000 （**优先匹配前端资源）**比如这样请求的话，http://localhost:3000/index.html，React自己有`index.html`的情况下，会优先找`index.html`下面的
 
+### 方法二
 
+1. 第一步：创建代理配置文件
 
+   ```
+   在src下创建配置文件：src/setupProxy.js
+   ```
 
+2. 编写setupProxy.js配置具体代理规则：
 
+   ```js
+   const proxy = require('http-proxy-middleware')
+   
+   module.exports = function(app) {
+     app.use(
+       proxy('/api1', {  //api1是需要转发的请求(所有带有/api1前缀的请求都会转发给5000)
+         target: 'http://localhost:5000', //配置转发目标地址(能返回数据的服务器地址)
+         changeOrigin: true, //控制服务器接收到的请求头中host字段的值
+         /*
+         	changeOrigin设置为true时，服务器收到的请求头中的host为：localhost:5000
+         	changeOrigin设置为false时，服务器收到的请求头中的host为：localhost:3000
+         	changeOrigin默认值为false，但我们一般将changeOrigin值设为true
+         */
+         pathRewrite: {'^/api1': ''} //去除请求前缀，保证交给后台服务器的是正常请求地址(必须配置)
+       }),
+       proxy('/api2', { 
+         target: 'http://localhost:5001',
+         changeOrigin: true,
+         pathRewrite: {'^/api2': ''}
+       })
+     )
+   }
+   ```
 
+说明：
 
-
+1. 优点：可以配置多个代理，可以灵活的控制请求是否走代理。
+2. 缺点：配置繁琐，前端请求资源时**必须加前缀**。
 
 
 
