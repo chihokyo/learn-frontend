@@ -137,7 +137,6 @@ debugger; // 在这里可以看出真实DOM会有很多不需要的属性很重
 7.标签首字母
 	(1).若小写字母开头，则将该标签转为html中同名元素，若html中无该标签对应的同名元素，则报错。
 	(2).若大写字母开头，react就去渲染对应的组件，若组件没有定义，则报错。
-
 ```
 
 关于5的深入理解
@@ -460,7 +459,9 @@ class Like extends React.Component {
 }
             
 function demo(){
-   console.log(this) // 这里的undefined 因为这个是你自定义的函数，在babel的严格模式下，这里的this就是这个。如果非严格模式下，也就是<script type="text/javascript">，那就是window。所以当然拿不到state
+   console.log(this) 
+    // 这里的undefined 因为这个是你自定义的函数，在babel的严格模式下，这里的this就是这个。
+    // 如果非严格模式下，也就是<script type="text/javascript">，那就是window。所以当然拿不到state
 }
 ```
 
@@ -2696,35 +2697,43 @@ import './index.css'
 1. 优点：可以配置多个代理，可以灵活的控制请求是否走代理。
 2. 缺点：配置繁琐，前端请求资源时**必须加前缀**。
 
+## 7. 路由
 
+单页Web应用（single page web application，SPA）
 
+```
+1.	单页Web应用（single page web application，SPA）。
+2.	整个应用只有一个完整的页面。
+3.	点击页面中的链接不会刷新页面，只会做页面的局部更新。
+4.	数据都需要通过ajax请求获取, 并在前端异步展现。
+```
 
+关于前后端的路由
 
+```
+1.	后端路由：
+    1)	理解： value是function, 用来处理客户端提交的请求。
+    2)	注册路由： router.get(path, function(req, res))
+    3)	工作过程：当node接收到一个请求时, 根据请求路径找到匹配的路由, 调用路由中的函数来处理请求, 返回响应数据
+2.	前端路由：
+    1)	浏览器端路由，value是component，用于展示页面内容。
+    2)	注册路由: <Route path="/test" component={Test}>
+    3)	工作过程：当浏览器的path变为/test时, 当前路由组件就会变为Test组件
+```
 
+本质就是说整个项目就一个*HTML* 这样很不利于SEO！
 
+路由链接的本质就是一个kv组合而已。
 
+key就是路径，value有可能是function，也有可能是组件。
 
+**前端路由的基石！**
 
+本质用的是BOM（Brower Object）浏览器对象，专门用来管理所有的操作。
 
+这里用了*history.js*这个库来验证的
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### 关于路由传参的几种方式
 
 
 
