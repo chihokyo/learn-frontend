@@ -2733,9 +2733,261 @@ key就是路径，value有可能是function，也有可能是组件。
 
 这里用了*history.js*这个库来验证的
 
-### 关于路由传参的几种方式
+```javascript
+// let history = History.createBrowserHistory() //方法一，直接使用H5推出的history身上的API
+let history = History.createHashHistory() //方法二，hash值（锚点）
 
+function push (path) {
+    history.push(path)
+    return false
+}
 
+function replace (path) {
+    history.replace(path)
+}
+
+function back() {
+    history.goBack()
+}
+
+function forword() {
+    history.goForward()
+}
+
+history.listen((location) => {
+    console.log('请求路由路径变化了', location)
+})
+```
+
+- 锚点跳转就会有#这个符号，不会引起页面刷新，但会引起页面跳转产生历史。
+- 前端路由的工作原理就是*history.js*
+
+react-router
+
+- web 直接学这个为web打造 *react-router-dom*
+- vative
+- anywhere
+
+路由和路由器是不一样的。路由器可以管理路由。
+
+点击导航引起路径变化，路径的变化被路由器检测到，然后匹配组件。
+
+#### BrowserRouter
+
+```jsx
+import './App.css';
+import {Link, BrowserRouter, Route, Routes} from 'react-router-dom'
+import Home from './components/Home'
+import About from './components/About'
+function App() {
+  return (
+    <div className="App">
+      <h1>我是头</h1>
+      {/* <a href=""></a>
+      <a href=""></a> */}
+        <Routes>
+          {/* 在React里面靠路有链接切换组件-编写路由链接 */}
+            <Link className="" to="/about">About</Link>
+            <Link className="" to="/home">Home</Link>
+          {/* 注册路由 */}
+            <Route path="/about" componet={<About/>}></Route>
+            <Route path="/home" componet={<Home/>}></Route>
+          </Routes>
+    </div>
+  );
+}
+
+export default App;
+
+```
+
+#### 路由的基本使用
+
+```
+1.明确好界面中的导航区、展示区
+2.导航区的a标签改为Link标签
+	<Link to="/xxxxx">Demo</Link>
+3.展示区写Route标签进行路径的匹配
+	<Route path='/xxxx' component={Demo}/>
+4.<App>的最外侧包裹了一个<BrowserRouter>或<HashRouter>
+```
+
+#### 路由组件 PK 一般组件
+
+路由组件 会收到很多路由器给的东西
+
+一般组件 不给就不会收到
+
+```
+1.写法不同：
+    一般组件：<Demo/>
+    路由组件：<Route path="/demo" component={Demo}/>
+2.存放位置不同：
+    一般组件：components
+    路由组件：pages
+3.接收到的props不同：
+    一般组件：写组件标签时传递了什么，就能收到什么
+    路由组件：接收到三个固定的属性
+            history:
+                go: ƒ go(n)
+                goBack: ƒ goBack()
+                goForward: ƒ goForward()
+                push: ƒ push(path, state)
+                replace: ƒ replace(path, state)
+            location:
+                pathname: "/about"
+                search: ""
+                state: undefined
+            match:
+                params: {}
+                path: "/about"
+                url: "/about"
+```
+
+#### LInk 和 NavLink 和 封装NavLink
+
+NavLink可以实现路由链接的高亮，通过activeClassName指定样式名
+
+之前
+
+```jsx
+// App.jsx
+<NavLink activeClassName="yes" className="yes-2" to="/about">About</NavLink>
+```
+
+ 之后
+
+```jsx
+// App.jsx
+<NyNavLink to="/home">Home</NyNavLink>
+// index.jsx
+<NavLink activeClassName="yes" className="yes-2" {...this.props}/>
+```
+
+标签体内容也是一个属性，可以在*this.props*为*children*
+
+可以使用*console.log(this.props)*验证
+
+```jsx
+<NyNavLink to="/home">Home</NyNavLink>
+<NyNavLink to="/home" children="Home" /> 
+// 意思就是说这俩一样的
+```
+
+#### 关于Switch的使用
+
+之前
+
+```jsx
+// 这样会发现会全部继续向下匹配
+<Route path="/path1" component={About}/>
+<Route path="/path2" component={About2}/>
+```
+
+之后
+
+```jsx
+<Switch>
+	<Route path="/path1" component={About}/>
+	<Route path="/path2" component={About2}/>
+</Switch>
+```
+
+总结
+
+```
+1.通常情况下，path和component是一一对应的关系。
+2.Switch可以提高路由匹配效率(单一匹配)。
+```
+
+#### 样式丢失问题
+
+如果请求不存在的地址的时候，react会自动跳转到默认的界面，就是*index.html*
+
+**多级路径** + **刷新**页面会出现问题。可以查看路径来确定。
+
+```jsx
+// 刷新就会丢失
+localhost/path/about 会丢失
+// 刷新不会丢失
+localhost/about 不会丢失
+```
+
+因为react在刷新的时候会默认 *localhost/path/*  是一个整体，就会找不到资源。
+
+如何解决呢？
+
+方法1
+
+```
+public/index.html 中 引入样式时不写 ./ 写 / （常用）  因为这样会直接根据localhost找
+```
+
+方法2
+
+```
+public/index.html 中 引入样式时不写 ./ 写 %PUBLIC_URL% （常用）
+```
+
+方法3
+
+```
+使用HashRouter  因为#后面的react都会忽略
+```
+
+#### 路由的模糊匹配 (默认是模糊匹配)
+
+给多可以，给少不行！！
+
+*/home*  给了 */home/a/b* 可以的
+
+*/home/a/b*  给了 */home* 不可以
+
+```jsx
+// 模糊匹配下是可以的 OK
+/home 
+/home/a/b
+```
+
+精准匹配 → exact 这样就必须符合条件
+
+```jsx
+<Route exact={true} path="/about" component={About}/> // OK
+<Route exact path="/about" component={About}/> // OK
+```
+
+> 严格匹配不要随便开启，需要再开，有些时候开启会导致无法继续匹配二级路由
+
+#### Redicrt 重定向
+
+兜底作用
+
+一般写在所有路由注册的最下方，当所有路由都无法匹配时，跳转到Redirect指定的路由
+
+```jsx
+<Switch>
+    <Route path="/about" component={About}/>
+	<Route path="/home" component={Home}/>
+	<Redirect to="/about"/> 
+</Switch>
+```
+
+#### 二级路由（嵌套路由）
+
+为了实现，类似于下面这样。
+
+![image-20211109232049802](https://raw.githubusercontent.com/chihokyo/image_host/develop/20211109232050.png)
+
+路由是有顺序的，会依次匹配。
+
+先匹配第一级，然后第二级.....
+
+比如 `/home/new`
+
+- 先匹配1级 这样不会丢 先挂载 `/home`
+- 继续进行匹配 `/home/new`
+
+所以严格模式就天残！下面所有的子路由都祭天了。
 
 
 
