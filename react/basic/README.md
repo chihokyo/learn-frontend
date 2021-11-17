@@ -2989,15 +2989,116 @@ public/index.html 中 引入样式时不写 ./ 写 %PUBLIC_URL% （常用）
 
 所以严格模式就天残！下面所有的子路由都祭天了。
 
+### 传递参数
+
+#### params → 直接在路径下
+
+直接写``肯定是不行的，因为这里是jsx，不是js，需要的话可以在{}写js
+
+```jsx
+// 【路由链接(携带参数)】给路由组件传递参数 放出信号
+<Link to={`/demo/test/tom/${id}`}>详情</Link>
+// 【注册路由(声明接收)】声明接受params参数 一一对应 接收信号
+<Route path="/demo/test/:name/" component={Test}/>
+//  【接收参数】
+this.props.match.params
+```
+
+#### search → 无需声明
+
+```jsx
+// 路由链接(携带参数)
+<Link to='/demo/test?name=tom&age=18'}>详情</Link>
+<Link to={`/demo/test?name=${name}&age=${id}`}>详情</Link>
+// 注册路由(无需声明，正常注册即可)
+<Route path="/demo/test" component={Test}/>
+// 接收参数
+this.props.location.search
+// 备注：获取到的search是urlencoded编码字符串，需要借助querystring解析
+```
+
+这里会引入一个qs的库 `querystring`
+
+```jsx
+import qs from '`querystring'
+const { search } = this.props.location
+const {id, title} = qs.parse(search.slice(1)) // 直接去掉？之后解构赋值
+```
+
+本质就是把字符串 转换 成一个对象
+
+#### state参数 → 地址栏不会暴露
+
+不同于上面2个，这个state参数不会再地址栏进行暴露。
+
+这个state不会和组件的state有任何关系
+
+```jsx
+// 路由链接(携带参数)
+<Link to={{pathname:'/demo/test',state:{name:'tom',age:18}}} />
+// 注册路由(无需声明，正常注册即可)
+<Route path="/demo/test" component={Test}/>
+// 接收参数
+this.props.location.state
+```
+
+> 虽然地址栏没有东西，但是刷新也可以保留住参数
+>
+> 如何实现的呢？其实本质就是用的浏览器的history，使用的就是浏览器的这个history API
+>
+> 但是如果清除掉 **缓存** 的话，那么就会出错。所以解构赋值的时候
+
+```jsx
+const {id, title} = this.props.location.state || {}
+// 所以要注意空对象的问题。
+```
+
+如何选择？
+
+- 不想展示在地址栏就用state
+
+### 编程式路由导航
+
+不借助路由链接 Link NavLink来实现
+
+#### push PK replace
+
+默认就是push
+
+```jsx
+<Link replace={true} />
+<Link replace />
+```
+
+## 8. redux
+
+这样的构造下，很难去搞数据的传递。
+
+使用通信里的广播。
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/develop/20211117140047.png)
 
 
 
+这时候redux就出来了，redux里面就是一个公用的。集中式状态管理。可以把一些集中的数据放在redux里面，然后谁需要就向里面拿就可以了。
 
+其实就是**集中管理状态。** 很像中间商。
 
+action 负责分发
 
+store　相当于 一个中枢 只会reducer进行操作
 
+![image-20211117145800557](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20211117145800557.png)
 
+action → 中介（接活儿）核心就是把要做的事情给包装成对象。
 
+store → 大老板 负责调控，交代打工人做事。交付给组件
+
+reducer → 打工人（初始化状态，加工状态）
+
+最后 components 用 *getState()* 就获取了最新的状态。
+
+客人（点餐）→ 服务员（分发） → 老板监控（运筹帷幄） → 厨师（做饭）
 
 
 
