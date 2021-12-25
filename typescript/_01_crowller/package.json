@@ -11,7 +11,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/superagent": "^4.1.13",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.10",
+    "superagent": "^6.1.0"
   }
 }
