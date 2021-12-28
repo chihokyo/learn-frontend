@@ -1,21 +1,7 @@
 import superagent from 'superagent';
-import cheerio from 'cheerio';
 import fs from 'fs';
 import path from 'path';
-
-interface Course {
-  title: string;
-  count: number;
-}
-
-interface courseResult {
-  time: number;
-  data: Course[];
-}
-
-interface Content {
-  [propName: number]: Course[];
-}
+import Analyzer from './analyzer';
 
 class Crowller {
   private secret = 'x3b174jsx';
@@ -25,59 +11,12 @@ class Crowller {
   private filePath = path.resolve(__dirname, '../data/course.json');
 
   /**
-   * 获取源文件之后转换成对象
-   *
-   * @param html 网页源文件
-   * @returns courseResult 对象
-   */
-  getCourseInfo(html: string) {
-    const $ = cheerio.load(html);
-    const courseItems = $('.course-item');
-
-    const courseInfos: Course[] = []; // 初始化课程信息 存储所有过滤好的信息
-
-    // 获取所有course后进行遍历
-    courseItems.map((index, element) => {
-      // 获取每一个描述
-      const desc = $(element).find('.course-desc');
-      // 获取每一个标题
-      const title = desc.eq(0).text();
-      // 获取每一个学习人数 → 进行关键字分割寻找数字
-      const count = parseInt(desc.eq(1).text().split('：')[1], 10);
-      // 添加到课程信息
-      courseInfos.push({
-        title,
-        count,
-      });
-    });
-    return {
-      time: new Date().getTime(),
-      data: courseInfos,
-    };
-  }
-
-  /**
    * 获取源文件
    * @returns 输出文本信息
    */
   async getRawHtml() {
     const result = await superagent.get(this.url); // 这里返回一个reponse类型的
     return result.text;
-  }
-
-  /**
-   *  不断添加获取的文件json信息
-   * @param courseInfo 课程信息
-   * @returns 最新的课程信息
-   */
-  generateJsonContent(courseInfo: courseResult) {
-    let fileContent: Content = {};
-    if (fs.existsSync(this.filePath)) {
-      // 文字 → 对象
-      fileContent = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
-    }
-    fileContent[courseInfo.time] = courseInfo.data;
-    return fileContent;
   }
 
   /**
@@ -94,18 +33,18 @@ class Crowller {
   async initSpiderProcess() {
     // ①读取html源文件 ======> 通用的
     const html = await this.getRawHtml(); // 异步函数同样需要添加html
-    // ②获取html源文件转换成对象
-    const courseInfo = this.getCourseInfo(html);
-    // ③在json里不断添加获取的信息
-    const fileContent = this.generateJsonContent(courseInfo);
+
+    const fileContent = analyzer.analyzer(html, this.filePath);
+
     // ④写入json文件 ======> 通用的
-    this.writeFile(JSON.stringify(fileContent));
+    this.writeFile(fileContent);
   }
 
   // 构造函数
-  constructor() {
+  constructor(private analyzer: any) {
     this.initSpiderProcess();
   }
 }
 
-const crowller = new Crowller();
+const analyzer = new Analyzer();
+const crowller = new Crowller(analyzer);
