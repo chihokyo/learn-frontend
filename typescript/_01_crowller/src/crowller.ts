@@ -22,6 +22,8 @@ class Crowller {
   private url = `http://www.dell-lee.com/typescript/demo.html?secret=${this.secret}`;
   private rawHtml = ''; // 初始化html源文件
 
+  private filePath = path.resolve(__dirname, '../data/course.json');
+
   /**
    * 获取源文件之后转换成对象
    *
@@ -39,7 +41,7 @@ class Crowller {
       // 获取每一个描述
       const desc = $(element).find('.course-desc');
       // 获取每一个标题
-      const title = desc.eq(1).text();
+      const title = desc.eq(0).text();
       // 获取每一个学习人数 → 进行关键字分割寻找数字
       const count = parseInt(desc.eq(1).text().split('：')[1], 10);
       // 添加到课程信息
@@ -69,28 +71,35 @@ class Crowller {
    * @returns 最新的课程信息
    */
   generateJsonContent(courseInfo: courseResult) {
-    const filePath = path.resolve(__dirname, '../data/course.json');
     let fileContent: Content = {};
-    if (fs.existsSync(filePath)) {
+    if (fs.existsSync(this.filePath)) {
       // 文字 → 对象
-      fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      fileContent = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'));
     }
     fileContent[courseInfo.time] = courseInfo.data;
     return fileContent;
   }
 
   /**
+   * 将文件写入
+   * @param content 对象
+   */
+  writeFile(content: string) {
+    fs.writeFileSync(this.filePath, content);
+  }
+
+  /**
    * 主函数
    */
   async initSpiderProcess() {
-    //
+    // ①读取html源文件 ======> 通用的
     const html = await this.getRawHtml(); // 异步函数同样需要添加html
+    // ②获取html源文件转换成对象
     const courseInfo = this.getCourseInfo(html);
-    const filePath = path.resolve(__dirname, '../data/course.json');
+    // ③在json里不断添加获取的信息
     const fileContent = this.generateJsonContent(courseInfo);
-
-    // 对象 → 字符串
-    fs.writeFileSync(filePath, JSON.stringify(fileContent));
+    // ④写入json文件 ======> 通用的
+    this.writeFile(JSON.stringify(fileContent));
   }
 
   // 构造函数
