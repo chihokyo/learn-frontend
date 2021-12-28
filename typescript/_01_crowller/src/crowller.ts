@@ -1,11 +1,12 @@
 import superagent from 'superagent';
 import fs from 'fs';
 import path from 'path';
-import Analyzer from './analyzer';
+import AnalyzerOne from './analyzer';
 
+export interface Analyzer {
+  analyzer: (html: string, filePath: string) => string;
+}
 class Crowller {
-  private secret = 'x3b174jsx';
-  private url = `http://www.dell-lee.com/typescript/demo.html?secret=${this.secret}`;
   private rawHtml = ''; // 初始化html源文件
 
   private filePath = path.resolve(__dirname, '../data/course.json');
@@ -41,10 +42,12 @@ class Crowller {
   }
 
   // 构造函数
-  constructor(private analyzer: any) {
+  constructor(private url: string, private analyzer: Analyzer) {
     this.initSpiderProcess();
   }
 }
 
-const analyzer = new Analyzer();
-const crowller = new Crowller(analyzer);
+const secret = 'x3b174jsx';
+const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
+const analyzer = new AnalyzerOne();
+new Crowller(url, analyzer);

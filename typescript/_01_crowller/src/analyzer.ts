@@ -1,6 +1,7 @@
 import cheerio from 'cheerio';
 import fs from 'fs';
 import path from 'path';
+import { Analyzer } from './crowller';
 
 interface Course {
   title: string;
@@ -16,7 +17,7 @@ interface Content {
   [propName: number]: Course[];
 }
 
-export default class Analyzer {
+export default class AnalyzerOne implements Analyzer {
   private filePath = path.resolve(__dirname, '../data/course.json');
 
   /**
