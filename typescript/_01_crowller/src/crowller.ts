@@ -1,7 +1,7 @@
 import superagent from 'superagent';
 import fs from 'fs';
 import path from 'path';
-import AnalyzerOne from './analyzer';
+import AnalyzerTwo from './analyzerTwo';
 
 export interface Analyzer {
   analyzer: (html: string, filePath: string) => string;
@@ -49,5 +49,5 @@ class Crowller {
 
 const secret = 'x3b174jsx';
 const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
-const analyzer = new AnalyzerOne();
+const analyzer = new AnalyzerTwo();
 new Crowller(url, analyzer);
