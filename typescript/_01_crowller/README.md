@@ -503,3 +503,67 @@ const crowller = new Crowller(analyzer);
 
 ```
 
+## 6 组合模式
+
+从这里开始直接看代码会更清晰一点点，所以直接只写Github的仓库地址
+
+## 
+
+# 配置文件
+
+```json
+ts-node // 可以简化调试成本
+```
+
+但是问题就是没有编译，所以需要
+
+*package.json*
+
+```json
+"build" : "tsc" // 其实tsc就是编译命令
+```
+
+如果指定biild生成的文件在哪里
+
+*tsconfig.json*
+
+```json
+"outDir": "./build",   
+```
+
+发生改变自动编译
+
+```json
+ "build": "tsc -w"
+```
+
+编译之后还自动运行
+
+```json
+npm install nodemon -D
+// 增加配置
+"start": "nodemon node ./build/crowller.js"
+```
+
+这样会发现无限循环，所以需要增加nodemon配置
+
+```json
+ "nodemonConfig" : {
+    "ignore": "data/*"
+  },
+```
+
+nodemon默认只会watch js的文件，而没有ts
+
+所以通过nodemon+tsc-w 就达到了ts-node的效果
+
+```json
+npm install concurrently -D
+// 这个插件，可以并行执行多个脚本
+"scripts": {
+    "dev:build": "tsc -w",
+    "dev:start": "nodemon node ./build/crowller.js",
+    "dev": "concurrently npm:dev:*"
+  },
+```
+
