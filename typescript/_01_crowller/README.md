@@ -567,3 +567,543 @@ npm install concurrently -D
   },
 ```
 
+## 配置
+
+```json
+// 初始化配置
+tsc --init
+// 生成配置文件后 tsc --xx的话并不会执行config文件，
+// 只能通过tsc这样
+tsc
+```
+
+各种配置项的说明
+
+[看这个网页就可以了，因为太多了](https://juejin.cn/post/6844904093568221191)
+
+## 联合类型&类型保护
+
+```typescript
+interface Bird {
+    fly:boolean;
+    sing: () => {};
+}
+
+interface Dog {
+    fly:boolean;
+    bark: () => {};
+}
+
+// 类型断言
+function tryAnimal(animal: Bird | Dog) {
+    if(animal.fly) {
+        (animal as Bird).sing();
+    } else {
+        (animal as Dog).bark();
+    }
+}
+
+
+// in语法
+function tryAnimal2(animal: Bird | Dog) {
+    if ('sing' in animal) {
+        animal.sing();
+    } else {
+        animal.bark();
+    }
+}
+
+// typeof语法
+function add(first:string | number, second: string | number) {
+    if (typeof first === 'string' || typeof second === 'string') {
+        return `${first}${second}`
+    } else {
+        return first + second;
+    }
+}
+
+// intanceof只能用于class,而不能用于interface
+class NumberObj {
+    count:number
+}
+function add2(first:object | NumberObj, second: object | NumberObj) {
+    if (first instanceof NumberObj && second instanceof NumberObj) {
+        return first.count + second.count;
+    }
+    return 0;
+}
+
+```
+
+## Enum 枚举
+
+我个人的理解，枚举就是一个常量数组。
+
+```typescript
+// 没用之前
+const Status = {
+    OFFLINE:0,
+    ONLINE:1,
+    DELETED:2,
+};
+
+function getResult(status:any) {
+    if (status == Status.OFFLINE) {
+        return 'offline';
+    } else if (status == Status.ONLINE){
+        return 'online';
+    } else if (status == Status.DELETED) {
+        return 'deleted';
+    }
+    return 'error';
+}
+```
+
+用了之后呢？
+
+```typescript
+enum Status {
+  OFFLINE, // 不写默认从0开始
+  ONLINE,
+  DELETED,
+}
+
+enum Status {
+  OFFLINE, // 0
+  ONLINE = 2, // 从写的位置向下+1
+  DELETED, // 3 
+}
+```
+
+## 泛型
+
+```typescript
+function join(a: string | number, b: string | number) {
+  return `${a}${b}`;
+}
+// 如果希望a和b传入的参数类型是一样的
+// generic 泛指的类型
+
+function join2<ABC>(a: ABC, b: ABC) {
+  return `${a}${b}`;
+}
+
+join2<string>('1', '1');
+
+function map<T>(params: T[]) {
+  // (params: Array<ABC>)
+  return params;
+}
+
+map<string>(['heelo']);
+
+function map<T, P>(params: T[]) {
+  // (params: Array<ABC>)
+  return params;
+}
+
+map<string>(['heelo']);
+```
+
+同时也可以定义多个，泛型在用的时候才会知道是什么类型
+
+```typescript
+// 也可以同时定义多个泛型
+function map2<T, P>(param1: T, param2: P) {
+  return `${param1}${param2}`;
+}
+
+map2<string, number>('1', 2);
+map2('1', 2); // 不写就给你推断
+```
+
+如果泛型不知道是什么类型，但是会满足某一个接口呢？
+
+```typescript
+interface Item {
+  name: string;
+}
+
+class DataManager<T extends Item> {
+  constructor(private data: T[]) {}
+  getItem(index: number): string {
+    return this.data[index].name;
+  }
+}
+
+const data = new DataManager([
+  {
+    name: 'xiaowang',
+  },
+]);
+
+console.log(data.getItem(0));
+
+```
+
+如果泛型可能是string也有可能是number，2种之一呢？
+
+```typescript
+class DataManager<T extends string | number> {
+  constructor(private data: T[]) {}
+  getItem(index: number): T {
+    return this.data[index];
+  }
+}
+
+const data = new DataManager<string>([]); // 空数组也可以,['1']也可以
+```
+
+![image-20220102175221744](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220102175221744.png)
+
+```typescript
+// 如何使用泛型作为一个具体的类型注解
+// 相当于要接受一个泛型
+const func: <T>(param: T) => string = <T>() => {
+  return 'hello';
+};
+// 比如可以拆分成
+function hello<T>(param: T) {
+  return param;
+}
+const func2: <T>(param: T) => T = hello;
+```
+
+## 命名空间
+
+类似模块的感觉，不会污染全局变量
+
+```typescript
+namespace Home {
+	  class Header{}
+    class Content{}
+    class Footer{}
+}
+
+// 如果你想要外部使用
+namespace Home {
+	  class Header{} 
+    class Content{}
+    class Footer{}
+  	export class Page { // 通过这种export形式进行暴露
+      constructor(){
+        new Header()
+ 				new Content()
+        new Footer()
+      }
+    }
+}
+
+// 调用的使用
+Home.page
+```
+
+但是上面的代码并没有体现拆分，所以现在拆分成page和组件
+
+*components.ts* → 记得引入
+
+```typescript
+namespace Components {
+	  export class Header{} 
+    export class Content{}
+    export class Footer{}
+}
+```
+
+*page.ts*
+
+```typescript
+namespace Home {
+  	export class Page { // 通过这种export形式进行暴露
+      constructor(){
+        new Components.Header()
+ 				new Components.Content()
+        new Components.Footer()
+      }
+    }
+}
+```
+
+上面的话 还需要引入。
+
+```html
+<script src="./dist/components.js"></script>
+```
+
+如果不想引入的话，可以修改*tsconfig*配置项目
+
+```json
+"outFile": "./",                      /* Specify a file that bundles all outputs into one JavaScript file. If `declaration` is true, also designates a file that bundles all .d.ts output. */
+// 但同时也需要修改成
+"module": "amd",      
+```
+
+注意一下依赖声明
+
+```typescript
+/// <refrence path="./components.ts"> 加上这个之后结构更加清晰，
+namespace Home {
+  	export class Page { // 通过这种export形式进行暴露
+      constructor(){
+        new Components.Header()
+ 				new Components.Content()
+        new Components.Footer()
+      }
+    }
+}
+```
+
+同时命名空间里也可以定义interface，也可以有子命名空间
+
+```typescript
+namespace Components {
+  	// 子命名空间
+	  export namespace SubComponents{
+      export class Test{}
+    }
+  	// interface
+ 		export interface User{
+      name:string;
+    }
+	  export class Header{} 
+    export class Content{}
+    export class Footer{}
+}
+```
+
+## import引入语法
+
+下面的这种，比较难以辨认。模块化组织看起来不清晰
+
+```typescript
+/// <refrence path="./components.ts"> 加上这个之后结构更加清晰，
+namespace Home {
+  	export class Page { // 通过这种export形式进行暴露
+      constructor(){
+        new Components.Header()
+ 				new Components.Content()
+        new Components.Footer()
+      }
+    }
+}
+```
+
+```typescript
+// 使用amd语法
+import {Header, Content, Footer} from './componets'
+
+class Page {
+    constructor(){
+        new Header();
+        new Content();
+        new Footer();
+    }
+}
+```
+
+如何引入amd语法？
+
+使用包`require.js`
+
+```
+// 因为特别麻烦，所以直接使用webpack，就不写下面的。主要知道amd，commonjs兼容适配。
+```
+
+## 关于Parcel
+
+和webpack对打的，但是没webpack这么麻烦，这么多的配置。就不用按照↑那种一步步还要引入啥的。
+
+```json
+npm install parcel@next -D
+```
+
+然后去package.json就能直接给你编译了
+
+```json
+"scripts": {
+    "test": "parcel ./src/index.html",
+  },
+```
+
+## 如何编译自己的类型文件-使用jQuery演示
+
+以前说过在ts写js代码，虽然使用了parcel这样的库可以帮我们编译，但是有时候ide却不能帮我们主动识别
+
+比如在html引入了jQuery的库
+
+```html
+<script src="https://code.jquery.com/jquery-3.6.0.slim.js" integrity="sha256-HwWONEZrpuoh951cQD1ov2HUK5zA5DwJ1DNUXaM6FsY=" crossorigin="anonymous"></script>
+```
+
+然后在ts文件里写jq代码
+
+```typescript
+$(function(){
+  alert(1) // 这里的$就无法识别
+})
+```
+
+以前的话我们会引用
+
+```
+npm install type@jquery
+```
+
+现在我们自己写**类型定义文件**使用的是 `declare`关键字 
+
+*jquery.d.ts*
+
+```typescript
+// 接收一个函数，返回void
+// 接收了一个什么样子的函数呢 () => {} in是无参，out是对象
+// 接收了一个什么样子的函数呢 () => void in是无参，out是void
+declare var $: (param: () => {}) => void;
+
+```
+
+然后如果比如写了一个入口函数，一个选择器的话。就可以这样写。
+
+```typescript
+interface JqueryInstance {
+  html: (html: string) => JqueryInstance;
+}
+
+// 函数重载
+declare function $(readyFunc: () => void): void;
+declare function $(selector: string): JqueryInstance;
+
+```
+
+其实上面那两行重载，可以写成这种形式
+
+```typescript
+// 使用interface语法，实现函数重载
+interface Jquery {
+  (readyFunc: () => void): void;
+  (selector: string): JqueryInstance;
+}
+
+declare var $: Jquery;
+
+```
+
+如果要对对象进行**类型定义**，或者对**类进行类型定义**，以及**命名空间的嵌套**。
+
+```typescript
+declare namespace $ {
+    namespace fn {
+        class init{}
+    }
+}
+
+$(function() {
+  $('body').html('<div>123</div>');
+  new $.fn.init(); // 适用于这部分
+});
+
+```
+
+使用es6模块化
+
+```typescript
+// Es6 模块化
+declare module 'jquery' {
+  interface JqueryInstance {
+    html: (html: string) => JqueryInstance;
+  }
+  // 混合类型
+  function $(readyFunc: () => void): void;
+  function $(selector: string): JqueryInstance;
+  namespace $ {
+    namespace fn {
+      class init {}
+    }
+  }
+  export = $;
+}
+
+// 这样外部使用的时候直接引入就可以
+import $ from 'jquery';
+
+$(function() {
+  $('body').html('<div>123</div>');
+  new $.fn.init();
+});
+
+```
+
+# 泛型中keyof语法的使用
+
+稍微有点难以理解
+
+先看看发生背景
+
+```typescript
+interface Person {
+  name: string;
+  age: number;
+  gender: string;
+}
+class Teacher {
+  constructor(private info: Person) {}
+  getInfo(key:string) { // 这里的key是一个string
+    return this.info[key];
+  }
+}
+
+const teacher = new Teacher({
+  name: 'dell',
+  age: 18,
+  gender: 'male'
+});
+
+const test = teacher.getInfo('hello');// 你会发现即使你写不包含在Person里的也不报错
+console.log(test)
+
+```
+
+虽然上面的写法不报错，但是这样类型就没了意义。所以需要进行约束
+
+```typescript
+class Teacher {
+  constructor(private info: Person) {}
+  getInfo(key:string) { 
+    // 极其不优雅
+    if(key == 'name' || key == 'age' || key == 'gender') {
+          return this.info[key];
+    }
+  }
+}
+```
+
+最后事实上用的就是keyof语法来解决的
+
+```typescript
+class Teacher {
+  constructor(private info: Person) {}
+  getInfo<T extends keyof Person>(key: T): Person[T] {
+    return this.info[key];
+  }
+}
+```
+
+其实这个T相当于遍历了Person里面全部的属性
+
+相当于这个type，不仅仅是以前的类型，比如string，number，还可以是一个具体的内容！比如`name,age,gender`这种字符串。
+
+```typescript
+type T = 'name' // 相当于申请了类型别名
+
+type NAME = 'name';
+key: 'name';
+Person['name'];
+
+type T = 'age'
+key: 'age'
+Person['age']
+
+type T = 'gender'
+key: 'gender'
+Person['gender']
+```
+
