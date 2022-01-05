@@ -1032,7 +1032,7 @@ $(function() {
 
 ```
 
-# 泛型中keyof语法的使用
+## 泛型中keyof语法的使用
 
 稍微有点难以理解
 
@@ -1105,5 +1105,169 @@ Person['age']
 type T = 'gender'
 key: 'gender'
 Person['gender']
+```
+
+# express
+
+搭建框架
+
+```json
+"scripts": {
+  "dev:build": "tsc -w",
+  "dev:start": "nodemon node ./build/index.js",
+  "dev": "tsc && concurrently npm:dev:*"
+},
+```
+
+输入命令
+
+```
+npm install express --save
+npm i --save-dev @types/express
+```
+
+然后构建
+
+```typescript
+// src/index.ts
+import express, { Request, Response } from 'express';
+import router from './router';
+
+const app = express();
+
+app.use(router);
+
+app.listen(7001, () => {
+  console.log('server is running');
+});
+
+src/router.ts
+import { Router, Request, Response } from 'express';
+import Crowller from './crowller';
+import AnalyzerOne from './analyzerOne';
+
+const router = Router();
+
+router.get('/', (req: Request, res: Response) => {
+  res.send(`
+    <html>
+      <body>
+        <form method="post" action="/getData">
+          <input type="password" name="password" />
+          <button>提交</button>
+        </form>
+      </body>
+    </html>
+  `);
+});
+
+router.get('/getData', (req: Request, res: Response) => {
+  const secret = 'x3b174jsx';
+  const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
+  const analyzer = AnalyzerOne.getInstance();
+  new Crowller(url, analyzer);
+  res.send('hello getData111');
+});
+
+export default router;
+
+
+```
+
+如果要增加权限的话，会发现无法去得到值
+
+```typescript
+router.post('/getData', (req: Request, res: Response) => {
+  console.log(req.body); // undefined why？
+  if (req.body.password === '111') {
+  } else {
+    res.send('Error');
+  }
+});
+```
+
+因为仔细看追根溯源的话
+
+```
+req.body → ReqBody → any
+```
+
+可以发现是类型文件有问题，没有识别到，翻译有错误，但是ide没有提示错误，如果这样的话那么ts就失去了意义。
+
+所以解决方案，就是中间件`body-parser`
+
+```
+npm i body-parser
+```
+
+一定要写在路由前面，毕竟是中间件
+
+```typescript
+// src/router.ts
+import express, { Request, Response } from 'express';
+import router from './router';
+import bodyParser from 'body-parser';
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(router);
+
+app.listen(7001, () => {
+  console.log('server is running');
+});
+
+```
+
+顺利解决！！
+
+有了新问题
+
+```
+问题1: express 库的类型定义文件 .d.ts 文件类型描述不准确
+问题2: 当我使用中间件的时候，对 req 或者 res 做了修改之后呢，实际上类型并不能改变。
+```
+
+关于问题2就是相当于
+
+```typescript
+// 如果你以后新增一个属性
+req.hello = 1;
+// 那么ide也不会出现的
+```
+
+那如何解决呢？
+
+**问题1解决自己写一个！！！接口！！**
+
+```typescript
+// src/router.ts
+interface RequestWithBody extends Request {
+  body: {
+    [key: string]: string | undefined;
+  };
+}
+......
+router.post('/getData', (req: RequestWithBody, res: Response)
+```
+
+**问题2 解决 自己写个文件 类型融合**
+
+```typescript
+// custom.d.ts
+declare namespace Express {
+  interface Request {
+    name: string;
+  }
+
+  
+// 这样你就可以自己添加了
+// src/router.ts
+router.post('/getData', (req: RequestWithBody, res: Response) => {
+  const { password } = req.body;
+  if (password === '111') {
+  } else {
+    res.send(`${req.name} Error`); // 这里就可以用
+  }
+});
 ```
 
