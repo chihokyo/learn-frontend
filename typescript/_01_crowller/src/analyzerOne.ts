@@ -18,8 +18,16 @@ interface Content {
 }
 
 export default class AnalyzerOne implements Analyzer {
+  private static instance: AnalyzerOne; // 单例模式
   private filePath = path.resolve(__dirname, '../data/course.json');
 
+  // 单例模式
+  static getInstance() {
+    if (!AnalyzerOne.instance) {
+      AnalyzerOne.instance = new AnalyzerOne();
+    }
+    return AnalyzerOne.instance;
+  }
   /**
    * 获取源文件之后转换成对象
    *
@@ -72,4 +80,6 @@ export default class AnalyzerOne implements Analyzer {
     const fileContent = this.generateJsonContent(courseInfo, filePath);
     return JSON.stringify(fileContent);
   }
+
+  private constructor() {} // 私有化这个单例 外部无法直接new
 }

@@ -35,18 +35,15 @@ class Crowller {
     // ①读取html源文件 ======> 通用的
     const html = await this.getRawHtml(); // 异步函数同样需要添加html
 
-    const fileContent = analyzer.analyzer(html, this.filePath);
+    const fileContent = this.analyzer.analyzer(html, this.filePath);
 
     // ④写入json文件 ======> 通用的
     this.writeFile(fileContent);
   }
-
   // 构造函数
   constructor(private url: string, private analyzer: Analyzer) {
     this.initSpiderProcess();
   }
 }
-const secret = 'x3b174jsx';
-const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
-const analyzer = new AnalyzerOne();
-new Crowller(url, analyzer);
+
+export default Crowller;

@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const superagent_1 = __importDefault(require("superagent"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const analyzerOne_1 = __importDefault(require("./analyzerOne"));
 class Crowller {
     // 构造函数
     constructor(url, analyzer) {
@@ -49,13 +48,10 @@ class Crowller {
         return __awaiter(this, void 0, void 0, function* () {
             // ①读取html源文件 ======> 通用的
             const html = yield this.getRawHtml(); // 异步函数同样需要添加html
-            const fileContent = analyzer.analyzer(html, this.filePath);
+            const fileContent = this.analyzer.analyzer(html, this.filePath);
             // ④写入json文件 ======> 通用的
             this.writeFile(fileContent);
         });
     }
 }
-const secret = 'x3b174jsx';
-const url = `http://www.dell-lee.com/typescript/demo.html?secret=${secret}`;
-const analyzer = new analyzerOne_1.default();
-new Crowller(url, analyzer);
+exports.default = Crowller;

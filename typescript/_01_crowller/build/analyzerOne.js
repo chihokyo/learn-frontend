@@ -9,6 +9,13 @@ const path_1 = __importDefault(require("path"));
 class AnalyzerOne {
     constructor() {
         this.filePath = path_1.default.resolve(__dirname, '../data/course.json');
+    } // 私有化这个单例 外部无法直接new
+    // 单例模式
+    static getInstance() {
+        if (!AnalyzerOne.instance) {
+            AnalyzerOne.instance = new AnalyzerOne();
+        }
+        return AnalyzerOne.instance;
     }
     /**
      * 获取源文件之后转换成对象
