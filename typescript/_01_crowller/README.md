@@ -1107,6 +1107,8 @@ key: 'gender'
 Person['gender']
 ```
 
+
+
 # express
 
 搭建框架
@@ -1123,7 +1125,7 @@ Person['gender']
 
 ```
 npm install express --save
-npm i --save-dev @types/express
+npm i --save-dev @types/express // 类型注解文件
 ```
 
 然后构建
@@ -1239,6 +1241,8 @@ req.hello = 1;
 
 **问题1解决自己写一个！！！接口！！**
 
+根据已经写好的d.ts 然后自己实现一个。
+
 ```typescript
 // src/router.ts
 interface RequestWithBody extends Request {
@@ -1258,16 +1262,66 @@ declare namespace Express {
   interface Request {
     name: string;
   }
-
   
 // 这样你就可以自己添加了
+// src/index.ts
+app.use((req: Request, res: Response, next: NextFunction) => {
+  // 这里req虽然没有name这个属性，也不知道是什么类型，但可以通过类型融合进行添加
+  req.name = 'System';
+  next();
+});
 // src/router.ts
 router.post('/getData', (req: RequestWithBody, res: Response) => {
-  const { password } = req.body;
-  if (password === '111') {
+    const { password } = req.body;
+    ...
+    } else {
+      res.send(`${req.name} Error`); // 同时这里也可以表示出name
+    }
+  });
+```
+
+开始写登录功能
+
+主要用到的是一个库
+
+```json
+cookie-session
+```
+
+所以就要安装
+
+```
+npm install cookie-session --save
+npm install @types/cookie-session --save
+```
+
+然后执行
+
+```typescript
+// src/index.ts
+import cookieSession from 'cookie-session';
+app.use(
+  cookieSession({
+    name: 'session',
+    keys: ['chin'],
+    // 登录期限 24小时
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+  })
+);
+// 判断是否登录
+const isLogin = req.session ? req.session.login : false;
+// 如果已经登录
+if (isLogin) {
+  res.send('已经登录');
+} else {
+  // 未登录
+  // 看看验证码
+  if (password === '111' && req.session) {
+    req.session.login = true;
+    res.send('登录成功');
   } else {
-    res.send(`${req.name} Error`); // 这里就可以用
+    res.send('登录失败');
   }
-});
+}
 ```
 
