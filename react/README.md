@@ -2,13 +2,15 @@
 
 ## 1. 文件夹结构
 
-```
+```ba
 .
-├── BASIC # 基础学习 
+├── basic # 基础学习 
 │   └── README.md 基础学习总结
-├── comment_demo #【练手项目】简单的发表评论实时显示 可运行
-├── todolist #【练手项目】简单的todolist 可运行
-└── README.md # 整体结构
+├── project # 项目
+│   └── comment_demo #【练手项目】简单的发表评论实时显示 可运行
+│   └── jianshu_todo # 简书项目之前的练手 → 这个的README比较详细
+│   └── simple_todolist #【练手项目】简单todolist 可运行
+└── README.md
 ```
 
 ## 2.快速定位
