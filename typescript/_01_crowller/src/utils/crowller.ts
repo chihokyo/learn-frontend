@@ -9,7 +9,7 @@ export interface Analyzer {
 class Crowller {
   private rawHtml = ''; // 初始化html源文件
 
-  private filePath = path.resolve(__dirname, '../data/course.json');
+  private filePath = path.resolve(__dirname, '../../data/course.json');
 
   /**
    * 获取源文件
