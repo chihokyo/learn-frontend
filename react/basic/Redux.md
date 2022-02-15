@@ -24,9 +24,9 @@ angular和vue都可以用，是一个状态管理的js库
 
 其实就是**集中管理状态。** 很像中间商。
 
-action 负责分发
+action 负责创建分发 → 本质就是一个对象 包含俩东西**①type，指名要干什么。②data，修改的数据。**
 
-store　相当于 一个中枢 只会reducer进行操作
+store　相当于 一个中枢 通过dispatch 指挥reducer进行操作
 
 ![image-20211117145800557](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20211117145800557.png)
 
@@ -34,11 +34,21 @@ action → 中介（接活儿）核心就是把要做的事情给包装成对象
 
 store → 大老板 负责调控，交代打工人做事。交付给组件
 
-reducer → 打工人（初始化状态，加工状态）
+reducer → 打工人（初始化状态【state】，加工状态【action】）→ 处理原始数据，还有逻辑。
 
 最后 components 用 *getState()* 就获取了最新的状态。
 
 客人（点餐）→ 服务员（分发） → 老板监控（运筹帷幄） → 厨师（做饭）
+
+```
+这里有一个后期写的一张图，可以帮助理解。
+```
+
+![image-20220215222721776](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220215222721776.png)
+
+最后版本
+
+![image-20220215224046602](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220215224046602.png)
 
 ## 没有redux的世界
 

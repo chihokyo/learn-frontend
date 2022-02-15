@@ -97,7 +97,7 @@ class App extends React.Component {
 
 ![image-20220203223423984](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220203223423984.png)
 
-## 8
+## 8 传递参数
 
 关于传递参数一些好的方法
 
@@ -291,3 +291,128 @@ PureComponent是为了解决每次判定类组件是否更新的时候，要手�
 ![image-20220210155128656](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220210155128656.png)
 
 高阶可以自定义
+
+ 	
+
+高阶组件使用之前之后的的区别。
+
+使用前 
+
+```jsx
+import React, { PureComponent } from 'react';
+
+class Home extends PureComponent {
+  render() {
+    return (
+      <h2>
+        Home:
+        {`nickname is  ${this.props.nickname} age is ${this.props.age}`}
+      </h2>
+    );
+  }
+}
+
+class About extends PureComponent {
+  render() {
+    return (
+      <h2>
+        About:{`nickname is  ${this.props.nickname} age is ${this.props.age}`}
+      </h2>
+    );
+  }
+}
+
+class App extends PureComponent {
+  render() {
+    return (
+      <div>
+        <Home nickname="chin" age={90} />
+        <About nickname="chin2" age={10} />
+      </div>
+    );
+  }
+}
+
+export default App;
+```
+
+如果这个时候多了一个需求，想给Home和About组件新增加一个属性的话。
+
+```jsx
+About:{`nickname is  ${this.props.nickname} age is ${this.props.age}`}
+```
+
+如果修改每个组件这样就太不优雅了，于是就使用高阶组件来实现。
+
+```jsx
+import React, { PureComponent } from 'react';
+
+function enhanceLevelProps(WraapedComponent) {
+  return (props) => {
+    return <WraapedComponent {...props} level="100" />;
+  };
+}
+
+class Home extends PureComponent {
+  render() {
+    return (
+      <h2>
+        Home:
+        {`nickname is  ${this.props.nickname} age is ${this.props.age} level is ${this.props.level}`}
+      </h2>
+    );
+  }
+}
+
+class About extends PureComponent {
+  render() {
+    return (
+      <h2>
+        About:
+        {`nickname is  ${this.props.nickname} age is ${this.props.age} level is ${this.props.level}`}
+      </h2>
+    );
+  }
+}
+
+const EnhanceHome = enhanceLevelProps(Home);
+const EnhanceAbout = enhanceLevelProps(About);
+
+class App extends PureComponent {
+  render() {
+    return (
+      <div>
+        <EnhanceHome nickname="chin" age={90} />
+        <EnhanceAbout nickname="chin2" age={10} />
+      </div>
+    );
+  }
+}
+
+export default App;
+
+```
+
+![image-20220211205113492](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220211205113492.png)
+
+## 24 关于redux的基本使用
+
+因为redux不只是react可以用，vue也可以用。
+
+这个有一个纯函数的概念，`reducer()`本质就是一个纯函数
+
+```
+纯函数
+确定的输入，一定会产生确定的输出; 
+函数在执行过程中，不能产生副作用;所谓副作用就是传入的数据不能被修改
+```
+
+![image-20220215222721776](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220215222721776.png)
+
+于是最后的完成版本就是这样的。
+
+![image-20220215224046602](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220215224046602.png)
+
+![image-20220215233757128](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220215233757128.png)
+
+## 25 关于redux的react
