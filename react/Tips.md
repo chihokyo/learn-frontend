@@ -415,4 +415,62 @@ export default App;
 
 ![image-20220215233757128](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220215233757128.png)
 
+一些补充
+
+![image-20220216000617737](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220216000617737.png)
+
+关于导出导入也是可以有多个选择的。
+
+我看了这么多，都不如这个解释的好。
+
+![img](https://pic3.zhimg.com/80/84a649275f15c1d6699482beb4b1318f_1440w.jpg?source=1940ef5c)
+
 ## 25 关于redux的react
+
+下面就用一个点击的案例来说明一下如何搭配起来的。
+
+![image-20220217000130292](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220217000130292.png)
+
+由于接下来的redux 有点难 决定先放弃一下。大概在16 17 18 的50分钟前
+
+## 26 路由操作
+
+首先来一个hash路由原理，咱们正常用`a`标签的代码。是会造成跳转的。
+
+![image-20220218173036544](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220218173036544.png)
+
+接下来还有一个实现
+
+那就是H5新的接口！
+
+![image-20220218173403243](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220218173403243.png)
+
+## 27 关于Link和Route区别
+
+Link其实就是a连接，Route像是一个组件
+
+![image-20220218180741698](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220218180741698.png)
+
+## 28 关于Route里的Switch&Redirect
+
+![image-20220220232909926](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220220232909926.png)
+
+## 29 关于子路由嵌套
+
+![image-20220220233917656](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220220233917656.png)
+
+## 30 关于跳转
+
+目前写的跳转都是下面这两个
+
+Link
+
+NavLink
+
+如果想是一个按钮呢？也就是你自己封装一个组件！
+
+用的原理差不多是这样的
+
+![image-20220220235626822](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220220235626822.png)
+
+![image-20220220235755014](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220220235755014.png)
