@@ -8,6 +8,10 @@
 
 ![image-20220203171522223](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220203171522223.png)
 
+关于严格模式下 `render()`总会调用2次的，关上就是1次了。
+
+![image-20220222141238517](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220222141238517.png)
+
 ## 2 组件怎么来的
 
 想要自己写一个组件的话，就需要继承`React.componet`
@@ -193,9 +197,23 @@ Spread Attributes 自己查 反正都超级方便跟。。。相关。
 - 类组件实现
 - 函数组件实现
 
-反正就很冗余，最后很少用，都用redux了。
+啥叫跨组件，就是父给子，子给孙，孙给其他啥的这种就叫跨组件。
 
-貌似这个不会也不会怎么样。但是姑且也还是学学比较好。
+如果没有的话，需要一层一层的，但是跨组件可以直接用。
+
+步骤如下
+
+- 创建context对象
+- 包裹起来  <Provider>
+- 传入数据
+
+类式组件是这样的
+
+![image-20220302153549603](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220302153549603.png)
+
+函数组件
+
+![](https://raw.githubusercontent.com/chihokyo/image_host/develop/20220303170608.png)
 
 ## 18 再看看setState
 
@@ -459,7 +477,7 @@ Link其实就是a连接，Route像是一个组件
 
 ![image-20220220233917656](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220220233917656.png)
 
-## 30 关于跳转
+## 30 关于history跳转
 
 目前写的跳转都是下面这两个
 
@@ -474,3 +492,58 @@ NavLink
 ![image-20220220235626822](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220220235626822.png)
 
 ![image-20220220235755014](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220220235755014.png)
+
+如果执意想用方式二呢？？？
+
+答案！**高阶组件 withRoute(组件)**
+
+![image-20220221001826938](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220221001826938.png)
+
+其实就是给一些普通渲染的组件 + history属性
+
+> 但是上面有一个坑的意思，就是react V6之后就不行了。建议看最新的文档。
+
+那么withRouter的原理呢？
+
+反正看起来所以又是来自react-router-dom，但其实有一部分来自的react-router
+
+![image-20220221002950695](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220221002950695.png)
+
+那么withRouter的源码在哪里，其实在这里了。
+
+感觉这个知识还是蛮多的，看得懂就看得懂，看不懂就拉倒。
+
+## 31 动态路由
+
+可以作为参数传递的一种方式。参数传递！！！！！
+
+**方法1 参数传递**
+
+![image-20220221144937928](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220221144937928.png)
+
+**方法2 search传递** → 已经不推荐了
+
+现在不是很推荐query
+
+![image-20220221161349407](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220221161349407.png)
+
+**方法3 传入对象** → 推荐的
+
+![image-20220221171157378](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220221171157378.png)
+
+>简单的数据传递就用方法1 复杂的就用方法3
+>
+>2基本上没人用
+
+## 32 react-router-config
+
+因为 Switch组件的作用: 就是**路径和组件**之间的映射关系
+
+一个个switch这样写的 这样写实在太分散了！！
+
+![image-20220221231157105](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220221231157105.png)
+
+`renderRoute()`的本质是什么呢？
+
+![image-20220222114357013](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220222114357013.png)
+
