@@ -419,6 +419,8 @@ export default App;
 
 这个有一个纯函数的概念，`reducer()`本质就是一个纯函数
 
+**所以说reduce（state）这里传入的state数据是不能改的！！！**你可以复制一份。
+
 ```
 纯函数
 确定的输入，一定会产生确定的输出; 
@@ -448,6 +450,12 @@ export default App;
 下面就用一个点击的案例来说明一下如何搭配起来的。
 
 ![image-20220217000130292](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220217000130292.png)
+
+上面那个案例，数据是分开的，而且事件不一样，但是其他可能是一样的。
+
+所以现在开始抽离出去。
+
+
 
 由于接下来的redux 有点难 决定先放弃一下。大概在16 17 18 的50分钟前
 
