@@ -177,7 +177,18 @@ index.js → 里面有dispatch 分发用
 
 ## 7 redux-saga
 
-有点累，先不看了。
+其实saga比thunk先进在哪里呢？
+
+就是`dispatch(还是对象)`，同时中间件的详情可以写在别的文件里面。
+
+学习这个首先要有generator的基础知识
+
+基础知识如下
+
+```javascript
+```
+
+于是saga的实现就要靠
 
 ## 8 中间件实现原理
 

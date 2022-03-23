@@ -126,8 +126,6 @@ React 会保存你传递的函数（我们将它称之为 “effect”），并�
 在这个 effect 中，我们设置了 document 的 title 属性，不过我们也可以执行数据获取或调用其他命令式的 API。
 ```
 
-###### 
-
 话说我觉得这篇文章也写的挺好的
 
 [React hooksを基礎から理解する (useEffect編)](https://qiita.com/seira/items/e62890f11e91f6b9653f)
@@ -161,6 +159,10 @@ useEffect(() => {
 
 就是跨组件的数据交互的啦。具体想知道普通的context的话，去看Tips我写的。
 
+>以前都是：类名+ contextType = context  
+>
+>然后用的时候Provier包裹最外层，Consumer
+
 如果说用这个省略了什么的话
 
 - 不用consumer
@@ -190,15 +192,19 @@ return (
 
 ## 7 useReducer
 
-首先这个和redux关系不大，唯一很像的地方的就是reducer作为一个纯函数。dispatch发请求。
+不要看到reducer就感觉是redux了。
+
+首先这个和redux关系不大，唯一很像的地方的就是reducer作为一个纯函数。
+
+**参数1 state是数据**
+
+**参数2 dispatch发请求。**
 
 通过useReducer完成加减操作。
 
 ```jsx
 const [state, dispatch] = useReducer(reducer, { count: 1 });
 ```
-
-
 
 ![image-20220303183117391](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220303183117391.png)
 
@@ -258,3 +264,9 @@ function Parent() {
 > 另外Redux有thunk和saga之类的中间件支持async  action，而useReducer没有，还得用其他库。
 >
 > useContext+useReducer说白了就是项目很小，只有少部分祖孙组件间需要共享状态时才会使用的一个简易共享方案。真正较复杂的情况那必然还是用Redux/Mobx这些的。
+
+## 8 useCallBack
+
+这个本来是为了性能的优化
+
+useCallBack是一个函数，他会返回一个值，只要内部的依赖不变，这个值就不会变化。

@@ -374,7 +374,7 @@ render() {
 }
 ```
 
-#### **那么如何触发点击状态？**
+#### **那么如何触发点击状态？**重点⭐️
 
 首先看原生事件绑定
 
@@ -391,7 +391,7 @@ render() {
 		<button onclick="demo()">按钮3</button>
 
 		<script type="text/javascript" >
-             // 方法1
+      // 方法1
 			const btn1 = document.getElementById('btn1')
 			btn1.addEventListener('click',()=>{
 				alert('按钮1被点击了')
@@ -419,7 +419,7 @@ React怎么实现呢
 
 错误写法1
 
-```js
+```jsx
 render(){
     const {isLike} = this.state
     return <h1 onClick="demo()"><h1/>
@@ -429,7 +429,7 @@ render(){
 
 错误写法2
 
-```js
+```jsx
 render(){
     const {isLike} = this.state
     return <h1 onClick={demo()}><h1/>
@@ -439,7 +439,7 @@ render(){
 
 推导出来到了正确的写法
 
-```js
+```jsx
 render(){
     const {isLike} = this.state
     return <h1 onClick={demo}><h1/>
@@ -703,7 +703,7 @@ class Weather extends React.Component{
 
 按照上面的演变过程，最后的结果就是
 
-```js
+```jsx
 <script type="text/babel">
     class Weather extends React.Component{
 

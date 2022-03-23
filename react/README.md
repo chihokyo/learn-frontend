@@ -6,6 +6,10 @@
 .
 ├── basic # 基础学习 
 │   └── README.md 基础学习总结
+├── advanced # 进阶学习
+│   └── Hooks.md    # hooks相关
+│   └── Redux.md    # redux相关 
+│   └── Tips.md     # 重点盲点自我总结
 ├── project # 项目
 │   └── comment_demo #【练手项目】简单的发表评论实时显示 可运行
 │   └── jianshu_todo # 简书项目之前的练手 → 这个的README比较详细
@@ -26,4 +30,3 @@
 
 - Chrome工具要安装React
 - VSCode设置
-

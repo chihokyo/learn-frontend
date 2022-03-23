@@ -274,7 +274,7 @@ insertList() {
 
 PureComponent是为了解决每次判定类组件是否更新的时候，要手动实现`shouldComponentUpdate`
 
-**PureComponent** 这个只能解决类组件，函数式组件不适用，不行的。
+**PureComponent** 这个只能解决类组件，函数式组件不适用，不行的。但是函数式组件可以用`memo()`
 
 比如
 
@@ -555,3 +555,30 @@ NavLink
 
 ![image-20220222114357013](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220222114357013.png)
 
+## 33 ref的一些事情
+
+这个怎么说呢，ref这个其实就是说，目前react的开发不是组件开发吗？
+
+平常都是用数据驱动页面的变化的，页面的数据变化进行render（渲染），但如果不想用数据，而是直接操作dom呢？
+
+这个时候就需要ref，比如我想拿到自己组件的元素，想拿到子组件的元素
+
+下面是类组件
+
+![image-20220322192427479](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220322192427479.png)
+
+但是上面只是针对类组件的，那么函数组件呢？
+
+这就说出来了，ref其实本来就是react管理的，并非一个普通的属性
+
+```jsx
+<Home ref={"unnormal"}/> // 并非一般的属性
+```
+
+如何解决呢？
+
+答案就是一个高阶函数`forwardRef()`
+
+这是一个高阶函数，传入一个组件，出来一个组件。出来之后这个组件拥有了一个强大的属性，那就是ref！！你不是不让我自己搞吗？于是我自己搞！
+
+![image-20220322201646230](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220322201646230.png)
