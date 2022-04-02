@@ -32,7 +32,7 @@ process {
     ......
 ```
 
-###  特殊的全局对象
+### 特殊的全局对象
 
 为什么特殊呢？因为 ↓
 
@@ -41,7 +41,7 @@ process {
 
 ### 常见的全局对象
 
--  process对象 → process提供了Node进程中相关的信息
+- process对象 → process提供了Node进程中相关的信息
 - console对象 → 提供了简单的调试控制台
 - 定时器函数 → `setTimeout()`,`setInterval()`,`setImmediate()`,`process.nextTick()`
 
@@ -82,12 +82,10 @@ var foo = "ng"
 因为函数是有作用域的。
 
 ```javascript
-
 (function(){
     var foo = "okk"
     console.log(foo);
 })()
-
 ```
 
 但是这样如何让别的文件也来用你内部的作用域呢？
@@ -97,7 +95,7 @@ var foo = "ng"
 var moduleBar = (function () {
  var foo = "okk"
  var bar = "bar"
-	
+
  // 这样就返回去了
   return {
     foo,
@@ -136,7 +134,7 @@ moduleBar.foo
 - 导入 `require()` 这个根本不用记忆
 
 - 导出 → 比较难记忆
-
+  
   - exports
   - module.exports
 
@@ -188,14 +186,14 @@ const bar = 0x100 // exports的地址
  那么 module.exports 和 exports 有什么关系或者区别呢  
 
 > 我们追根溯源，通过维基百科中对CommonJS规范的解析:
->
+> 
 > **CommonJS中是没有module.exports的概念的**
->
+> 
 > 但是为了实现模块的导出，Node中使用的是Module的类，每一个模块都是Module的一个实例，也就是 module 
->
+> 
 > 所以在Node中真正用于导出的其实根本不是exports，而是module.exports; 因为module才是导出的真正实现者;
 
--  `new Module()`  一个js就是一个 **module** 实例 
+- `new Module()`  一个js就是一个 **module** 实例 
 - 所有的文件都有一个module全局对象，不信可以在 `console.log(module)`来看看
 - 真正导出的人就是 `module.exports`
 - 源码里面可以看看 `module.exports = exports`
@@ -226,7 +224,7 @@ console.log(module.paths)
 ## 5. 模块的加载过程
 
 - 模块在第1次导入，会被运行1次。
-
+  
   ```javascript
   // 加载过程是同步 → 意思就是一个个向下执行
   console.log("main中的代码被执行");
@@ -235,12 +233,10 @@ console.log(module.paths)
   require('./foo');
   ```
 
-  
-
 - 多次导入，会被放进缓存，最终只会运行1次。
-
+  
   ↑ 验证
-
+  
   ```javascript
   console.log(module.loaded) // false:还未加载 true：已经加载
   ```
@@ -251,14 +247,14 @@ console.log(module.paths)
 
 ```
 ■ CommonJS加载模块是同步的:
-	同步的意味着只有等到对应的模块加载完毕，当前模块中的内容才能被运行;
-	这个在服务器不会有什么问题，因为服务器加载的js文件都是本地文件，加载速度非常快;
+    同步的意味着只有等到对应的模块加载完毕，当前模块中的内容才能被运行;
+    这个在服务器不会有什么问题，因为服务器加载的js文件都是本地文件，加载速度非常快;
 ■ 如果将它应用于浏览器呢?
-	浏览器加载js文件需要先从服务器将文件下载下来，之后在加载运行;
-	那么采用同步的就意味着后续的js代码都无法正常运行，即使是一些简单的DOM操作;
+    浏览器加载js文件需要先从服务器将文件下载下来，之后在加载运行;
+    那么采用同步的就意味着后续的js代码都无法正常运行，即使是一些简单的DOM操作;
 ■ 所以在浏览器中，我们通常不使用CommonJS规范:
-	当然在webpack中使用CommonJS是另外一回事;
-	因为它会将我们的代码转成浏览器可以直接执行的代码;
+    当然在webpack中使用CommonJS是另外一回事;
+    因为它会将我们的代码转成浏览器可以直接执行的代码;
 ```
 
 ## 7. ES module 横空出世
@@ -274,11 +270,11 @@ console.log(module.paths)
 
 ```javascript
 import {
-  
+
 }
 
 export {
-	
+
 }
 // 上面看起来像是一个对象，但其实没有 export = {} 本质就是一个关键字 
 // 导出的是里面变量的引用
@@ -373,10 +369,10 @@ let flag = true
 if (flag) {
   // 因为是异步加载 非同步 有个返回值 返回值是promise
   const promise = import("./module.js") 
-  	.then((res)=>{
+      .then((res)=>{
       console.log(res)
     })
-  	.catch()
+      .catch()
 }
 ```
 
@@ -474,7 +470,7 @@ require和export混用
 // a.js
 const name = "chin"
 export {
-	name
+    name
 }
 // main.js 导入文件a
 require("a.js") // 这样可以不？
@@ -498,3 +494,138 @@ module.exports = {
 // main.js → 默认用的是default形式
 import foo from "./a.js"
 ```
+
+## 11. npm是啥
+
+反正就是一个包管理工具，很强大👍🏻
+
+这里有一个小TIPS
+
+那就是每一次npm其实下载的是一个压缩包→压缩包在哪里找的？在registry仓库找→然后下载到本地进行解压！
+
+怎么看自己的registry
+
+```bash
+npm config get registry
+```
+
+OK
+
+```bash
+npm init # 创建需要你自己填写
+npm init -y # 创建就默认那种
+```
+
+```json
+// 其他的我都不写了，差不多搜一搜都知道，写一下自己的盲区。
+// 这个入口和webpack打包的入口并不冲突
+// 比如我们使用axios模块 const axios = require('axios')
+// 实际上是找到对应的main属性查找文件的
+"main" : "index.js"
+```
+
+## 12. polyfills
+
+`polyfills` 补丁的意思，就是给浏览器增加一些语法支持！`babel`是转换，其实和polyfills还是有很大的不同的。
+
+```json
+{
+  "browserslist": [
+    "last 1 version",
+    "> 1%",
+    "maintained node versions",
+    "not dead"
+  ]
+}
+```
+
+## 13. 关于全局安装 npm install -g
+
+这个全局安装到底是啥意思呢？比如下面的这个全局安装，难道这个意思就是说你的项目不用再次安装 axios ？不是说 -g就是可以安装之后不用再具体项目再次 install 依赖了！
+
+当然axios也不需要全局安装
+
+```bash
+npm install axios -g
+```
+
+而是因为全局安装的**都是一些工具**，生成一个**可执行文件**，并且放在你电脑的环境变量。然后就能找到包的可执行文件。
+
+感觉就是通过 npm 给你的电脑安装了 **命令**。
+
+```bash
+npm list -g --depth=0 // 查看全局安装了
+npm root -g // 查看全局的那些包安装在了哪里
+```
+
+那么本地**开发环境** PK **生产环境** 安装有啥区别？
+
+```bash
+# 安装开发和生产依赖 
+npm install axios  # 一样的
+npm i axios
+# 开发依赖
+npm install webpack --save-dev  # 一样的
+npm install webpack -D
+npm i webpack –D
+```
+
+## 14. package-lock.json 干什么用的？
+
+本质就是
+
+- 写真正依赖的版本号
+- 记录一下依赖了什么（可以实现缓存）
+
+![image-20220402221352332](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220402221352332.png)
+
+## 15. npm和npx到底啥不一样
+
+本来一直搞不清楚，这一次终于搞清楚了！
+
+比如你在全局安装了一个V2的包，在项目安装了V5的包。
+
+那么当你在终端输入
+
+```bash
+webapck # 那么会显示哪里？答案是V2的
+```
+
+原因非常简单，在**当前目录下**找不到webpack时，就会去全局找，并且执行命令！这里在终端找的，当前目录么有，肯定去全局找！
+
+如何解决？
+
+- 具体到项目根目录下
+
+```bash
+./nodu_modules/bin/webpack —version
+# 如果这个时候你想看你本地的，需要具体的到bin下面的可执行文件
+```
+
+- 修改package.json中的scripts-
+
+- **使用主角 npx**
+
+  
+
+  ```bash
+  npx webpack --version
+  ```
+
+npx原理会到当前目录的`./nodu_modules/bin`目录下查找命令
+
+## 15. 如何制作一个自己的终端命令包？
+
+这个貌似需要技术含量很高，在NodeJS day6 - day7 以后需要的时候慢慢看吧。
+
+基本上就是需要两个包
+
+- https://github.com/tj/commander.js/
+
+- 第1步
+  - 在index.js写上 `#!/usr/bin/env node`
+- 第2步
+  - 在package.json增加bin属性
+- 第3步 
+  - 执行npm link
+

@@ -52,3 +52,118 @@ bar(); // hello global
 closureFn = null // 这样就可以手动销毁
 ```
 
+## 6 this在nodejs里为什么是{}？
+
+module → 加载 → 编译 → 放到一个函数 → 执行这个函数（`function.call({}`)）
+
+源码可以看到的！
+
+[源码地址lib/internal/modules/cjs/loader.js](https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js)
+
+![image-20220328013823562](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220328013823562.png)
+
+## 7 this什么时候确定？
+
+只有在执行的时候才能确定，动态绑定！解析的时候是啥谁也不知道，在函数执行上下文FEC真正执行的时候才能被确定。
+
+- 不同的绑定规则，不同的调用方法，结果也就不一样。
+
+![image-20220328014727949](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220328014727949.png)
+
+```javascript
+/**
+ * this的指向，和你的函数在哪里定义的根本无关
+ * 跟谁调用的，调用的方式才有关系！
+ */
+
+// 1.直接调用
+function foo() {
+  console.log(this);
+}
+foo(); // window对象 → 一大坨
+
+// 2.创建对象，对象中的函数指向foo
+var obj = {
+  id: '1',
+  foo: foo,
+};
+obj.foo(); // obj的对象 → { id: '1', foo: [Function: foo] }
+
+// 3.apply 调用
+foo.apply('demo'); // 字符串 → [String: 'demo']
+```
+
+## 8 this的指向问题
+
+## 9
+
+## 10 自己实现一个call/apply/bind
+
+要实现这个，就要给所有的函数都实现一个方法。用的就是所有函数的母亲`Function` 通过原型链来实现
+
+```javascript
+// 给所有函数增加属性 mycall 这个属性是一个方法
+Function.prototype.mycall = function () {
+  console.log('mycall is called');
+};
+
+function foo() {
+  console.log('foo');
+}
+
+function bar() {
+  console.log('bar');
+}
+
+// 这样就顺利给这俩函数增加了方法 mycall
+foo.mycall(); // mycall is called
+bar.mycall(); // mycall is called
+```
+
+那么如何才能让我自己定义的 `mycall()` 方法实现和 `call()` 一样，能够执行就运行呢？
+
+本质其实用就用了this的隐式绑定
+
+```javascript
+// 给所有函数增加属性
+Function.prototype.mycall = function () {
+  console.log('mycall is called');
+  // 如何才能让函数知道是哪个函数？通用性问题
+  // 为什么这样就可以？因为this只跟你谁调用有关 !!!
+  var fn = this; // 绑定this
+  fn(); // 谁调用就指向谁
+};
+
+function foo() {
+  console.log('foo');
+}
+
+function bar() {
+  console.log('bar');
+}
+
+foo.mycall();
+bar.mycall();
+```
+
+接下来就是要解决的this问题，因为原生的`call(this)` 这样写谁，就可以绑定谁的。
+
+```javascript
+// 给所有函数增加属性
+Function.prototype.mycall = function (thisArg) {
+  console.log('mycall is called');
+  // 如何才能让函数知道是哪个函数？通用性问题
+  // 为什么这样就可以？因为this只跟你谁调用有关
+  var fn = this;
+  // fn();
+  // 那么如何解决随意指向？
+  thisArg.fn = fn; // 那就是给你这个绑定一个同名函数
+  thisArg.fn(); // 直接执行
+
+  // 因为是多余的 用完就弃
+  delete thisArg;
+};
+```
+
+this有可能是其他类型，所以需要你转换一下。
+
