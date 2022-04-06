@@ -629,3 +629,104 @@ npx原理会到当前目录的`./nodu_modules/bin`目录下查找命令
 - 第3步 
   - 执行npm link
 
+
+
+## 16. 浏览器的事件循环
+
+可以说一下就是代码在浏览器的顺序是如何实现的？
+
+首先JS是单线程的！现在说一下，栈和堆。
+
+栈这里面记录了一个简单的代码执行，代码默认在`main.js`
+
+![image-20220403220431866](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220403220431866.png)
+
+那么浏览器的时间循环加上异步呢？
+
+异步的一些函数调用，比如`setTimeout()`
+
+- `setTimeout()`的本质不是和JS在一条道上的，而是一个webapi，这个会被放入事件队列
+- 事件队列中的函数，会放在调用栈，在合适的时机执行
+- 下面这个图还蛮形象的
+
+出自于这篇文章[JavaScript Visualized: Promises & Async/Await](https://medium.com/@lydiahallie/javascript-visualized-promises-async-await-a3f1aad8a943)
+
+写的超好！
+
+![img](https://miro.medium.com/max/1400/0*iHLzfmlOAroed4Bz.gif)
+
+下面通过一个面试题说一下执行过程
+
+先说结论
+
+主线程任务 ＞ 微任务（Promise，queueMicrotask） ＞ 宏任务 (setTimeout)等等
+
+![image-20220403231935375](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220403231935375.png)
+
+下面又是一个面试题，增加了await和async
+
+```javascript
+new Promise(function (resolve) {
+  console.log('promise1');
+  resolve();
+}).then(function () {
+  console.log('then1');
+});
+
+// await这一句 相当于 就是立即执行这一块
+function (resolve) {
+  console.log('promise1');
+  resolve();
+// await后面的那一句 相当于then
+  
+// 于是就感觉是这样的
+async funtion async1() {
+  await async2;
+  console.log('then1');
+}
+async funtion async2() {
+  console.log('promise1');
+  resolve();
+}
+```
+
+下面来了
+
+![image-20220403234123397](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220403234123397.png)
+
+## 17. 关于阻塞&非阻塞&同步&异步
+
+其实这个吧，我以前经常搞不清，随着我学习的越来越多，我差不多知道是什么意思的。
+
+首先NodeJS的组合会用 libuv 用的是事件队列，和Java那种有线程锁不一样，你所有看起来异步的东西最后都会放进去这个 libuv，然后帮你搞，本质是不会发生脏数据那种的。
+
+我自己的感觉吧
+
+阻塞 非阻塞 → 指的就是调用程序的人 是对后面产生影响不，自己不干后面就不能干。
+
+同步 异步 → 指的是执行自己是以什么形式执行的，嘛。差不多吧。反正JS几乎都是回调异步操作的。
+
+## 17. Buffer&Stream
+
+> JS本身处理二进制是一件很不友好的事情，但是我们的视频音频图片本身就是二进制居多。所以怎么处理呢？
+>
+> 这时候Buffr就开始闪亮登场了！
+>
+> 前端用的很少，但是后端就用的很多。
+
+- Buffer就是一个一个8位2进制的数组：01010101
+
+下面是一个小知识
+
+> 8bit(01010101) = 1byte
+>
+> 1024byte = 1kb
+>
+> 1024kb = 1Mb
+
+下面都是一些Buffer的API使用了，就没必要看了。
+
+其实本质就是了解几个API
+
+- sharp
+- 
