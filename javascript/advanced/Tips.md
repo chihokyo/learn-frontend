@@ -895,11 +895,337 @@ return fn.call(this, ...args);
 
 因为从上面的实现的那段代码可以看出来
 
-```javascript
-var curryAdd = myCurry(add); 
+![image-20220407001212850](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220407001212850.png)
 
-console.log(curryAdd(10, 20, 30)); 
-// 这里相当于this是柯里化后的，并不是原来的函数 add的那个this
-// 这样就拿不到原来的函数对象
+不进行强制绑定的话，其实就是为了保证原函数和柯里化的函数都是同一个this
+
+```javascript
+fn(...args); // this问题，这里会是window
+return fn.call(this, ...args); // 这里的fn的this不是{},会变成window
 ```
 
+## 21 组合函数 Compose
+
+这个也是函数式编程的一些技巧
+
+```
+比如我们现在需要对某一个数据进行函数的调用，执行两个函数fn1和fn2，这两个函数是依次执行的; 
+那么如果每次我们都需要进行两个函数的调用，操作上就会显得重复;
+那么是否可以将这两个函数组合起来，自动依次调用呢?
+这个过程就是对函数的组合，我们称之为 组合函数(Compose Function);
+```
+
+```javascript
+/***********使用之前**************/
+// 比如一个数字先+10 在乘 2
+function add(num) {
+  return num + 10;
+}
+function double(num) {
+  return num * 2;
+}
+
+var num = 10;
+var res = double(add(num));
+console.log(res);
+
+/***********使用之后**************/
+// ① 先组合起来
+function composeFn(x, y) {
+  return function (num) {
+    return y(x(num));
+  };
+}
+// ② 再生成一个新的函数
+var newFn = composeFn(add, double);
+console.log(newFn(10));
+```
+
+那么如何手动实现自动让函数进行组合？
+
+```javascript
+// 把所有fns放在一起
+function myCompose(...fns) {
+  // 以下只是测试参数错误
+  var length = fns.length;
+  for (var i = 0; i < length; i++) {
+    // 如果传入的不是函数，直接报错
+    if (typeof fns[i] !== 'function') {
+      throw new TypeError('参数错误');
+    }
+  }
+  // 这里的参数就是新函数的所有参数
+  return function compose(...args) {
+    var index = 0;
+    // 没有参数 or 多个参数
+    // 先执行1次
+    var res = length ? fns[index].apply(this, args) : args;
+    // index刚开始是0 先拿到一个在开始
+    while (++index < length) {
+      // 已有的结果传入到res 这里就是接连调用函数了
+      res = fns[index].call(this, res);
+    }
+    return res;
+  };
+}
+var newFn = myCompose(add, double);
+console.log(newFn(100));
+```
+
+## 22  with作用域问题
+
+首先js的作用域只有2
+
+- main.js  就是一个模块整体就是一个作用域 → 全局作用域
+- 函数是一个作用域 → 函数作用域
+
+主要就是这两个作用域，其他都没有。
+
+```javascript
+var msg = 'hello msg';
+
+function foo() {
+  function bar() {
+    // 先在自己找 → 再去的foo找 → 去的全局找
+    // 目前这个作用域的链条是chain是这样的  
+    console.log(msg);
+  }
+  bar();
+}
+
+foo();
+
+
+var msg = 'hello msg';
+
+function foo() {
+  function bar() {
+    // 先在自己找 → 再去的foo找 → 去的全局找
+    // 目前这个作用域的链条是chain是这样的  
+    console.log(msg);
+  }
+  bar();
+}
+```
+
+感觉with就像一个任意门，可以随便快速传送一个变量到一个位置，便于代码找到自己想要的变量。
+
+```javascript
+('use strict');
+
+var message = 'Hello World';
+// console.log(message)
+
+// with语句: 可以形成自己的作用域
+var obj = { id: 'chin', age: 18, message: 'obj message' };
+
+function foo() {
+  function bar() {
+    with (obj) {
+      console.log(message);
+      console.log('------');
+    }
+  }
+  bar();
+}
+
+foo();
+
+var info = { id: 'chin' };
+with (info) {
+  console.log(name);
+}
+```
+
+**严格模式下是不能使用with的**
+
+并且很多也不推荐使用
+
+## 23 eval 
+
+这个在webpack里打包的时候可能会有这个选项，好多语言都有这个，就是字符串写代码。
+
+- 可读性很差 → 连个缩进高亮都没
+- 字符串被篡改开发的话不安全
+- eval执行必须经过js解释器，不能被js引擎所优化
+
+```javascript
+var jsString = 'var message = "Hello World"; console.log(message);';
+
+eval(jsString);
+```
+
+## 24 严格模式
+
+strict mode 
+
+- 既可以在整个文件里面开启严格模式
+- 也可以在某个函数开启严格模式
+
+```
+1. 无法意外的创建全局变量
+2. 严格模式会使引起静默失败(silently fail,注:不报错也没有任何效果)的赋值操作抛出异常 
+3. 严格模式下试图删除不可删除的属性
+4.严格模式不允许函数参数有相同的名称
+5. 不允许0的八进制语法
+6. 在严格模式下，不允许使用with
+```
+
+严格模式下关于一些函数的this指向问题
+
+这里最主要的是默认执行函数和`setTimeout()`
+
+```javascript
+// 在严格模式下, 自执行函数(默认绑定)会指向 undefined
+function foo() {
+  console.log(this);
+}
+var obj = {
+  name: 'why',
+  foo: foo,
+};
+foo(); // 严格模式下这里就是 undefined
+
+obj.foo(); // 这里还是不变的 obj
+var bar = obj.foo;
+bar(); // 严格模式下这里就是 undefined
+
+```
+
+setTimeout　这里需要仔细看
+
+```javascript
+// setTimeout的this
+// 箭头函数肯定是没有的this 也就是{}
+// 严格模式下，普通函数这里指向的是window，并不是想象中的是自执行函数的undefined
+// 因为内部调用的时候，fn.apply(this = window)
+setTimeout(function () {
+  console.log(this);
+}, 1000);
+```
+
+```
+是由于setTimeout()调用的代码运行在与所在函数完全分离的执行环境上。这会导致这些代码中包含的 this 关键字会指向 window (或全局)对象。详细可参考MDN setTimeout
+```
+
+## 25 关于js的面向对象
+
+1. **创建对象的方式**
+
+- `var obj = new Object()`
+- `var obj = {}`
+
+```javascript
+// 1.创建方式一: 通过new Object()创建
+var obj = new Object();
+obj.id = 'chin';
+obj.age = 77;
+obj.height = 1.88;
+obj.running = function () {
+  console.log(this.id + '在跑步~');
+};
+
+// 2.创建方式二: 字面量形式
+var info = {
+  id: 'chin',
+  age: 40,
+  height: 1.98,
+  eating: function () {
+    console.log(this.id + '在吃东西~');
+  },
+};
+```
+
+2. 关于属性的操作
+
+```javascript
+var obj = {
+  id: 'yes',
+  age: '88',
+};
+// 获取属性
+console.log(obj.id);
+// 给属性赋值
+obj.location = 'china';
+console.log(obj);
+// 删除
+delete obj.id;
+// 遍历
+for (var key in obj) {
+  console.log(key);
+}
+```
+
+## 26 属性描述符
+
+为什么可以直接定义属性，还需要属性描述符呢？
+
+因为属性描述符不仅仅可以直接定义属性，还可以对属性进行一些配置。
+
+**数据描述符**
+
+- value
+- **configurable**  
+- **enumerable**
+- writable
+
+默认都是false
+
+`var obj = {}`
+
+```javascript
+Object.defineProperty(obj, 'location', {
+  // 很多配置
+  value: "China", // 默认值undefined
+  // 该特殊不可删除/也不可以重新定义属性描述符
+  configurable: false, // 默认值false
+  // // 该特殊是配置对应的属性(address)是否是可以枚举
+  enumerable: true, // 默认值false
+  // // 该特性是属性是否是可以赋值(写入值)
+  writable: false // 默认值false
+});
+```
+
+**存取属性描述符**
+
+- **configurable** 一样的
+- **enumerable** 一样的
+- `get()`
+- `set()`
+
+```javascript
+var obj = {
+  name: 'chin',
+  age: 18,
+  _location: '北京市',
+};
+
+// 存取属性描述符
+// 1.隐藏某一个私有属性被希望直接被外界使用和赋值
+// 2.如果我们希望截获某一个属性它访问和设置值的过程时, 也会使用存储属性描述符
+Object.defineProperty(obj, 'address', {
+  enumerable: true,
+  configurable: true,
+  get: function () {
+    foo();
+    return this._location;
+  },
+  set: function (value) {
+    bar();
+    this._location = value;
+  },
+});
+
+console.log(obj.location);
+
+obj.address = 'china';
+console.log(obj.address);
+
+function foo() {
+  console.log('获取了一次location的值');
+}
+
+function bar() {
+  console.log('设置了location的值');
+}
+```
