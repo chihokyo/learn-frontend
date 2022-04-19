@@ -8,6 +8,8 @@ JS在执行的时候，首先全局会有一个GO的作用域。
 
 这个需要一些图来辅助理解。明天整理。
 
+直接看#3就行
+
 ## 2 代码在内存的执行
 
 加载到内存 → CPU执行 → 根据CPU可能会在开辟空间
@@ -89,7 +91,6 @@ FEC主要三个板块组成
 - VO 形参
 - Scope Chain VO + Parent的VO（大部分都是GO）
 - **this** → 就是在这个时候确定的
-
 - 不同的绑定规则，不同的调用方法，结果也就不一样。
 
 ![image-20220328014727949](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220328014727949.png)
@@ -1203,7 +1204,7 @@ var obj = {
 // 存取属性描述符
 // 1.隐藏某一个私有属性被希望直接被外界使用和赋值
 // 2.如果我们希望截获某一个属性它访问和设置值的过程时, 也会使用存储属性描述符
-Object.defineProperty(obj, 'address', {
+Object.defineProperty(obj, 'address, {
   enumerable: true,
   configurable: true,
   get: function () {
@@ -1216,7 +1217,7 @@ Object.defineProperty(obj, 'address', {
   },
 });
 
-console.log(obj.location);
+console.log(obj._location);
 
 obj.address = 'china';
 console.log(obj.address);
@@ -1229,3 +1230,326 @@ function bar() {
   console.log('设置了location的值');
 }
 ```
+
+还可以一次性定义多个属性修饰符
+
+```javascript
+var obj = {
+  // 私有属性(js里面是没有严格意义的私有属性)
+  _age: 18,
+  _eating: function () {},
+  // 既可以像下面那样直接写一个函数
+  // 也可以这样直接写
+  set age(value) {
+    this._age = value;
+  },
+  get age() {
+    return this._age;
+  },
+};
+
+// 一次性定义多个
+Object.defineProperties(obj, {
+  name: {
+    configurable: true,
+    enumerable: true,
+    writable: true,
+    value: 'chin',
+  },
+  age: {
+    configurable: true,
+    enumerable: true,
+    get: function () {
+      return this._age;
+    },
+    set: function (value) {
+      this._age = value;
+    },
+  },
+});
+
+obj.age = 19;
+console.log(obj.age);
+console.log(obj);
+```
+
+获取某个对象的属性修饰符，其实就是俩方法
+
+`Object.getOwnPropertyDescriptor(obj, "具体属性")`
+
+`Object.getOwnPropertyDescriptors(obj)` 直接传入对象就行
+
+限制属性的几种方式
+
+`Object.preventExtensions(obj)` → 禁止对象继续添加新的属性
+
+`Object.seal()` → 禁止对象配置/删除里面的属性
+
+`Object.freeze()` → 让属性不可以修改(writable: false)
+
+## 27 创建js对象的几种方式
+
+- 字面量
+
+```javascript
+var obj = {}  
+```
+
+- 工厂模式
+
+缺点 类型过于宽泛，不能获取真实的对象。输出的时候全是Object，不能具体到Animal,Person这种
+
+```javascript
+  // 工厂模式: 工厂函数
+function createPerson(name, age, height, address) {
+  var p = {};
+  p.name = name;
+  p.age = age;
+  p.height = height;
+  p.address = address;
+
+  p.eating = function () {
+    console.log(this.name + '在吃东西~');
+  };
+
+  p.running = function () {
+    console.log(this.name + '在跑步~');
+  };
+
+  return p;
+}
+
+var p1 = createPerson('张三', 18, 1.88, '广州市');
+var p2 = createPerson('李四', 20, 1.98, '上海市');
+var p3 = createPerson('王五', 30, 1.78, '北京市');
+
+// 工厂模式的缺点(获取不到对象最真实的类型)
+console.log(p1, p2, p3);
+```
+
+- 通过构造函数 new 出来。
+
+## 28 关于js的构造函数
+
+其实构造函数就是普通函数，只是被new了之后就有了不同的意义。
+
+就像蜘蛛侠也只是个普通人，当他披上战衣的时候他就是蜘蛛侠，人人都可以成为蜘蛛侠，人人又是蜘蛛侠。
+
+```javascript
+function foo() {
+  console.log('foo');
+}
+new foo(); // 一旦前面加上了new 这个foo就成了构造函数
+new foo; // 依然会被调用，和上面实际上是一模一样的
+```
+
+- 构造函数名并非一定要大写，`foo Foo`都是一样的，只是大写是约定俗成的
+- 写`new foo` 也依然会被调用
+
+那么new之后发生了什么呢？
+
+```
+p1. 在内存中创建一个新的对象(空对象);
+p2. 这个对象内部的[[prototype]]属性会被赋值为该构造函数的prototype属性;
+p3. 构造函数内部的this，会指向创建出来的新对象;
+p4. 执行函数的内部代码(函数体代码);
+p5. 如果构造函数没有返回非空对象，则返回创建出来的新对象;
+```
+
+## 29 js构造函数new出来的对象是否为同一个？
+
+每一个都是不同的！每一次都会单独搞出来一份！
+
+因为函数每一次调用，都会单独开辟一段空间，用完之后销毁，然后继续开辟一段空间。
+
+```javascript
+function Person(name, age, height, address) {
+  this.name = name;
+  this.age = age;
+  this.height = height;
+  this.address = address;
+
+  this.eating = function () {
+    console.log(this.name + '在吃东西~');
+  };
+
+  this.running = function () {
+    console.log(this.name + '在跑步');
+  };
+}
+
+var p1 = new Person('张三', 18, 1.88, '广州市');
+var p2 = new Person('李四', 20, 1.98, '北京市');
+
+console.log(p1.eating === p2.eating); // false
+
+// 下一个也同理
+function foo() {
+  function bar() {}
+  return bar;
+}
+
+var fn1 = foo();
+var fn2 = foo();
+
+console.log(fn1 === fn2); // false
+```
+
+那如何解决呢？ 就是通过对象的原型！
+
+## 30 对象原型出来了 → 隐式原型
+
+为了要节省空间，这里先说一下原型的概念。
+
+- 每个对象都是有一个原型的`[[prototype]]` （早期ECMA没有规范去查看原型，这个双括号也只是个es空泛规定的，在不同的地方有自己不同的实现方式的时候他就这样写
+- 后来浏览器为了让大家查看，各家自己规定了一些查看原型的方法，比如 \__proto__，默认是一个空对象
+- 但是这并不是正规的，ES5之后提供的 `Object.getPrototypeOf(obj)` 
+
+上面的一段话总结一下就是，每个对象都有一个对象原型（又叫**隐式原型**）。浏览器有浏览器的查看，es有es的查看方法。
+
+> 原型有什么用呢？
+
+```javascript
+// 当我们从一个对象中获取某一个属性时, 它会触发 [[get]] 操作
+// 1. 在当前对象中去查找对应的属性, 如果找到就直接使用
+// 2. 如果没有找到, 那么会沿着它的原型链去查找 [[prototype]]
+// obj.age = 18
+obj.__proto__.age = 18;
+
+console.log(obj.age);
+```
+
+其实这个隐式原型，就是浏览器为了实现[[prototype]] 搞出来的  \__proto__ 
+
+```javascript
+var obj = {
+  id: "chin",
+  // 本质就是每一个对象浏览器都给她弄了一个
+  __proto__:{}
+}
+```
+
+## 31 函数原型出来了 → 显式原型
+
+函数也是一个对象，所以上面**对象有的**，**函数这里也有**！！也叫显式原型！
+
+但是函数自己有一个自己的 **显式原型 prototype**！打印出来也是一个空对象！
+
+> 这个显式原型啥作用？
+
+这个只在你的函数成为蜘蛛侠（new）的时候有作用，当你通过 new 让自己成为构造函数的时候，这个时候新建的对象的  \__proto__ 就 **指向**了 函数的 prototype。
+
+也就是 `对象.__proto__ = 函数.prototype` （内部自动操作）
+
+```javascript
+function foo() {
+  console.log('foo');
+}
+var f1 = new foo();
+console.log(f1.__proto__ === foo.prototype);
+```
+
+上面一段的内存图感觉
+
+![image-20220411171027390](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220411171027390.png)
+
+## 32 function.prototype 真的为{}空对象？
+
+实际上是不是的，验证一下
+
+之所以打印的是空的，是因为可枚举的那个属性给设置成了false
+
+- `enumerable:false`
+
+```javascript
+function foo() {
+  console.log('foo');
+}
+
+console.log(foo.prototype); // {}
+console.log(Object.getOwnPropertyDescriptor(foo.prototype)); 
+/*
+  {
+    constructor: {
+      value: [Function: foo],
+      writable: true,
+      enumerable: false, → 枚举属性 false
+      configurable: true
+    }
+  }
+*/
+```
+
+所以可以验证出来
+
+```javascript
+console.log(foo.prototype.constructor); // 指向的是函数本身
+console.log(foo.prototype.constructor.name); // 函数名
+// 所以有一个骚操作。
+
+console.log(
+  foo.prototype.constructor.prototype.constructor.prototype.constructor
+); // [Function: foo]
+```
+
+## 32 function 给自己添加属性
+
+JS内部给 prototype 本来是只有一个 constructor 属性，
+
+```javascript
+// 很麻烦的添加方式
+// 一股脑的全部添加，完全赋值一个新的对象
+```
+
+## 33 对象-函数-原型
+
+**记忆点1**
+
+```javascript
+// obj 是一个对象
+var obj = {
+  id: 'chin',
+};
+// 因为obj就是 new Object出来的
+// Object 是个构造函数
+console.log(obj.__proto__ === Object.prototype); // true
+```
+
+**记忆点2**
+
+```javascript
+function Foo() {}
+```
+
+> Q: Foo是什么？
+>
+> A: 既是函数，也是对象。
+
+看看函数
+
+> Foo是一个【**函数**】, 那么它会有一个【**显式原型**】对象: `Foo.prototype`
+>
+> Q: `Foo.prototype`来自哪里?
+>
+> A: JS系统内部在创建了一个函数的时候，会自动给你一个 prototype，然后 → `Foo.prototype = { constructor: Foo }`
+
+看看对象
+
+> Foo是一个【**对象**】, 那么它会有一个【**隐式原型**】对象: Foo.\__proto__
+>
+> Q: Foo.\__proto__来自哪里?
+>
+> A: 既然是对象，就相当于你`new Function()`
+>
+> 相当于 `var Foo = new Function()`
+>
+> 相当于系统给了你一个 `Foo.__proto__ = Function.prototype`
+>
+> Q: `Function.prototype`又来自哪里?
+>
+> A: 其实就是JS系统内部在创建Function的时候， 给`Function.prototype = {constructor:Function}`
+
+
+
+个人感觉记忆到上面就够了。所谓的原型链，我也是搞懂了。但暂时不在这里总结，等所有课程结束之后进行总结。
+

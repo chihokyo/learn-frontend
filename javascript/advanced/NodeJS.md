@@ -82,7 +82,10 @@ var foo = "ng"
 因为函数是有作用域的。
 
 ```javascript
-(function(){
+function(){}() // 这样写前面不会被解析成一段代码块
+(function(){})() // 要加上括号
+// 为了避免一些解析上不会被看成一段完整代码的问题还要加上;
+;(function(){
     var foo = "okk"
     console.log(foo);
 })()
@@ -338,7 +341,8 @@ import { foo as Cfoo, bar, hoge} from "./module.js"
 // A: 可以在别名的基础上在命名一次 但一定要用export 别名的那个命名
 import { Cfoo as CDfoo, bar, hoge} from "./module.js"
 
-// 3. 方式二
+// 3. 方式三 一股脑的全导入
+import * as foo from './modules/foo.js';
 ```
 
 关于import其实她还是个函数，用来解决什么问题呢？
