@@ -615,3 +615,331 @@ for (let item of arr) {
 
 ```
 
+## 模板字符串&标签模板字符串
+
+模板字符串真的太easy了。`${}` 一把梭
+
+```javascript
+const id = 'chin';
+const time = 5;
+const activity = 'eating';
+
+console.log(`${id} in ${time} was ${activity}`);
+```
+
+主要是标签模板字符串这个比较难以理解
+
+```javascript
+// 日常调用一个函数是这样的
+function foo(x, y) {
+  return x + y;
+}
+console.log(foo(1, 2));
+```
+
+但是事实上这样也是可以调用函数的
+
+```javascript
+const id = 'chin';
+const time = 5;
+const activity = 'eating';
+
+function foo(x, y) {
+  return x + y;
+}
+// 他会把所有被切割的字符串，当成第一个参数[1,2,3]
+// 然后剩下的按照顺序排列
+// 比如下面这个第2个参数$:{id},第3个${time},${activity}
+console.log(foo`1${id}2${time}3${activity}`);
+```
+
+应用在哪里呢？`styled-components`
+
+```javascript
+const Title = styled.h1`
+  font-size: 1.5em;
+  text-align: center;
+  color: palevioletred;
+`;
+
+// 这里就相当于在styled库里有个函数叫 h1()
+```
+
+## 函数的默认参数
+
+以前的话如何解决默认参数？
+
+```javascript
+/**
+ * 缺点:
+ *  1.写起来很麻烦, 并且代码的阅读性是比较差
+ *  2.这种写法是有bug
+ */
+function foo(m, n) {
+  m = m || 'aaa';
+  n = n || 'bbb';
+
+  console.log(m, n);
+}
+foo(0, '');
+// 因为在js里如果你输入的0，""
+console.log(0 === false); // true
+console.log('' === false); // true
+```
+
+关于bug这里可以用babel编译器来验证。
+
+```javascript
+function foo(m = 'aaa', n = 'bbb') {
+  console.log(m, n);
+}
+// 下面才是无bug版本
+function foo() {
+  var m = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'aaa';
+  var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'bbb';
+  console.log(m, n);
+}
+```
+
+所以ES6可以这样写
+
+有默认值的参数最好放**最后**
+
+```javascript
+function foo(m = 'aaa', n = 'bbb') {
+  console.log(m, n);
+}
+
+// foo()
+foo(0, '');
+
+// 如果不放在最后，那么length计算会出错
+
+```
+
+而且还支持解构的默认参数
+
+```javascript
+// 写法1
+function foo(info = { id: '001', age: 18 }) {
+  console.log(info.id, info.age);
+}
+foo();
+// 写法2
+function foo({ id, age } = { id: '001', age: 18 }) {
+  console.log(id, age);
+}
+foo();
+// 写法3
+function foo({ id = '001', age = 18 } = {}) {
+  console.log(id, age);
+}
+foo();
+```
+
+## 函数的剩余参数
+
+rest parameter → 首先这个`...`不是前面说的展开运算符，是**前缀**。
+
+相当于把剩余的参数放入`args`这个变量里，成为数组。
+
+※而且必须放在最后
+
+```javascript
+function foo(x, y, ...args) {
+  console.log(args);
+}
+foo(10, 20, 30, 40); // [ 30, 40 ]
+```
+
+> arguments 区别是什么呢？
+>
+> - 是类数组的对象（伪数组），剩余参数是真输入
+> - arguments包含所有参数，而剩余参数只有剩余参数
+
+## 箭头函数
+
+箭头函数没有this，也没有显式原型，prototype
+
+```javascript
+const foo = () => {
+  console.log(this); // 1.箭头函数本身没this 从上层作用域找this
+  console.log(arguments); // 2.箭头函数也没有arguments
+};
+foo();
+console.log(foo.prototype); // undefined
+// 3.所以箭头函数没办法new
+```
+
+> 但是箭头函数作为一个函数 是有\__proto__的
+
+## 展开语法 Spread Syntax
+
+**首先她和剩余参数完全不是一个系统！**
+
+参考链接：[剩余语法（剩余参数）](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Spread_syntax#剩余语法（剩余参数）)
+
+展开语法的本质是一个浅拷贝。
+
+首先展开语法不是什么时候都可以用到的。主要用于下面几个场景。
+
+```javascript
+// 1.函数调用的时候 为了分别传入参数
+const arr = ['foo', 'bar', 'baz'];
+const str = 'chin';
+function foo(x, y, z) {
+  console.log(x, y, z);
+}
+// 如果为了达到在调用foo函数顺便把arr当做参数传进去，可以使用下面的方法
+// 使用apply的目的不是为了调用函数，而是为了改变this的指向。
+foo.apply(null, arr);
+// 在调用函数使用展开运算符
+foo(...arr);
+foo(...str); // 还可以展开字符串 c h i
+
+// 2.构造数组
+const arr = ['yes', 'abc', 'xyz'];
+const newArr = [...arr, 'yes'];
+console.log(newArr); // [ 'yes', 'abc', 'xyz', 'yes' ]
+
+const str = 'my'; // 甚至可以拆分字符串为数组
+console.log([...arr, ...str]); // [ 'yes', 'abc', 'xyz', 'm', 'y' ]
+
+// 3.ES9之后
+const info = {
+  id: 'uuid',
+  age: 19,
+};
+// 3-1 构造新对象字面量
+const newInfo = { ...info, location: 'Tokyo' };
+const arr = ['yes', 'abc', 'xyz'];
+console.log(newInfo);
+// 3-2 甚至可以成为数组（会添加索引值）
+const newInfo2 = { ...info, ...arr };
+console.log(newInfo2); // { '0': 'yes', '1': 'abc', '2': 'xyz', id: 'uuid', age: 19 }
+```
+
+为什么说展开运算符本质是一个浅拷贝呢？
+
+```javascript
+const info = {
+  id: 'uu1',
+  hobby: ['swim', 'run'],
+};
+
+const newInfo = { ...info };
+newInfo.hobby[0] = ['sleep'];
+console.log(newInfo);
+console.log(info);
+```
+
+这里说一些结论
+
+当你想简单拷贝一个对象的时候，直接可以
+
+```javascript
+const obj = {
+  id: 'uu1',
+  hobby: ['swim', 'run'],
+};
+const newObj = { ...obj };
+```
+
+
+
+## Symbol
+
+代表独一无二！！
+
+```javascript
+const s1 = Symbol();
+const s2 = Symbol();
+console.log(s1 === s2);
+
+// 1.经常用于在各种变量赋值上，因为可以保证独一无二性
+// 1.1 比如对象
+const obj = {
+  [s1]: 'uu1',
+  age: 19,
+};
+// 1.2 比如数组
+const arr = [1, 2, 3];
+const s1 = Symbol();
+arr[s1] = 5;
+
+console.log(arr); // [ 1, 2, 3, [Symbol()]: 5 ]
+
+// 2.还能给她增加一个描述，用来描述
+const s3 = Symbol('1');
+const s4 = Symbol('2');
+
+// 2.1 当是同一个描述符的时候是回复覆盖掉的
+// const s4 = Symbol('1');
+
+console.log(obj.s1); // 不能被点
+console.log(obj[s1]); // uu1
+```
+
+如果想获取Symbol定义的属性名，`Object.keys()`不管用。需要有特殊的API。
+
+```javascript
+const s1 = Symbol('1');
+const obj = {
+  [s1]: 'uu1',
+  age: 19,
+};
+const s5 = Symbol();
+// 3. 定义一个新的属性
+Object.defineProperty(obj, s5, {
+  enumerable: true,
+  configurable: true,
+  writable: true,
+  value: 'mba',
+});
+// 这个时候想要取得key的话，Object.keys()拿不到
+console.log(Object.keys(obj)); // 会发现只有 [ 'age' ]
+// 只有通过
+console.log(Object.getOwnPropertySymbols(obj)); // [ Symbol(1), Symbol() ]
+
+// 4. Symbol.key() Symbol.keyFor()
+const sx = Symbol.for('x');
+const sy = Symbol.for('y');
+console.log(sx === sy); // false
+// 获取key
+const key = Symbol.keyFor(sx);
+console.log(key); // x
+
+
+// 5. 那么如果我们现在就是想创建相同的Symbol应该怎么 来做呢?
+const s1 = Symbol.for('x');
+const s2 = Symbol.for('x');
+console.log(s1 === s2); // true
+
+```
+
+## Set
+
+其实也就是存储数据的形式。
+
+`数组 + 不能重复 = Set`
+
+Set的本质感觉就是给你去重的。
+
+```javascript
+// 1.去重
+const set = new Set();
+set.add(1);
+set.add(2);
+set.add(3);
+set.add(2);
+console.log(set); // Set(3) { 1, 2, 3 }
+// 2.但是对象，数组这种不是这样。因为存储的地址
+const set = new Set();
+set.add({});
+set.add({});
+console.log(set); // Set(2) { {}, {} }
+```
+
+
+
+## Map
