@@ -917,7 +917,7 @@ console.log(s1 === s2); // true
 
 ```
 
-## Set
+## Set/WeakSet
 
 其实也就是存储数据的形式。
 
@@ -940,6 +940,448 @@ set.add({});
 console.log(set); // Set(2) { {}, {} }
 ```
 
+这里可以简单做个对比
 
+```javascript
+// 🌚做个对比
+const set = new Set();
+set.add([1, 2, 3]);
+set.add([1, 2, 3]);
+console.log(set); // Set(2) { [ 1, 2, 3 ], [ 1, 2, 3 ] }
+// 🌝
+const set2 = new Set();
+const arr = [1, 2, 3];
+set2.add(arr);
+set2.add(arr);
+console.log(set2); // Set(1) { [ 1, 2, 3 ] }
+```
 
-## Map
+这里主要说一下强引用和弱引用的区别吧。
+
+## Map/WeakMap
+
+## Proxy 代理 主要用来监听的感觉（类）
+
+在编程里是经常要监听对象的改变的，以前用的属性描述符。
+
+```javascript
+// 1.以前都是这样监听的
+const obj = {
+  id: 'chin',
+  age: 19,
+};
+
+Object.defineProperty(obj, 'id', {
+  get: function () {
+    console.log('get id');
+  },
+  set: function () {
+    console.log('set id');
+  },
+});
+console.log(obj.id); // get id
+console.log((obj.id = 'chin2')); // set id chin2
+
+// 2.但这样的弊端只能监听到id一个，想全部监听呢？
+// Object.keys(obj)取得所有属性
+const obj = {
+  id: 'chin',
+  age: 19,
+};
+Object.keys(obj).forEach((key) => {
+  let value = obj[key];
+  Object.defineProperty(obj, key, {
+    get: function () {
+      console.log(`get里面的:${key}属性被访问了`);
+    },
+    set: function (newValue) {
+      console.log(`set里面的:${key}属性被被设置成:${newValue}`);
+      value = newValue;
+    },
+  });
+});
+
+obj.id = 'yes';
+obj.age = 100;
+console.log(obj.id);
+```
+
+但属性描述符的本职任务并不是为了监听对象的变化的，所以Proxy就应运而生了。下面主要是`get(),set()`
+
+![image-20220421132007942](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220421132007942.png)
+
+> 本质就是通过Proxy在不改变元obj的情况下，对原来的obj进行增强，进行监听
+
+```javascript
+const objProxy = new Proxy(obj, {
+  // 获取值时的捕获器
+  get: function (target, key) {
+    console.log(`监听到对象的${key}属性被访问了`, target);
+    return target[key];
+  },
+
+  // 设置值时的捕获器
+  set: function (target, key, newValue) {
+    console.log(`监听到对象的${key}属性被设置值`, target);
+    target[key] = newValue;
+  },
+
+  // 监听in的捕获器
+  has: function (target, key) {
+    console.log(`监听到对象的${key}属性in操作`, target);
+    return key in target;
+  },
+
+  // 监听delete的捕获器
+  deleteProperty: function (target, key) {
+    console.log(`监听到对象的${key}属性in操作`, target);
+    delete target[key];
+  },
+});
+```
+
+还有剩下9个捕获器，这里先演示下
+
+```javascript
+function foo() {}
+const fooProxy = new Proxy(foo, {
+  apply: function (target, thisArg, argArray) {
+    console.log('使用的apply进行调用的');
+    return target.apply(thisArg, argArray);
+  },
+  construct: function (target, argArray, newTarget) {
+    // 进行展开
+    console.log('使用了new调用');
+    return new target(...argArray);
+  },
+});
+
+fooProxy.apply({}, [1, 2]); // 使用的apply进行调用的
+new fooProxy('x', 'y'); // 使用了new调用
+```
+
+这里稍微有一个使用场景
+
+```javascript
+// 1️⃣
+const rows = dataList.map(data => {
+  return `
+    <tr>
+      <td>${data.A !== null ? data.A : '-'}</td>
+      <td>${data.B !== null ? data.B : '-'}</td>
+      <td>${data.C !== null ? data.C : '-'}</td>
+      <td>${data.D !== null ? data.D : '-'}</td>
+    </tr>
+  `
+})
+// 2️⃣ 函数普通封装
+const formatter = value => value !== null ? value : '-'
+const rows = dataList.map(data => {
+  return `
+    <tr>
+      <td>${formatter(data.A)}</td>
+      <td>${formatter(data.B)}</td>
+      <td>${formatter(data.C)}</td>
+      <td>${formatter(data.D)}</td>
+    </tr>
+  `
+})
+// 3️⃣ 使用了proxy
+const rows = dataList.map(data => {
+  const p = new Proxy(data, {
+    get(target, name) {
+      if (target[name] === null) return '-'
+      return target[name]
+    }
+  })
+  return `
+    <tr>
+      <td>${p.A}</td>
+      <td>${p.B}</td>
+      <td>${p.C}</td>
+      <td>${p.D}</td>
+    </tr>
+  `
+```
+
+## Reflect 反射（对象）
+
+```javascript
+const obj = {
+  id:"chin",
+  age:199
+}
+
+console.log(Object.getPrototypeOf(obj));
+console.log(Reflect.getPrototypeOf(obj));
+console.log(Object.getPrototypeOf(obj) === Reflect.getPrototypeOf(obj)); //true
+```
+
+Object本身就是一个构造函数，生命不可承受之重！
+
+因为是对象，所以没有new！
+
+- 和Object的方法很相似，几乎差不读。
+- 和Proxy一样有13个常见方法。
+- 为了避开对元对象的操作
+
+Proxy的操作会直接操作原来的obj，所以Proxy是有缺点的。
+
+## receiver
+
+![image-20220421191550443](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220421191550443.png)
+
+上面的this指向了obj，如果用了receiver之后
+
+`Reflect.get(参数1，参数2，receiver)` receiver其实可以改变this的指向
+
+![image-20220421191854178](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220421191854178.png)
+
+差不多上面就是receiver的用法，接下来是`Reflect.construct()`
+
+```javascript
+function Dog(id, legs) {
+  this.id = id;
+  this.legs = legs;
+}
+
+function Animal() {}
+
+// 执行的是 Dog 面的内容，但是创造出来的实例对象是 Animal 里面的
+const animal = Reflect.construct(Dog, ['uuid', 4], Animal);
+console.log(animal.__proto__ === Animal.prototype); // true
+```
+
+## 响应式
+
+vue里面的，关于原理。
+
+就是说一个数据，当它发生了变化→会自动触发某个函数。这就是响应式的。
+
+大概就是↓这个效果。
+
+```java
+const foo = 'foo';
+function bar() {
+  console.log('bar');
+}
+// 只要这个 foo 一旦发生变化就自动执行bar()
+foo = '111';
+```
+
+这个响应式原理是一个渐变的过程。
+
+先搁浅一下。TODO
+
+## Promise
+
+历史问题。那么 JavaScript 是为了解决什么问题呢？
+
+JS是单线程的，就是排队上厕所。但是有时候等不了怎么办，比如说大的文件的下载，成功了还失败了？我难道必须等你全部下载完（成功失败未定）才能干其他事情吗？这些都是好耗时的，等不起的！
+
+![image-20220422132526348](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422132526348.png)
+
+`Promise` 是一个类（构造函数）
+
+- 给调用者一个承诺（新建一个`new Promise()`）
+- 创建的时候需要放进去一个回调函数 `new Promise(exector)`
+
+![image-20220422134458062](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422134458062.png)
+
+然后就可以把上面那段代码用`Promise`来重构了
+
+![img](https://raw.githubusercontent.com/chihokyo/image_host/develop/sp20220422_135735_489.png)
+
+然后就可以直接用了
+
+```javascript
+const promise = requestData('request1');
+
+promise
+  .then(() => {
+    console.log('success');
+  })
+  .catch(() => {
+    console.log('failed');
+  });
+
+// 这样写也可以 then里面2个回调函数，1个成功，1个失败
+promise.then(
+  () => {
+    console.log('success');
+  },
+  () => {
+    console.log('failed');
+  }
+);
+
+// 这样直接写也可以
+new requestData((resolve, reject) => {
+  console.log('------');
+  resolve();
+  reject();
+})
+  .then((res) => {
+    console.log(res);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+```
+
+于是差不多最后的结果就是
+
+```javascript
+const p1 = new Promise((resolve, reject) => {
+  const data = [
+    { id: 'uuid1', age: 99 },
+    { id: 'uuid2', age: 10 },
+  ];
+  const errMsg = 'failed';
+  let flag = false;
+  if (flag) {
+    resolve(data);
+  } else {
+    reject(errMsg);
+  }
+});
+
+p1.then((res) => {
+  console.log(res);
+}).catch((err) => {
+  console.log(err);
+});
+```
+
+一般Promise也有几个状态
+
+![image-20220422140804125](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422140804125.png)
+
+状态一旦确定，就无法更改，就是被锁住的。
+
+```javascript
+new requestData((resolve, reject) => {
+  console.log('------');
+  resolve(); // fulfilled状态
+  // reject(); ❌ 这个时候已经敲定了 resolve ，在来 reject 是没意义的
+})
+  .then((res) => {
+    console.log(res);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+```
+
+关于`resolve()`的参数问题
+
+![image-20220422151915827](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422151915827.png)
+
+### then()
+
+关于`then()`方法
+
+首先 then 是一个 Promise 对象上的方法，然后可以验证出来
+
+```javascript
+// 直接打印是出不来的 ，因为可以看到 enumerable: false,
+console.log(Object.getOwnPropertyDescriptors(Promise.prototype));
+```
+
+结果就是
+
+```json
+{
+  length: { value: 1, writable: false, enumerable: false, configurable: true },
+  name: {
+    value: 'Promise',
+    writable: false,
+    enumerable: false,
+    configurable: true
+  },
+  prototype: {
+    value: Object [Promise] {},
+    writable: false,
+    enumerable: false,
+    configurable: false
+  },
+  all: {
+    value: [Function: all],
+    writable: true,
+    enumerable: false,
+    configurable: true
+  },
+  allSettled: {
+    value: [Function: allSettled],
+    writable: true,
+    enumerable: false,
+    configurable: true
+  },
+  any: {
+    value: [Function: any],
+    writable: true,
+    enumerable: false,
+    configurable: true
+  },
+  race: {
+    value: [Function: race],
+    writable: true,
+    enumerable: false,
+    configurable: true
+  },
+  resolve: {
+    value: [Function: resolve],
+    writable: true,
+    enumerable: false,
+    configurable: true
+  },
+  reject: {
+    value: [Function: reject],
+    writable: true,
+    enumerable: false,
+    configurable: true
+  },
+  [Symbol(Symbol.species)]: {
+    get: [Function: get [Symbol.species]],
+    set: undefined,
+    enumerable: false,
+    configurable: true
+  }
+}
+```
+
+当 `resolve()` 方法被回调时, 所有的 `then()` 方法传入的回调函数都会被调用
+
+```javascript
+const thenPromise = new Promise((resolve, reject) => {
+  resolve('then test');
+});
+
+thenPromise.then((res) => {
+  console.log('res1', res);
+});
+thenPromise.then((res) => {
+  console.log('res2', res);
+});
+thenPromise.then((res) => {
+  console.log('res3', res);
+});
+
+```
+
+那么再来比较一下下面这两者
+
+![image-20220422233031775](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422233031775.png)
+
+于是就引出了新的问题，就是第二段Promise的问题。
+
+`then()`  有没有返回值的问题。结论就是有的，返回值是一个新的`new Promise()`但是分三种情况。
+
+先说一下原理+第一种情况
+
+![image-20220422233703276](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422233703276.png)
+
+然后是剩下2种
+
+![image-20220422234853081](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422234853081.png)
+
