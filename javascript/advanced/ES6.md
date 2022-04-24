@@ -1385,3 +1385,101 @@ thenPromise.then((res) => {
 
 ![image-20220422234853081](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422234853081.png)
 
+### catch()方法的使用
+
+关于 `catch()` 有几个需要注意的地方
+
+![image-20220424225510796](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220424225510796.png)
+
+另外这就产生了独立调用的问题
+
+```javascript
+const cPromise = new Promise((resolve, reject) => {
+  // resolve(11);
+  reject(22);
+});
+
+cPromise.then((res) => {});
+// 这里会报错 为什么？
+// 因为如果相对独立的话，想当 👆 根本没有实现 reject() 时候的处理
+cPromise.catch((err) => {
+  console.log(err);
+});
+```
+
+并且catch会捕获从上到下的全部异常。兜底一样。
+
+```javascript
+const cPromise = new Promise((resolve, reject) => {
+  resolve();
+});
+
+cPromise
+  .then((res) => {})
+  .then((res) => {
+    throw new Error('then error message');
+  })
+  .catch((err) => {
+    console.log('err:', err); // err: Error: then error message
+  });
+```
+
+那么 `catch()` 有没有返回值？
+
+```javascript
+const cPromise = new Promise((resolve, reject) => {
+  reject('111');
+});
+
+cPromise
+  .then((res) => {
+    console.log('res:', res);
+  })
+  .catch((err) => {
+    console.log('err:', err); // err: 111
+    // 答案就是有的 原理和上面一样
+    // return 回来的其实一个Promise新的resolve
+    return 'catch return value';
+  })
+  .then((res) => {
+    console.log('res result:', res); // res result: catch return value
+  })
+  .catch((err) => {
+    console.log('err result:', err);
+  });
+
+```
+
+### finally()
+
+没啥好说的，无论成功失败都会执行的
+
+```javascript
+const finallyPromise = new Promise((resolve, reject) => {
+  // resolve(11);
+  reject(22);
+});
+
+finallyPromise
+  .then((res) => {
+    console.log('res', res);
+  })
+  .catch((err) => {
+    console.log('err', err); // err 22
+  })
+  .finally(() => {
+    console.log('无论成功失败我都会执行的！'); // 无论成功失败我都会执行的！
+  });
+```
+
+### all()/allSettled()
+
+`all()`  只要有1个 `reject()`，整体结果就是 `reject()`，其他的都拿不到结果。
+
+`allSettled()`  
+
+### race()/any()
+
+`race()` 谁最快用谁的状态，无论这个race是 `resolve()` 还是 `reject()`
+
+`any()` 无论是谁，我都要一个能 `resolve()`
