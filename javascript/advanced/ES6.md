@@ -845,8 +845,6 @@ const obj = {
 const newObj = { ...obj };
 ```
 
-
-
 ## Symbol
 
 代表独一无二！！
@@ -1483,3 +1481,1012 @@ finallyPromise
 `race()` 谁最快用谁的状态，无论这个race是 `resolve()` 还是 `reject()`
 
 `any()` 无论是谁，我都要一个能 `resolve()`
+
+## 手写 Promise
+
+因为早期大家写 Promise 的时候都各自为政，为了统一实现规范，promiseplus应运而生。[Promises/A+](https://promisesaplus.com)
+
+```javascript
+// 第1版本
+class MyPromise {
+  constructor(executor) {
+    executor();
+  }
+}
+
+const myPromise = new MyPromise(() => {
+  console.log('我已被执行了');
+});
+```
+
+```javascript
+// 第2版本
+class MyPromise {
+  constructor(executor) {
+    // 因为这里要有函数
+    const resolve = () => {
+      console.log('resolve');
+    };
+    const reject = () => {
+      console.log('reject');
+    };
+    executor(resolve, reject);
+  }
+}
+
+const myPromise = new MyPromise((resolve, reject) => {
+  console.log('我已被执行了');
+});
+```
+
+```javascript
+// 第3版本
+// 为了存储状态。因为调用了 reject 肯定就不能搞 resolve 了
+const PROMISE_STATUS_PENDING = 'pending';
+const PROMISE_STATUS_FULFILLED = 'fulfilled';
+const PROMISE_STATUS_REJECTED = 'rejected';
+
+class MyPromise {
+  constructor(executor) {
+    // 初始化状态
+    this.status = PROMISE_STATUS_PENDING;
+
+    const resolve = () => {
+      // 不为 pending 才调用
+      if (this.status === PROMISE_STATUS_PENDING) {
+        this.status = PROMISE_STATUS_FULFILLED;
+        console.log('resolve');
+      }
+    };
+    const reject = () => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        this.status = PROMISE_STATUS_REJECTED;
+        console.log('reject');
+      }
+    };
+    executor(resolve, reject);
+  }
+}
+
+const myPromise = new MyPromise((resolve, reject) => {
+  resolve();
+  reject();
+});
+```
+
+```javascript
+// 第4版本
+const PROMISE_STATUS_PENDING = 'pending';
+const PROMISE_STATUS_FULFILLED = 'fulfilled';
+const PROMISE_STATUS_REJECTED = 'rejected';
+
+class MyPromise {
+  constructor(executor) {
+    // 初始化状态
+    this.status = PROMISE_STATUS_PENDING;
+    // 保留value和reason
+    this.value = undefined;
+    this.reason = undefined;
+
+    // value 和 reason 都是一种规范
+    const resolve = (value) => {
+      // 不为 pending 才调用
+      if (this.status === PROMISE_STATUS_PENDING) {
+        this.status = PROMISE_STATUS_FULFILLED;
+        this.value = value;
+        console.log('resolve');
+      }
+    };
+    const reject = (reason) => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        this.status = PROMISE_STATUS_REJECTED;
+        this.reason = reason;
+        console.log('reject');
+      }
+    };
+    executor(resolve, reject);
+  }
+}
+
+const myPromise = new MyPromise((resolve, reject) => {
+  resolve(111); // 拿到参数
+  reject(222);
+});
+
+// 为了让res和err都拿到上面的参数 初始化 value/reason
+myPromise.then(
+  (res) => {
+    console.log(res);
+  },
+  (err) => {
+    console.log(err);
+  }
+);
+```
+
+以上就是一个基本的框架，但是这里有一个问题，就是如何让`then()`里面的函数进行回调呢？
+
+```javascript
+// 第5版本
+const PROMISE_STATUS_PENDING = 'pending';
+const PROMISE_STATUS_FULFILLED = 'fulfilled';
+const PROMISE_STATUS_REJECTED = 'rejected';
+
+class MyPromise {
+  constructor(executor) {
+    // 初始化状态
+    this.status = PROMISE_STATUS_PENDING;
+    // 保留value和reason
+    this.value = undefined;
+    this.reason = undefined;
+
+    // value 和 reason 都是一种规范
+    const resolve = (value) => {
+      // 不为 pending 才调用
+      if (this.status === PROMISE_STATUS_PENDING) {
+        this.status = PROMISE_STATUS_FULFILLED;
+        this.value = value;
+        console.log('resolve');
+        // 执行then传进来的第1个回调函数
+        this.onfulfilled();
+      }
+    };
+    const reject = (reason) => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        this.status = PROMISE_STATUS_REJECTED;
+        this.reason = reason;
+        console.log('reject'); // 
+        // 执行then传进来的第2个回调函数
+        this.onrejected();
+      }
+    };
+    executor(resolve, reject);
+  }
+
+  // 为什么写方法会要加on 一般表示 当某个事件发生会执行
+  then(onfulfilled, onrejected) {
+    this.onfulfilled = onfulfilled;
+    this.onrejected = onrejected;
+  }
+}
+
+const myPromise = new MyPromise((resolve, reject) => {
+  resolve(111); // 拿到参数
+  reject(222);
+});
+
+// 为了让res和err都拿到上面的参数 初始化 value/reason
+myPromise.then(
+  (res) => {
+    console.log(res);
+  },
+  (err) => {
+    console.log(err);
+  }
+);
+
+```
+
+但是这里的问题，就是延迟执行的问题。
+
+![image-20220425134641359](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220425134641359.png)
+
+所以以下有2种方案，`setTimeout()` 这种宏任务，或者微任务！
+
+先写一个setTimeout 非推荐的用法，然后写一个 `queueMicrotask()` 用法
+
+![image-20220425135502746](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220425135502746.png)
+
+但是目前的版本
+
+- 只能单独调用一个 `then()`  → 用数组
+- 不能进行链式调用
+- `then()` 里面裹个 `then()`
+
+```javascript
+// 第6版本
+const PROMISE_STATUS_PENDING = 'pending';
+const PROMISE_STATUS_FULFILLED = 'fulfilled';
+const PROMISE_STATUS_REJECTED = 'rejected';
+
+class MyPromise {
+  constructor(executor) {
+    this.status = PROMISE_STATUS_PENDING;
+    this.value = undefined;
+    this.reason = undefined;
+    this.onfulfilledFns = [];
+    this.onrejectedFns = [];
+
+    const resolve = (value) => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 添加微任务
+        queueMicrotask(() => {
+          this.status = PROMISE_STATUS_FULFILLED;
+          this.value = value;
+          this.onfulfilledFns.forEach((fn) => {
+            fn(this.value);
+          });
+        });
+      }
+    };
+
+    const reject = (reason) => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 添加微任务
+        queueMicrotask(() => {
+          this.status = PROMISE_STATUS_REJECTED;
+          this.reason = reason;
+          this.onrejectedFns.forEach((fn) => {
+            fn(this.reason);
+          });
+        });
+      }
+    };
+
+    executor(resolve, reject);
+  }
+
+  then(onfulfilled, onrejected) {
+    // 如果在then调用的时候 状态已确定（解决setTimeout里面的调用）
+    if (this.status === PROMISE_STATUS_FULFILLED && onfulfilled) {
+      onfulfilled(this.value);
+    }
+    // 如果在then调用的时候 状态已确定（解决setTimeout里面的调用）
+    if (this.status === PROMISE_STATUS_REJECTED && onrejected) {
+      onrejected(this.reason);
+    }
+    if (this.status === PROMISE_STATUS_PENDING) {
+      this.onfulfilledFns.push(onfulfilled);
+      this.onrejectedFns.push(onrejected);
+    }
+  }
+}
+
+const myp = new MyPromise((resolve, reject) => {
+  resolve(222);
+});
+
+myp.then(
+  (res) => {
+    console.log(res);
+  },
+  (err) => {
+    console.log(err);
+  }
+);
+
+myp.then(
+  (res) => {
+    console.log(res);
+  },
+  (err) => {
+    console.log(err);
+  }
+);
+
+// 为什么这里不能继续调用 因为延迟之后 ↓ 并没有加进去
+//  this.onfulfilledFns.push(onfulfilled);
+setTimeout(() => {
+  myp.then(
+    (res) => {
+      console.log('res3:', res);
+    },
+    (err) => {
+      console.log('err3:', err);
+    }
+  );
+}, 1000);
+
+```
+
+有一个确定状态的情况下
+
+```javascript
+// 第7版本
+    const resolve = (value) => {
+    };
+    .....
+          if (this.status == PROMISE_STATUS_PENDING) return; // New 如果不是pennding状态 就没必要执行微任务
+          this.status = PROMISE_STATUS_FULFILLED;
+          this.value = value;
+          this.onfulfilledFns.forEach((fn) => {
+            fn(this.value);
+          });
+        });
+      }
+    };
+
+    const reject = (reason) => {
+    };
+    .....
+          if (this.status == PROMISE_STATUS_PENDING) return; // New
+          this.status = PROMISE_STATUS_REJECTED;
+          this.reason = reason;
+          this.onrejectedFns.forEach((fn) => {
+            fn(this.reason);
+          });
+        });
+      }
+    };
+.....
+```
+
+为了可以进行链式调用
+
+```javascript
+// 第6版本
+const PROMISE_STATUS_PENDING = 'pending';
+const PROMISE_STATUS_FULFILLED = 'fulfilled';
+const PROMISE_STATUS_REJECTED = 'rejected';
+
+class MyPromise {
+  constructor(executor) {
+    this.status = PROMISE_STATUS_PENDING;
+    this.value = undefined;
+    this.reason = undefined;
+    this.onfulfilledFns = [];
+    this.onrejectedFns = [];
+
+    const resolve = (value) => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 添加微任务
+        queueMicrotask(() => {
+          if (this.status !== PROMISE_STATUS_PENDING) return;
+          this.status = PROMISE_STATUS_FULFILLED;
+          this.value = value;
+          this.onfulfilledFns.forEach((fn) => {
+            fn(this.value);
+          });
+        });
+      }
+    };
+
+    const reject = (reason) => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 添加微任务
+        queueMicrotask(() => {
+          if (this.status !== PROMISE_STATUS_PENDING) return;
+          this.status = PROMISE_STATUS_REJECTED;
+          this.reason = reason;
+          this.onrejectedFns.forEach((fn) => {
+            fn(this.reason);
+          });
+        });
+      }
+    };
+
+    // 为了处理代码new的时候就有的异常
+    try {
+      executor(resolve, reject);
+    } catch (err) {
+      reject(err);
+    }
+  }
+
+  then(onfulfilled, onrejected) {
+    return new MyPromise((resolve, reject) => {
+      // 如果在then调用的时候 状态已确定（解决setTimeout里面的调用）
+      if (this.status === PROMISE_STATUS_FULFILLED && onfulfilled) {
+        try {
+          const value = onfulfilled(this.value);
+          resolve(value);
+        } catch (err) {
+          reject(err);
+        }
+      }
+      // 如果在then调用的时候 状态已确定（解决setTimeout里面的调用）
+      if (this.status === PROMISE_STATUS_REJECTED && onrejected) {
+        try {
+          const reason = onrejected(this.reason);
+          resolve(reason);
+        } catch (err) {
+          reject(err);
+        }
+      }
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 为了拿到结果
+        this.onfulfilledFns.push(() => {
+          try {
+            const value = onfulfilled(this.value);
+            resolve(value);
+          } catch (err) {
+            reject(err);
+          }
+        });
+        this.onrejectedFns.push(() => {
+          try {
+            const reason = onrejected(this.reason);
+            resolve(reason);
+          } catch (err) {
+            reject(err);
+          }
+        });
+      }
+    });
+  }
+}
+
+const myp = new MyPromise((resolve, reject) => {
+  resolve(222);
+});
+
+myp
+  .then(
+    (res) => {
+      console.log('res1', res);
+      throw new Error('err message');
+    },
+    (err) => {
+      console.log('err1', err);
+    }
+  )
+  .then(
+    (res) => {
+      console.log('res2', res);
+    },
+    (err) => {
+      console.log('err2', err);
+    }
+  );
+
+```
+
+稍微优化，手写结束。
+
+```javascript
+// 第6版本
+const PROMISE_STATUS_PENDING = 'pending';
+const PROMISE_STATUS_FULFILLED = 'fulfilled';
+const PROMISE_STATUS_REJECTED = 'rejected';
+
+// 工具函数 执行
+function execFuncWithErr(execFn, value, resolve, reject) {
+  try {
+    const res = execFn(value);
+    resolve(res);
+  } catch (error) {
+    reject(error);
+  }
+}
+
+class MyPromise {
+  constructor(executor) {
+    this.status = PROMISE_STATUS_PENDING;
+    this.value = undefined;
+    this.reason = undefined;
+    this.onfulfilledFns = [];
+    this.onrejectedFns = [];
+
+    const resolve = (value) => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 添加微任务
+        queueMicrotask(() => {
+          if (this.status !== PROMISE_STATUS_PENDING) return;
+          this.status = PROMISE_STATUS_FULFILLED;
+          this.value = value;
+          this.onfulfilledFns.forEach((fn) => {
+            fn(this.value);
+          });
+        });
+      }
+    };
+
+    const reject = (reason) => {
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 添加微任务
+        queueMicrotask(() => {
+          if (this.status !== PROMISE_STATUS_PENDING) return;
+          this.status = PROMISE_STATUS_REJECTED;
+          this.reason = reason;
+          this.onrejectedFns.forEach((fn) => {
+            fn(this.reason);
+          });
+        });
+      }
+    };
+
+    // 为了处理代码new的时候就有的异常
+    try {
+      executor(resolve, reject);
+    } catch (err) {
+      reject(err);
+    }
+  }
+
+  then(onfulfilled, onrejected) {
+    return new MyPromise((resolve, reject) => {
+      // 如果在then调用的时候 状态已确定（解决setTimeout里面的调用）
+      if (this.status === PROMISE_STATUS_FULFILLED && onfulfilled) {
+        // try {
+        //   const value = onfulfilled(this.value);
+        //   resolve(value);
+        // } catch (err) {
+        //   reject(err);
+        // }
+
+        execFuncWithErr(onfulfilled, this.value, resolve, reject);
+      }
+      // 如果在then调用的时候 状态已确定（解决setTimeout里面的调用）
+      if (this.status === PROMISE_STATUS_REJECTED && onrejected) {
+        // try {
+        //   const reason = onrejected(this.reason);
+        //   resolve(reason);
+        // } catch (err) {
+        //   reject(err);
+        // }
+
+        execFuncWithErr(onrejected, this.reason, resolve, reject);
+      }
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 为了拿到结果
+        this.onfulfilledFns.push(() => {
+          //   try {
+          //     const value = onfulfilled(this.value);
+          //     resolve(value);
+          //   } catch (err) {
+          //     reject(err);
+          //   }
+          execFuncWithErr(onfulfilled, this.value, resolve, reject);
+        });
+        this.onrejectedFns.push(() => {
+          //   try {
+          //     const reason = onrejected(this.reason);
+          //     resolve(reason);
+          //   } catch (err) {
+          //     reject(err);
+          //   }
+
+          execFuncWithErr(onrejected, this.reason, resolve, reject);
+        });
+      }
+    });
+  }
+}
+
+const myp = new MyPromise((resolve, reject) => {
+  resolve(222);
+});
+
+myp
+  .then(
+    (res) => {
+      console.log('res1', res);
+      return '111';
+      //   throw new Error('err message');
+    },
+    (err) => {
+      console.log('err1', err);
+    }
+  )
+  .then(
+    (res) => {
+      console.log('res2', res);
+    },
+    (err) => {
+      console.log('err2', err);
+    }
+  );
+```
+
+`catch()` 方法实现
+
+本质就两句代码
+
+```javascript
+then(onfulfilled, onrejected) {
+    // 🆕
+    // onrejected =
+    //   onrejected === undefined
+    //     ? (err) => {
+    //         throw err;
+    //       }
+    //     : onrejected;
+
+    // 🆕 跟上面一样
+    onrejected =
+      onrejected ||
+      ((err) => {
+        throw err;
+      });
+    return new MyPromise((resolve, reject) => {
+      // 如果在then调用的时候 状态已确定（解决setTimeout里面的调用）
+      if (this.status === PROMISE_STATUS_FULFILLED && onfulfilled) {
+        // try {
+        //   const value = onfulfilled(this.value);
+        //   resolve(value);
+        // } catch (err) {
+        //   reject(err);
+        // }
+
+        execFuncWithErr(onfulfilled, this.value, resolve, reject);
+      }
+      // 如果在then调用的时候 状态已确定（解决setTimeout里面的调用）
+      if (this.status === PROMISE_STATUS_REJECTED && onrejected) {
+        // try {
+        //   const reason = onrejected(this.reason);
+        //   resolve(reason);
+        // } catch (err) {
+        //   reject(err);
+        // }
+
+        execFuncWithErr(onrejected, this.reason, resolve, reject);
+      }
+      if (this.status === PROMISE_STATUS_PENDING) {
+        // 为了拿到结果
+        this.onfulfilledFns.push(() => {
+          //   try {
+          //     const value = onfulfilled(this.value);
+          //     resolve(value);
+          //   } catch (err) {
+          //     reject(err);
+          //   }
+          execFuncWithErr(onfulfilled, this.value, resolve, reject);
+        });
+        this.onrejectedFns.push(() => {
+          //   try {
+          //     const reason = onrejected(this.reason);
+          //     resolve(reason);
+          //   } catch (err) {
+          //     reject(err);
+          //   }
+
+          execFuncWithErr(onrejected, this.reason, resolve, reject);
+        });
+      }
+    });
+  }
+	// 🆕
+  catch(onrejected) {
+    this.then(undefined, onrejected);
+  }
+```
+
+实现 `finally()`
+
+```javascript
+```
+
+## 迭代器 iterator
+
+就是一个光标，一直往下走。
+
+只要你的数据实现了这种规范（iterator protocol）的就是迭代器。
+
+```javascript
+next()
+1.无参 or 1个参数
+2.返回值 对象 {done,value}
+```
+
+于是下面就是一个迭代器
+
+```javascript
+// 对象
+const iterator = {
+  next() {
+    return {
+      done: true,
+      value: 1,
+    };
+  },
+};
+```
+
+自己实现一个迭代器
+
+```javascript
+const arr = ['foo', 'bar', 'baz'];
+// 实现一个简单的迭代器
+let index = 0;
+const arrIterator = {
+  next: function () {
+    if (index < arr.length) {
+      // 先输出 再++
+      return { done: false, value: arr[index++] };
+    } else {
+      return { done: true, value: undefined };
+    }
+  },
+};
+
+console.log(arrIterator.next());
+console.log(arrIterator.next());
+console.log(arrIterator.next());
+console.log(arrIterator.next());
+console.log(arrIterator.next());
+
+// { done: false, value: 'foo' }
+// { done: false, value: 'bar' }
+// { done: false, value: 'baz' }
+// { done: true, value: undefined }
+// { done: true, value: undefined }
+```
+
+可是上面的迭代器只能是arr的，那么想让所有的数据结构都可以呢？
+
+```javascript
+const names = ['1', '3', '5'];
+// 通用迭代器
+function createIterator(arr) {
+  let index = 0;
+  return {
+    next: function () {
+      if (index < arr.length) {
+        return { done: false, value: arr[index++] };
+      } else {
+        return { done: true, value: undefined };
+      }
+    },
+  };
+}
+
+const nameIterator = createIterator(names);
+console.log(nameIterator.next());
+console.log(nameIterator.next());
+console.log(nameIterator.next());
+console.log(nameIterator.next());
+console.log(nameIterator.next());
+```
+
+那什么是可迭代对象呢？
+
+当一个对象实现了 `iteratale protocol` 就是可迭代对象。和迭代器不一样
+
+- 必须要实现[Symbol.iterator]属性
+
+```javascript
+// 既然你现在的3个东西联系紧密
+// 完全可以封装成一起成一个新的对象
+// 那么这个对象就是【可迭代对象】
+const obj = {
+  // 有了迭代器
+};
+```
+
+他们的关系就是
+
+可迭代对象的属性`[Symbol.iterator]`用的是迭代器实现的
+
+```javascript
+const iterableObj = {
+  arr: ['foo', 'bar', 'baz'],
+  [Symbol.iterator]: function () {
+    let index = 0;
+    return {
+      // 但是由于next内部其实是访问不到arr这些的
+      // 所以就一定要用 箭头函数
+      next: function () {
+        if (index < this.arr.length) {
+          return { done: false, value: this.arr[index++] };
+        } else {
+          return { done: true, value: undefined };
+        }
+      },
+    };
+  },
+};
+const iterableObj2 = {
+  arr: ['foo', 'bar', 'baz'],
+  // 这里用的是可计算属性的写法 [Symbol.iterator]
+  [Symbol.iterator]: function () {
+    let index = 0;
+    return {
+      // 但是由于next内部其实是访问不到arr这些的
+      // 所以就一定要用 箭头函数
+      next: () => {
+        if (index < this.arr.length) {
+          return { done: false, value: this.arr[index++] };
+        } else {
+          return { done: true, value: undefined };
+        }
+      },
+    };
+  },
+};
+
+// 这里的最后的 [Symbol.iterator]()的() 不能少
+// 并且这样每次都是一个新的【iterator2 迭代器】
+const iterator2 = iterableObj2[Symbol.iterator]();
+console.log(iterator2.next());
+console.log(iterator2.next());
+console.log(iterator2.next());
+console.log(iterator2.next());
+console.log(iterator2.next());
+console.log(iterator2.next());
+```
+
+那么迭代器有什么用呢？ `for ...of` 必须用在可迭代对象上
+
+如果你没有实现属性 `[Symbol.iterator]:function` 那么你就不能用 ` for ...of`
+
+` for ...of` 
+
+常见的 Array/Map/Set/arguments(函数中的) 都是实现了 属性 `[Symbol.iterator]:function`  
+
+### 可迭代对象有啥用
+
+```javascript
+const names = []
+const newName = [...names] // 因为names是可迭代器
+
+// 对象除外 → 对象没实现可迭代对象 但是可以展开 ES9新增
+const newObj = {...obj} 
+
+// 那么迭代器有什么用呢？
+// 1.for of场景
+
+// 2.展开语法(spread syntax)
+const iterableObj = {
+  names: ['abc', 'cba', 'nba'],
+  [Symbol.iterator]: function () {
+    let index = 0;
+    return {
+      next: () => {
+        if (index < this.names.length) {
+          return { done: false, value: this.names[index++] };
+        } else {
+          return { done: true, value: undefined };
+        }
+      },
+    };
+  },
+};
+
+const names = ['abc', 'cba', 'nba'];
+const newNames = [...names, ...iterableObj];
+console.log(newNames);
+
+const obj = { name: 'why', age: 18 };
+// for (const item of obj) {
+
+// }
+// ES9(ES2018)中新增的一个特性: 用的不是迭代器
+const newObj = { ...obj };
+console.log(newObj);
+
+// 3.解构语法
+const [name1, name2] = names;
+// const { name, age } = obj 不一样ES9新增的特性
+
+// 4.创建一些其他对象时
+const set1 = new Set(iterableObj);
+const set2 = new Set(names);
+
+const arr1 = Array.from(iterableObj);
+
+// 5.Promise.all
+Promise.all(iterableObj).then((res) => {
+  console.log(res);
+});
+```
+
+## 生成器 generator
+
+为什么会有生成器的问题？
+
+一个函数在执行的时候，只有发生了问题or return or throw new Error 才会暂停。
+
+如果想让一个函数在执行的时候暂停一下，先休息一下，在从原来断的地方开始呢？
+
+**生成器函数**
+
+```javascript
+function foo(){} // 普通函数
+function* foo(){}  // 生成器函数
+```
+
+生成器的函数里面有个关键字 ,是一个特殊的迭代器。
+
+- `next()` → 返回值是 `{ value: undefined, done: false }`
+
+![image-20220426162545212](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426162545212.png)
+
+那么yield 有没有返回值呢？ 一旦done为true，当遇到yeild之后，生成器就
+
+- 暂停函数执行
+- 你如果想返回值 `yield 你想返回的值`
+
+![image-20220426163208964](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426163208964.png)
+
+如果不仅仅想有返回值，还想有参数呢？
+
+下面是参数问题
+
+![image-20220426225940570](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426225940570.png)
+
+但是如果你想要第一个值也传入呢？因为 `next()` 总是从第2个开始的。
+
+那建议从函数调用开始 
+
+```javascript
+function* foo(num) {
+ 	value = num * 10;
+}
+
+const fgenerator = foo(5);
+```
+
+如果在生成器函数里面有 return 代表着什么
+
+代表着中止执行
+
+![image-20220426230940032](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426230940032.png)
+
+同时如果第一次在生成器就直接调用 return 
+
+```javascript
+function* foo() {
+  console.log('函数开始执行~');
+
+  const value1 = 100;
+  console.log('第一段代码:', value1);
+  const n = yield value1;
+  
+  const value2 = 200 * n;
+  console.log('第二段代码:', value2);
+  const count = yield value2;
+
+  const value3 = 300 * count;
+  console.log('第三段代码:', value3);
+  yield value3;
+
+  console.log('函数执行结束~');
+  return '124';
+}
+
+const fgenerator = foo();
+console.log(fgenerator.return(1)); // 相当于直接返回了这个参数 { value: 1, done: true }
+```
+
+用的很少，除非你对上一次的值不太满意，可以终止。
+
+### throw 用法呢？
+
+![image-20220426232017813](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426232017813.png)
+
+生成器替代迭代器
+
+```javascript
+// 1️⃣ before
+function createArrayIterator(arr) {
+  let index = 0;
+  return {
+    next: function () {
+      if (index < arr.length) {
+        return { done: false, value: arr[index++] };
+      } else {
+        return { done: true, value: undefined };
+      }
+    },
+  };
+}
+
+// 2️⃣ after
+const arr = ['foo', 'bar', 'baz'];
+// 生成器替代迭代器
+function* createArrayIterator(arr) {
+  for (const item of arr) {
+    yield item;
+  }
+}
+
+const arrGene = createArrayIterator(arr);
+console.log(arrGene.next());
+console.log(arrGene.next());
+console.log(arrGene.next());
+
+// 3️⃣ 语法糖 yield*
+const arr = ['foo', 'bar', 'baz'];
+// 生成器替代迭代器
+function* createArrayIterator(arr) {
+  // 后面接一个可迭代的对象 就可以自己取出来 然后yield出去
+  yield* arr;
+}
+const arrGene2 = createArrayIterator(arr);
+console.log(arrGene2.next());
+console.log(arrGene2.next());
+console.log(arrGene2.next());
+
+```
+
+最后
