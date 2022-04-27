@@ -19,7 +19,7 @@ console.log(Object.getOwnPropertyDescriptors(Person.prototype)); // 所有的属
 
 ## contructor
 
-构造方法，new的时候用的。和以前的旧版本差别就是多了个`contructor()`而已，new的时候自动调用这个函数
+构造方法，new 的时候用的。和以前的旧版本差别就是多了个`contructor()`而已，new 的时候自动调用这个函数
 
 ```javascript
 class Person {
@@ -124,7 +124,7 @@ function inheritPrototype(SubType, SuperType) {
 }
 ```
 
-反正 ´ES6 之后就是 就可以了
+反正 ES6 之后就是 就可以了
 
 ```javascript
 class Student extends Person {}
@@ -167,7 +167,6 @@ var NewStudent = mixinRunnder(Student);
 new NewStudent().running();
 
 // 属性和构造函数比较难以混入，所以很少使用
-
 ```
 
 ## 多态
@@ -320,7 +319,7 @@ foo(obj);
 
 ## let/const
 
-说到这个还是先说一下var的作用域提升问题吧，这个要看JavaScript代码执行起来时候的内存图，因为var声明的变量
+说到这个还是先说一下 var 的作用域提升问题吧，这个要看 JavaScript 代码执行起来时候的内存图，因为 var 声明的变量
 
 ```javascript
 // ✅ 可以的
@@ -337,7 +336,7 @@ const foo = 'chin';
 foo = 'nchin'; // Assignment to constant variable.
 ```
 
-并且let和const，不能重复声明
+并且 let 和 const，不能重复声明
 
 ```javascript
 const a = 1;
@@ -346,19 +345,19 @@ const a = 2; // 已经声明过一次了
 let b = 22; // 已经声明过一次了
 ```
 
-## var/let/const到底用哪个？
+## var/let/const 到底用哪个？
 
 说个结论吧
 
-就是不要在用var，var现在只用于考验你对作用域提升，window全局对象，块级作用域的理解。并且现在的打包工具(webpack,babel)，都会给你ES6→ES5
+就是不要在用 var，var 现在只用于考验你对作用域提升，window 全局对象，块级作用域的理解。并且现在的打包工具(webpack,babel)，都会给你 ES6→ES5
 
->对于let和const用哪个？
+> 对于 let 和 const 用哪个？
 >
->优先使用const，如果需要修改了再改成let，因为const更安全！保证你的 变量不能随便被修改。
+> 优先使用 const，如果需要修改了再改成 let，因为 const 更安全！保证你的 变量不能随便被修改。
 
 ## 作用域提升问题
 
-let和const是没有作用域提升的（这句话有争议）
+let 和 const 是没有作用域提升的（这句话有争议）
 
 因为代码都是先创建一个执行上下文（词法环境+环境变量）
 
@@ -366,23 +365,22 @@ let和const是没有作用域提升的（这句话有争议）
 
 **直到被真正赋值之前！**
 
->网上很多人说在执行上下文的时候变量本身没有被创建出来
+> 网上很多人说在执行上下文的时候变量本身没有被创建出来
 >
->其实是不对的，因为变量在执行上下文之前就是被创建出来的。
+> 其实是不对的，因为变量在执行上下文之前就是被创建出来的。
 >
->但是不能被访问而已！！！
+> 但是不能被访问而已！！！
 >
->【作用域提升】这个老师的意思是，可以被访问的就是作用域提升，不可以访问的就不是作用域提升。作用域提升的目的是**提前被访问**，但是确实是有被创建出来的。红宝书说是叫【暂时性死区】
+> 【作用域提升】这个老师的意思是，可以被访问的就是作用域提升，不可以访问的就不是作用域提升。作用域提升的目的是**提前被访问**，但是确实是有被创建出来的。红宝书说是叫【暂时性死区】
 
 ```javascript
 // ✅ var 可以
 console.log(foo); // undefined
-var foo = "11";
+var foo = '11';
 
 // ❌ let/const 不可以
 console.log(foo); // ReferenceError: Cannot access 'foo' before initialization
-let foo = "11";
-
+let foo = '11';
 ```
 
 这里还有一个**暂时性死区问题**
@@ -402,20 +400,17 @@ function bar() {
   let foo = 'abc';
 }
 bar(); // 同理 ❌不可以！
-
 ```
 
+## window 里面的变量
 
+首先 window 只有在浏览器里有
 
-## window里面的变量
-
-首先window只有在浏览器里有
-
-你在JavaScript设置的变量，最终都将转换成window的变量，就是GO。这是老的版本。现在新版本叫VE，而且不保证你在js里面写的变量就和window.变量。这样能取到的，因为window具体是浏览器定义的，和V8没太大关系的。
+你在 JavaScript 设置的变量，最终都将转换成 window 的变量，就是 GO。这是老的版本。现在新版本叫 VE，而且不保证你在 js 里面写的变量就和 window.变量。这样能取到的，因为 window 具体是浏览器定义的，和 V8 没太大关系的。
 
 ## 块级作用域
 
-在ES5以前是没有块级作用域的，只有俩作用域。
+在 ES5 以前是没有块级作用域的，只有俩作用域。
 
 - 全局作用域
 - 块级作用域
@@ -428,7 +423,7 @@ function foo() {
 console.log(bar); // ❌ ReferenceError: Cannot access 'foo' before initialization
 ```
 
-比如下面的函数就是有3块作用域
+比如下面的函数就是有 3 块作用域
 
 ```javascript
 // 1.最外面一层全局作用域
@@ -441,7 +436,7 @@ function foo() {
 }
 ```
 
-但是ES6之后就有了块级作用域
+但是 ES6 之后就有了块级作用域
 
 ```javascript
 // 块级作用域
@@ -500,7 +495,7 @@ console.log(foo); // ✅ 外面可以访问
 console.log(bar); // ❌ 外面不能访问
 ```
 
-- for语句
+- for 语句
 
 ```javascript
 for (let i = 0; i < 10; i++) {
@@ -514,9 +509,9 @@ for (var i = 0; i < 10; i++) {
 console.log('var' + i); // 10
 ```
 
-> 为什么上面的var的i是10呢？
+> 为什么上面的 var 的 i 是 10 呢？
 >
-> 就相当于其实是下面这种感觉的。也就是var根本没块级作用域。
+> 就相当于其实是下面这种感觉的。也就是 var 根本没块级作用域。
 
 ```javascript
 for (var i = 0; i < 10; i++) {
@@ -541,8 +536,7 @@ for (var i = 0; i < btns.length; i++) {
     console.log('第' + i + '个按钮被点击');
   };
 }
-console.log(i) // 4 可以验证是第4个
-
+console.log(i); // 4 可以验证是第4个
 
 // *******以前的解决方法 使用立即执行函数*******
 
@@ -567,10 +561,10 @@ for (let i = 0; i < btns.length; i++) {
     console.log('第' + i + '个按钮被点击');
   };
 }
-console.log(i) // ❌根本不能访问到
+console.log(i); // ❌根本不能访问到
 ```
 
-一个小Tips吧
+一个小 Tips 吧
 
 ```javascript
 const arr = ['foo', 'bar', 'baz'];
@@ -612,12 +606,11 @@ for (let item of arr) {
   const item = 'bar';
   console.log(item);
 }
-
 ```
 
 ## 模板字符串&标签模板字符串
 
-模板字符串真的太easy了。`${}` 一把梭
+模板字符串真的太 easy 了。`${}` 一把梭
 
 ```javascript
 const id = 'chin';
@@ -687,7 +680,7 @@ console.log(0 === false); // true
 console.log('' === false); // true
 ```
 
-关于bug这里可以用babel编译器来验证。
+关于 bug 这里可以用 babel 编译器来验证。
 
 ```javascript
 function foo(m = 'aaa', n = 'bbb') {
@@ -695,13 +688,15 @@ function foo(m = 'aaa', n = 'bbb') {
 }
 // 下面才是无bug版本
 function foo() {
-  var m = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'aaa';
-  var n = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'bbb';
+  var m =
+    arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'aaa';
+  var n =
+    arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'bbb';
   console.log(m, n);
 }
 ```
 
-所以ES6可以这样写
+所以 ES6 可以这样写
 
 有默认值的参数最好放**最后**
 
@@ -714,7 +709,6 @@ function foo(m = 'aaa', n = 'bbb') {
 foo(0, '');
 
 // 如果不放在最后，那么length计算会出错
-
 ```
 
 而且还支持解构的默认参数
@@ -755,11 +749,11 @@ foo(10, 20, 30, 40); // [ 30, 40 ]
 > arguments 区别是什么呢？
 >
 > - 是类数组的对象（伪数组），剩余参数是真输入
-> - arguments包含所有参数，而剩余参数只有剩余参数
+> - arguments 包含所有参数，而剩余参数只有剩余参数
 
 ## 箭头函数
 
-箭头函数没有this，也没有显式原型，prototype
+箭头函数没有 this，也没有显式原型，prototype
 
 ```javascript
 const foo = () => {
@@ -771,7 +765,7 @@ console.log(foo.prototype); // undefined
 // 3.所以箭头函数没办法new
 ```
 
-> 但是箭头函数作为一个函数 是有\__proto__的
+> 但是箭头函数作为一个函数 是有\_\_proto\_\_的
 
 ## 展开语法 Spread Syntax
 
@@ -878,7 +872,7 @@ console.log(obj.s1); // 不能被点
 console.log(obj[s1]); // uu1
 ```
 
-如果想获取Symbol定义的属性名，`Object.keys()`不管用。需要有特殊的API。
+如果想获取 Symbol 定义的属性名，`Object.keys()`不管用。需要有特殊的 API。
 
 ```javascript
 const s1 = Symbol('1');
@@ -907,12 +901,10 @@ console.log(sx === sy); // false
 const key = Symbol.keyFor(sx);
 console.log(key); // x
 
-
 // 5. 那么如果我们现在就是想创建相同的Symbol应该怎么 来做呢?
 const s1 = Symbol.for('x');
 const s2 = Symbol.for('x');
 console.log(s1 === s2); // true
-
 ```
 
 ## Set/WeakSet
@@ -921,7 +913,7 @@ console.log(s1 === s2); // true
 
 `数组 + 不能重复 = Set`
 
-Set的本质感觉就是给你去重的。
+Set 的本质感觉就是给你去重的。
 
 ```javascript
 // 1.去重
@@ -1004,11 +996,11 @@ obj.age = 100;
 console.log(obj.id);
 ```
 
-但属性描述符的本职任务并不是为了监听对象的变化的，所以Proxy就应运而生了。下面主要是`get(),set()`
+但属性描述符的本职任务并不是为了监听对象的变化的，所以 Proxy 就应运而生了。下面主要是`get(),set()`
 
 ![image-20220421132007942](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220421132007942.png)
 
-> 本质就是通过Proxy在不改变元obj的情况下，对原来的obj进行增强，进行监听
+> 本质就是通过 Proxy 在不改变元 obj 的情况下，对原来的 obj 进行增强，进行监听
 
 ```javascript
 const objProxy = new Proxy(obj, {
@@ -1038,7 +1030,7 @@ const objProxy = new Proxy(obj, {
 });
 ```
 
-还有剩下9个捕获器，这里先演示下
+还有剩下 9 个捕获器，这里先演示下
 
 ```javascript
 function foo() {}
@@ -1106,36 +1098,36 @@ const rows = dataList.map(data => {
 
 ```javascript
 const obj = {
-  id:"chin",
-  age:199
-}
+  id: 'chin',
+  age: 199,
+};
 
 console.log(Object.getPrototypeOf(obj));
 console.log(Reflect.getPrototypeOf(obj));
 console.log(Object.getPrototypeOf(obj) === Reflect.getPrototypeOf(obj)); //true
 ```
 
-Object本身就是一个构造函数，生命不可承受之重！
+Object 本身就是一个构造函数，生命不可承受之重！
 
-因为是对象，所以没有new！
+因为是对象，所以没有 new！
 
-- 和Object的方法很相似，几乎差不读。
-- 和Proxy一样有13个常见方法。
+- 和 Object 的方法很相似，几乎差不读。
+- 和 Proxy 一样有 13 个常见方法。
 - 为了避开对元对象的操作
 
-Proxy的操作会直接操作原来的obj，所以Proxy是有缺点的。
+Proxy 的操作会直接操作原来的 obj，所以 Proxy 是有缺点的。
 
 ## receiver
 
 ![image-20220421191550443](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220421191550443.png)
 
-上面的this指向了obj，如果用了receiver之后
+上面的 this 指向了 obj，如果用了 receiver 之后
 
-`Reflect.get(参数1，参数2，receiver)` receiver其实可以改变this的指向
+`Reflect.get(参数1，参数2，receiver)` receiver 其实可以改变 this 的指向
 
 ![image-20220421191854178](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220421191854178.png)
 
-差不多上面就是receiver的用法，接下来是`Reflect.construct()`
+差不多上面就是 receiver 的用法，接下来是`Reflect.construct()`
 
 ```javascript
 function Dog(id, legs) {
@@ -1152,11 +1144,11 @@ console.log(animal.__proto__ === Animal.prototype); // true
 
 ## 响应式
 
-vue里面的，关于原理。
+vue 里面的，关于原理。
 
-就是说一个数据，当它发生了变化→会自动触发某个函数。这就是响应式的。
+就是说一个数据，当它发生了变化 → 会自动触发某个函数。这就是响应式的。
 
-大概就是↓这个效果。
+大概就是 ↓ 这个效果。
 
 ```java
 const foo = 'foo';
@@ -1175,7 +1167,7 @@ foo = '111';
 
 历史问题。那么 JavaScript 是为了解决什么问题呢？
 
-JS是单线程的，就是排队上厕所。但是有时候等不了怎么办，比如说大的文件的下载，成功了还失败了？我难道必须等你全部下载完（成功失败未定）才能干其他事情吗？这些都是好耗时的，等不起的！
+JS 是单线程的，就是排队上厕所。但是有时候等不了怎么办，比如说大的文件的下载，成功了还失败了？我难道必须等你全部下载完（成功失败未定）才能干其他事情吗？这些都是好耗时的，等不起的！
 
 ![image-20220422132526348](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422132526348.png)
 
@@ -1251,7 +1243,7 @@ p1.then((res) => {
 });
 ```
 
-一般Promise也有几个状态
+一般 Promise 也有几个状态
 
 ![image-20220422140804125](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422140804125.png)
 
@@ -1364,22 +1356,21 @@ thenPromise.then((res) => {
 thenPromise.then((res) => {
   console.log('res3', res);
 });
-
 ```
 
 那么再来比较一下下面这两者
 
 ![image-20220422233031775](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422233031775.png)
 
-于是就引出了新的问题，就是第二段Promise的问题。
+于是就引出了新的问题，就是第二段 Promise 的问题。
 
-`then()`  有没有返回值的问题。结论就是有的，返回值是一个新的`new Promise()`但是分三种情况。
+`then()` 有没有返回值的问题。结论就是有的，返回值是一个新的`new Promise()`但是分三种情况。
 
 先说一下原理+第一种情况
 
 ![image-20220422233703276](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422233703276.png)
 
-然后是剩下2种
+然后是剩下 2 种
 
 ![image-20220422234853081](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220422234853081.png)
 
@@ -1405,7 +1396,7 @@ cPromise.catch((err) => {
 });
 ```
 
-并且catch会捕获从上到下的全部异常。兜底一样。
+并且 catch 会捕获从上到下的全部异常。兜底一样。
 
 ```javascript
 const cPromise = new Promise((resolve, reject) => {
@@ -1445,7 +1436,6 @@ cPromise
   .catch((err) => {
     console.log('err result:', err);
   });
-
 ```
 
 ### finally()
@@ -1472,19 +1462,19 @@ finallyPromise
 
 ### all()/allSettled()
 
-`all()`  只要有1个 `reject()`，整体结果就是 `reject()`，其他的都拿不到结果。
+`all()` 只要有 1 个 `reject()`，整体结果就是 `reject()`，其他的都拿不到结果。
 
-`allSettled()`  
+`allSettled()`
 
 ### race()/any()
 
-`race()` 谁最快用谁的状态，无论这个race是 `resolve()` 还是 `reject()`
+`race()` 谁最快用谁的状态，无论这个 race 是 `resolve()` 还是 `reject()`
 
 `any()` 无论是谁，我都要一个能 `resolve()`
 
 ## 手写 Promise
 
-因为早期大家写 Promise 的时候都各自为政，为了统一实现规范，promiseplus应运而生。[Promises/A+](https://promisesaplus.com)
+因为早期大家写 Promise 的时候都各自为政，为了统一实现规范，promiseplus 应运而生。[Promises/A+](https://promisesaplus.com)
 
 ```javascript
 // 第1版本
@@ -1635,7 +1625,7 @@ class MyPromise {
       if (this.status === PROMISE_STATUS_PENDING) {
         this.status = PROMISE_STATUS_REJECTED;
         this.reason = reason;
-        console.log('reject'); // 
+        console.log('reject'); //
         // 执行then传进来的第2个回调函数
         this.onrejected();
       }
@@ -1664,22 +1654,21 @@ myPromise.then(
     console.log(err);
   }
 );
-
 ```
 
 但是这里的问题，就是延迟执行的问题。
 
 ![image-20220425134641359](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220425134641359.png)
 
-所以以下有2种方案，`setTimeout()` 这种宏任务，或者微任务！
+所以以下有 2 种方案，`setTimeout()` 这种宏任务，或者微任务！
 
-先写一个setTimeout 非推荐的用法，然后写一个 `queueMicrotask()` 用法
+先写一个 setTimeout 非推荐的用法，然后写一个 `queueMicrotask()` 用法
 
 ![image-20220425135502746](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220425135502746.png)
 
 但是目前的版本
 
-- 只能单独调用一个 `then()`  → 用数组
+- 只能单独调用一个 `then()` → 用数组
 - 不能进行链式调用
 - `then()` 里面裹个 `then()`
 
@@ -1776,7 +1765,6 @@ setTimeout(() => {
     }
   );
 }, 1000);
-
 ```
 
 有一个确定状态的情况下
@@ -1928,7 +1916,6 @@ myp
       console.log('err2', err);
     }
   );
-
 ```
 
 稍微优化，手写结束。
@@ -2144,6 +2131,7 @@ then(onfulfilled, onrejected) {
 实现 `finally()`
 
 ```javascript
+
 ```
 
 ## 迭代器 iterator
@@ -2202,7 +2190,7 @@ console.log(arrIterator.next());
 // { done: true, value: undefined }
 ```
 
-可是上面的迭代器只能是arr的，那么想让所有的数据结构都可以呢？
+可是上面的迭代器只能是 arr 的，那么想让所有的数据结构都可以呢？
 
 ```javascript
 const names = ['1', '3', '5'];
@@ -2299,18 +2287,18 @@ console.log(iterator2.next());
 
 如果你没有实现属性 `[Symbol.iterator]:function` 那么你就不能用 ` for ...of`
 
-` for ...of` 
+` for ...of`
 
-常见的 Array/Map/Set/arguments(函数中的) 都是实现了 属性 `[Symbol.iterator]:function`  
+常见的 Array/Map/Set/arguments(函数中的) 都是实现了 属性 `[Symbol.iterator]:function`
 
 ### 可迭代对象有啥用
 
 ```javascript
-const names = []
-const newName = [...names] // 因为names是可迭代器
+const names = [];
+const newName = [...names]; // 因为names是可迭代器
 
 // 对象除外 → 对象没实现可迭代对象 但是可以展开 ES9新增
-const newObj = {...obj} 
+const newObj = { ...obj };
 
 // 那么迭代器有什么用呢？
 // 1.for of场景
@@ -2364,15 +2352,15 @@ Promise.all(iterableObj).then((res) => {
 
 为什么会有生成器的问题？
 
-一个函数在执行的时候，只有发生了问题or return or throw new Error 才会暂停。
+一个函数在执行的时候，只有发生了问题 or return or throw new Error 才会暂停。
 
 如果想让一个函数在执行的时候暂停一下，先休息一下，在从原来断的地方开始呢？
 
 **生成器函数**
 
 ```javascript
-function foo(){} // 普通函数
-function* foo(){}  // 生成器函数
+function foo() {} // 普通函数
+function* foo() {} // 生成器函数
 ```
 
 生成器的函数里面有个关键字 ,是一个特殊的迭代器。
@@ -2381,7 +2369,7 @@ function* foo(){}  // 生成器函数
 
 ![image-20220426162545212](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426162545212.png)
 
-那么yield 有没有返回值呢？ 一旦done为true，当遇到yeild之后，生成器就
+那么 yield 有没有返回值呢？ 一旦 done 为 true，当遇到 yeild 之后，生成器就
 
 - 暂停函数执行
 - 你如果想返回值 `yield 你想返回的值`
@@ -2394,13 +2382,13 @@ function* foo(){}  // 生成器函数
 
 ![image-20220426225940570](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426225940570.png)
 
-但是如果你想要第一个值也传入呢？因为 `next()` 总是从第2个开始的。
+但是如果你想要第一个值也传入呢？因为 `next()` 总是从第 2 个开始的。
 
-那建议从函数调用开始 
+那建议从函数调用开始
 
 ```javascript
 function* foo(num) {
- 	value = num * 10;
+  value = num * 10;
 }
 
 const fgenerator = foo(5);
@@ -2412,7 +2400,7 @@ const fgenerator = foo(5);
 
 ![image-20220426230940032](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426230940032.png)
 
-同时如果第一次在生成器就直接调用 return 
+同时如果第一次在生成器就直接调用 return
 
 ```javascript
 function* foo() {
@@ -2421,7 +2409,7 @@ function* foo() {
   const value1 = 100;
   console.log('第一段代码:', value1);
   const n = yield value1;
-  
+
   const value2 = 200 * n;
   console.log('第二段代码:', value2);
   const count = yield value2;
@@ -2486,7 +2474,150 @@ const arrGene2 = createArrayIterator(arr);
 console.log(arrGene2.next());
 console.log(arrGene2.next());
 console.log(arrGene2.next());
-
 ```
 
-最后
+## 异步函数方案
+
+1 回调地狱
+
+```javascript
+// 现在模拟一个请求方案
+// 发送3次，每一次都是基于上一次的结果进行调用
+
+function requestDemo(url) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(url);
+    }, 100);
+  });
+}
+
+// 1️⃣回调地狱模式
+requestDemo('chin').then((res) => {
+  requestDemo(res + ' aaa').then((res) => {
+    requestDemo(res + ' bbb').then((res) => {
+      console.log(res); // chin aaa bbb
+    });
+  });
+});
+```
+
+2 then 返回值模式
+
+```javascript
+// 2️⃣ then模式返回值模式
+requestDemo('chin2')
+  .then((res) => {
+    // 因为这个就相当于搞了一个 newPromise.resolve()
+    return requestDemo(res + ' aaa');
+  })
+  .then((res) => {
+    return requestDemo(res + ' bbb');
+  })
+  .then((res) => {
+    return requestDemo(res + ' ccc');
+  });
+
+// 异步代码的处理方案
+function requestDemo(url) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(url);
+    }, 100);
+  });
+}
+```
+
+3 生成器
+
+```javascript
+// 3️⃣  Promise+ generator
+function* getData() {
+  const res1 = yield requestDemo('chin3');
+  const res2 = yield requestDemo(res1 + 'bbb');
+  const res3 = yield requestDemo(res2 + 'ccc');
+  console.log(res3);
+}
+
+const ge = getData(); // 第一次只是返回生成器
+// requestDemo('chin3');的返回值给了next
+// 由于requestDemo返回值是一个Promise 所以下面的返回值也有个Promise
+ge.next().value.then((res) => {
+  ge.next(res).value.then((res) => {
+    ge.next(res).value.then((res) => {
+      console.log(res);
+    });
+  });
+});
+```
+
+3-1 生成器自动化
+
+```javascript
+// 3️⃣-1  Promise+ generator 自动化一下
+// 这尼玛太难写了
+function generatorFn(getFn) {
+  const generator = getFn();
+  function exec(res) {
+    const result = generator.next(res);
+    if (result.done) return result.value;
+    result.value.then((res) => {
+      exec(res);
+    });
+  }
+  exec();
+}
+generatorFn(getData);
+```
+
+3-2 有个包叫 co
+
+TJ 大神写的
+
+4 await/async 实现
+
+```javascript
+// 本质就是上面的
+async function getData() {
+  const res1 = await requestDemo('chin3');
+  const res2 = await requestDemo(res1 + 'bbb');
+  const res3 = await requestDemo(res2 + 'ccc');
+  console.log(res3);
+}
+
+const ge = getData();
+```
+
+## async/await
+
+- 单独执行的时候 没区别
+
+```javascript
+async function foo() {
+  console.log('start');
+  console.log('1');
+  console.log('2');
+  console.log('3');
+  console.log('4');
+  console.log('end');
+}
+
+foo();
+```
+
+- 这样也是没区别
+
+```javascript
+async function foo() {
+  console.log('start');
+  console.log('1');
+  console.log('2');
+  console.log('3');
+  console.log('4');
+  console.log('end');
+}
+
+console.log('script1');
+foo();
+console.log('script2');
+```
