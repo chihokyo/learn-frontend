@@ -672,7 +672,7 @@ npx原理会到当前目录的`./nodu_modules/bin`目录下查找命令
 ```javascript
 new Promise(function (resolve) {
   console.log('promise1');
-  resolve();
+  resolve(	);
 }).then(function () {
   console.log('then1');
 });

@@ -2621,3 +2621,9 @@ console.log('script1');
 foo();
 console.log('script2');
 ```
+
+那么有什么区别呢？
+
+- 返回值有区别 → 返回一个Promise
+- 异常处理有区别 → 异步函数里的异常，会被作为promise里面的reject值
+- 可以使用 await （普通函数不能用）
