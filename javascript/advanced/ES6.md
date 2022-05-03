@@ -2432,6 +2432,37 @@ console.log(fgenerator.return(1)); // 相当于直接返回了这个参数 { val
 
 ![image-20220426232017813](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220426232017813.png)
 
+```javascript
+function* foo() {
+  console.log('start');
+  console.log('first code starting...');
+  const v1 = 100;
+  yield v1;
+}
+
+const g = foo();
+console.log(g.next()); // { value: 100, done: false }
+
+function* foo2() {
+  console.log('start');
+  console.log('1 code starting...');
+  const v1 = 100;
+  try {
+    yield v1; // 这样捕获 代码会正常执行
+  } catch (error) {
+    console.log(error);
+  }
+  console.log('2 code starting...'); // 这里也会执行
+  const v2 = 200;
+  yield v2; // 会执行到这里！！
+  console.log('end!!!');
+}
+
+const g1 = foo2();
+console.log(g1.next());
+console.log(g1.throw('ops!err!'));
+```
+
 生成器替代迭代器
 
 ```javascript
@@ -2624,6 +2655,128 @@ console.log('script2');
 
 那么有什么区别呢？
 
-- 返回值有区别 → 返回一个Promise
-- 异常处理有区别 → 异步函数里的异常，会被作为promise里面的reject值
+- 返回值有区别 → 返回一个 Promise
+- 异常处理有区别 → 异步函数里的异常，会被作为 promise 里面的 reject 值
 - 可以使用 await （普通函数不能用）
+
+```javascript
+async function foo() {
+  console.log('start');
+  console.log('end');
+  // 相当于默认 return undefined
+}
+
+console.log(foo()); // Promise { undefined }
+
+const p = foo();
+p.then((res) => {
+  console.log('promise!');
+  console.log('promise res is', res); // promise res is undefined
+});
+
+// 为什么是undefined？
+// 因为异步函数async调用这里默认返回的是一个Promise
+// 但是foo这个异步函数目前没有返回值 就相当于返回了 undefined
+```
+
+![image-20220502012131457](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220502012131457.png)
+
+异步函数里面的异常要特殊处理（被当成 `reject`）
+
+```javascript
+// 😄
+function foo() {
+  console.log('start');
+  throw new Error('original');
+}
+foo();
+console.log('我不能执行'); // 并不会被打印
+
+// 😣
+async function foo() {
+  console.log('start');
+  throw new Error('async');
+}
+foo(); // 为什么还能执行？ 因为这里是异步函数 异常会被当成reject来处理
+foo().catch((err) => {
+  console.log(err);
+});
+console.log('我还能执行');
+```
+
+await 问题
+
+```javascript
+function requestData() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('chin');
+    }, 1000);
+  });
+}
+
+async function foo() {
+  // await 表达式(Promise)
+  await requestData();
+  // 下面无论多少代码，只要上面await没结果
+  // 就统统不会执行
+  console.log('foo1');
+  console.log('foo2');
+  console.log('foo3');
+  console.log('foo4');
+}
+```
+
+![image-20220502013809816](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220502013809816.png)
+
+所以才会有看似异步，事实上是同步执行的效果。
+
+```javascript
+function requestData() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve('chin');
+    }, 1000);
+  });
+}
+async function foo2() {
+  const res1 = await requestData();
+  console.log('foo1', res1);
+  const res2 = await requestData();
+  console.log('foo2', res2);
+}
+
+foo2(); // 按照顺序执行 第一个res1没出来，第二个res2也不会执行
+```
+
+可不可以跟普通的值呢？
+
+可以的，相当于立即执行
+
+```javascript
+// 普通值 相当于立即执行
+async function foo() {
+  const res1 = await 111; // 立即会执行
+  console.log(res1);
+}
+
+foo(); // 111
+
+// 实现then 那就根据resolve的值
+async function foo() {
+  const res1 = await {
+    then: function (resolve, reject) {
+      resolve('abc');
+    },
+  };
+  console.log(res1);
+}
+
+foo(); // abc
+```
+
+如果 await 不是 resolve，而是 reject 呢？
+
+![image-20220502014811815](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220502014811815.png)
+
+上面红框圈错了，应该是`foo()` 整体的 reject
