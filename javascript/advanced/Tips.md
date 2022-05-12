@@ -1,18 +1,18 @@
-# JS提高 Tips
+# JS 提高 Tips
 
 ## 1 作用域提升问题
 
-首先要知道这个ES规范的说法问题，本质上没有变化，只是在说法上可能会有些许变化，但是意思是基本上差不多的。
+首先要知道这个 ES 规范的说法问题，本质上没有变化，只是在说法上可能会有些许变化，但是意思是基本上差不多的。
 
-JS在执行的时候，首先全局会有一个GO的作用域。
+JS 在执行的时候，首先全局会有一个 GO 的作用域。
 
 这个需要一些图来辅助理解。明天整理。
 
-直接看#3就行
+直接看#3 就行
 
 ## 2 代码在内存的执行
 
-加载到内存 → CPU执行 → 根据CPU可能会在开辟空间
+加载到内存 → CPU 执行 → 根据 CPU 可能会在开辟空间
 
 内存的生命周期
 
@@ -38,7 +38,7 @@ bar(); // hello global
 
 > 这里我只是先画一个整体流程图，不包含细节。
 
-总体说1就是编译阶段生成的，其他都是陆续生成的。
+总体说 1 就是编译阶段生成的，其他都是陆续生成的。
 
 先说几个名词
 
@@ -48,7 +48,7 @@ bar(); // hello global
 >
 > Functional Execution Context 函数执行上下文
 >
-> Activation Object AO  AO中包含形参、arguments、函数定义和指向函数对象、定义的变量
+> Activation Object AO AO 中包含形参、arguments、函数定义和指向函数对象、定义的变量
 
 ![image-20220326232628199](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220326232628199.png)
 
@@ -67,29 +67,29 @@ bar(); // hello global
 其实就是**闭包函数地址**和**周围环境的那个函数地址**互相指向对方，导致迟迟不会被销毁！
 
 ```javascript
-closureFn = null // 这样就可以手动销毁
+closureFn = null; // 这样就可以手动销毁
 ```
 
-## 6 this在nodejs里为什么是{}？
+## 6 this 在 nodejs 里为什么是{}？
 
 module → 加载 → 编译 → 放到一个函数 → 执行这个函数（`function.call({}`)）
 
 源码可以看到的！
 
-[源码地址lib/internal/modules/cjs/loader.js](https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js)
+[源码地址 lib/internal/modules/cjs/loader.js](https://github.com/nodejs/node/blob/master/lib/internal/modules/cjs/loader.js)
 
 ![image-20220328013823562](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220328013823562.png)
 
-## 7 this什么时候确定？
+## 7 this 什么时候确定？
 
-只有在**执行**的时候才能确定，动态绑定！解析的时候是啥谁也不知道，在函数执行上下文FEC真正执行的时候才能被确定。
+只有在**执行**的时候才能确定，动态绑定！解析的时候是啥谁也不知道，在函数执行上下文 FEC 真正执行的时候才能被确定。
 
-就是上面的内存执行不是有一块是函数的FEC（**F**unctional **E**xecution **C**ontext ）
+就是上面的内存执行不是有一块是函数的 FEC（**F**unctional **E**xecution **C**ontext ）
 
-FEC主要三个板块组成
+FEC 主要三个板块组成
 
 - VO 形参
-- Scope Chain VO + Parent的VO（大部分都是GO）
+- Scope Chain VO + Parent 的 VO（大部分都是 GO）
 - **this** → 就是在这个时候确定的
 - 不同的绑定规则，不同的调用方法，结果也就不一样。
 
@@ -118,7 +118,7 @@ obj.foo(); // obj的对象 → { id: '1', foo: [Function: foo] }
 foo.apply('demo'); // 字符串 → [String: 'demo']
 ```
 
-## 8 this的指向问题
+## 8 this 的指向问题
 
 - 默认绑定
 - 隐式绑定
@@ -186,7 +186,7 @@ fn(); // window
 - 隐式绑定
 
 隐式绑定: `Object.fn()`
-Object对象会被js引擎绑定到fn函数的中this里面
+Object 对象会被 js 引擎绑定到 fn 函数的中 this 里面
 
 ```javascript
 var obj = {
@@ -200,8 +200,8 @@ var obj = {
 
 obj.eating(); // 因为是obj调用，所以this就是obj
 // 下面这样就拿不到了，因为调用的根本不是obj
-var fn = obj.eating
-fn()
+var fn = obj.eating;
+fn();
 
 // 下面虽然函数是调用的obj1里面的
 var obj1 = {
@@ -215,31 +215,30 @@ var obj2 = {
   bar: obj1.foo,
 };
 
-obj2.bar(); // 但结果还是obj2 
+obj2.bar(); // 但结果还是obj2
 ```
 
 - 显示绑定
 
-call和apply在执行函数时,是可以明确的绑定this, 这个绑定规则称之为显示绑定！
+call 和 apply 在执行函数时,是可以明确的绑定 this, 这个绑定规则称之为显示绑定！
 
 - `call()` → 参数单独
-- `apply()` →  参数是数组
+- `apply()` → 参数是数组
 - `bind()` → 返回一个新函数 永久！
 
 ```javascript
-
 // 1.foo直接调用和call/apply调用的不同在于this绑定的不同
-foo直接调用指向的是全局对象(window)
-foo()
+foo直接调用指向的是全局对象(window);
+foo();
 
 var obj = {
-  name: "obj"
-}
+  name: 'obj',
+};
 
 // call/apply是可以指定this的绑定对象
-foo.call(obj)
-foo.apply(obj)
-foo.ap
+foo.call(obj);
+foo.apply(obj);
+foo.ap;
 
 // 2.
 function foo() {
@@ -259,9 +258,9 @@ console.log(bar === foo); // true
 console.log(newFoo === foo); // false
 ```
 
-- new绑定
+- new 绑定
 
-这里的this就是new出来的实例
+这里的 this 就是 new 出来的实例
 
 ```javascript
 // 我们通过一个new关键字调用一个函数时(构造器), 这个时候this是在调用这个构造器时创建出来的对象
@@ -286,9 +285,7 @@ var obj = {
 };
 ```
 
-
-
-## 9 this特殊的一些情况
+## 9 this 特殊的一些情况
 
 `setTimeout()`绑定的哪里？→ window
 
@@ -302,7 +299,7 @@ setTimeout(function () {
 // setTimeout 是window
 ```
 
-关于监听实现 → dom对象
+关于监听实现 → dom 对象
 
 ```javascript
 const btn = document.querySelector('button');
@@ -315,7 +312,7 @@ btn.onclick = function () {
 
 操作数组的函数 forEach/filter/map/find
 
-内部很有可能是独立的函数调用，所以结果就是window
+内部很有可能是独立的函数调用，所以结果就是 window
 
 ```javascript
 var array = ['foo', 'bar', 'baz'];
@@ -325,10 +322,10 @@ array.forEach(function () {
 // 但是你也可以修改
 array.forEach(function () {
   console.log(this);
-},这里可以写一下你想绑定的this指向);
+}, 这里可以写一下你想绑定的this指向);
 ```
 
-## 10 关于this优先级问题
+## 10 关于 this 优先级问题
 
 其实这个优先级理论性的感觉比较强。死记硬背一下。
 
@@ -336,15 +333,15 @@ array.forEach(function () {
 1.默认规则的优先级最低
 	→ 毫无疑问，默认规则的优先级是最低的，因为存在其他规则时，就会通过其他规则的方式来绑定this
 2.显示绑定优先级高于隐式绑定
-3.new绑定优先级高于隐式绑定 
+3.new绑定优先级高于隐式绑定
 4.new绑定优先级高于bind
-	→ new绑定和call、apply是不允许同时使用的，所以不存在谁的优先级更高 
+	→ new绑定和call、apply是不允许同时使用的，所以不存在谁的优先级更高
 	→ new绑定可以和bind一起使用，new绑定优先级更高
 ```
 
-## 11 this特例若干
+## 11 this 特例若干
 
-如果你call/apply/bind 绑定的是 `null undefined `这样的
+如果你 call/apply/bind 绑定的是 `null undefined `这样的
 
 那么这个**显示绑定会被忽略，使用默认规则**
 
@@ -389,13 +386,11 @@ obj1.foo();
 // (这个会被当成一个整体)()
 ```
 
-## 12 箭头函数this的特殊性
+## 12 箭头函数 this 的特殊性
 
-- 没有this和arguments
+- 没有 this 和 arguments
 
-- 箭头函数不适用前面的this规则 → 不进行this绑定 → 根据外层作用域来定
-
-  
+- 箭头函数不适用前面的 this 规则 → 不进行 this 绑定 → 根据外层作用域来定
 
   所以以下的情况都是被无视的
 
@@ -434,10 +429,10 @@ var obj = {
     }, 2000);
   },
 };
-obj.getData(); // 出错因为找不到这个push方法 
+obj.getData(); // 出错因为找不到这个push方法
 
 /*==========那则么办，一般都是这样解决的==========*/
-  
+
 var obj = {
   data: [],
   getData: function () {
@@ -469,7 +464,7 @@ var obj = {
 console.log(obj.data); // 这里打印不出来是因为setTimeout异步调用问题
 ```
 
-下面是如果getData也是一个呢？
+下面是如果 getData 也是一个呢？
 
 ```javascript
 var obj = {
@@ -486,7 +481,7 @@ obj.getData();
 console.log(obj.data);
 ```
 
-## 14 自己实现一个call/apply/bind
+## 14 自己实现一个 call/apply/bind
 
 要实现这个，就要给所有的函数都实现一个方法。用的就是所有函数的母亲`Function` 通过原型链来实现
 
@@ -511,7 +506,7 @@ bar.mycall(); // mycall is called
 
 那么如何才能让我自己定义的 `mycall()` 方法实现和 `call()` 一样，能够执行就运行呢？
 
-本质其实用就用了this的隐式绑定
+本质其实用就用了 this 的隐式绑定
 
 ```javascript
 // 给所有函数增加属性
@@ -535,7 +530,7 @@ foo.mycall();
 bar.mycall();
 ```
 
-接下来就是要解决的this问题，因为原生的`call(this)` 这样写谁，就可以绑定谁的。
+接下来就是要解决的 this 问题，因为原生的`call(this)` 这样写谁，就可以绑定谁的。
 
 ```javascript
 // 给所有函数增加属性
@@ -554,34 +549,35 @@ Function.prototype.mycall = function (thisArg) {
 };
 ```
 
-this有可能是其他类型，所以需要你转换一下。接下来的话，我直接上全部的代码吧。
+this 有可能是其他类型，所以需要你转换一下。接下来的话，我直接上全部的代码吧。
 
-其实代码的书写，尤其是轮子的书写，主要是考虑到好多的edge case，这些边界条件的考虑会特别多。
+其实代码的书写，尤其是轮子的书写，主要是考虑到好多的 edge case，这些边界条件的考虑会特别多。
 
 ```javascript
-Function.prototype.mycall = function(thisArg, ...args) {
+Function.prototype.mycall = function (thisArg, ...args) {
   // 在这里可以去执行调用的那个函数(foo)
   // 问题: 得可以获取到是哪一个函数执行了 mycall
   // 1.获取需要被执行的函数
-  var fn = this
+  var fn = this;
 
   // 2.对thisArg转成对象类型(防止它传入的是非对象类型)
-  thisArg = (thisArg !== null && thisArg !== undefined) ? Object(thisArg): window
+  thisArg =
+    thisArg !== null && thisArg !== undefined ? Object(thisArg) : window;
 
   // 3.调用需要被执行的函数
-  thisArg.fn = fn
-  var result = thisArg.fn(...args)
-  delete thisArg.fn 
+  thisArg.fn = fn;
+  var result = thisArg.fn(...args);
+  delete thisArg.fn;
   // 为什么删呢？因为你既然增加了一个fn属性，这个属性用完之后就没用了是多余的肯定是要删除的
 
   // 4.将最终的结果返回出去
-  return result
-}
+  return result;
+};
 ```
 
-## 15 关于arguments
+## 15 关于 arguments
 
-这个其实是AO里面的
+这个其实是 AO 里面的
 
 - 是全局的。
 - 你不用定义也是会存在的。
@@ -593,7 +589,6 @@ function foo(a, b, c) {
 }
 foo();
 // Arguments(3) [1, 2, 3, callee: ƒ, Symbol(Symbol.iterator): ƒ]0: 11: 22: 3callee: ƒ // foo(a, b, c)length: 3Symbol(Symbol.iterator): ƒ values()[[Prototype]]: Object
-
 ```
 
 常用操作也有三个
@@ -603,29 +598,29 @@ foo();
 ```javascript
 // 常见的对arguments的操作是三个
 // 1.获取参数的长度
-console.log(arguments.length)
+console.log(arguments.length);
 ```
 
-- 通过index获取某个参数
+- 通过 index 获取某个参数
 
 ```javascript
 // 2.根据索引值获取某一个参数
-console.log(arguments[2])
-console.log(arguments[3])
-console.log(arguments[4])
+console.log(arguments[2]);
+console.log(arguments[3]);
+console.log(arguments[4]);
 ```
 
-- callee获取当前arguments所在的函数
+- callee 获取当前 arguments 所在的函数
 
 ```javascript
 // 3.callee获取当前arguments所在的函数
-console.log(arguments.callee)
+console.log(arguments.callee);
 // arguments.callee() 千万不能直接调用 因为会无限loop
 ```
 
-## 16 arguments转成数组
+## 16 arguments 转成数组
 
-因为他是对象，所以想转换成数组。这里有几个方法，其中一个方法有关于this的一个应用场景！ 
+因为他是对象，所以想转换成数组。这里有几个方法，其中一个方法有关于 this 的一个应用场景！
 
 方法感觉还是很多的，现在一个个看。
 
@@ -636,7 +631,7 @@ function foo(num1, num2) {
   for (var i = 0; i < arguments.length; i++) {
     newArr.push(arguments[i]);
   }
-	return newArr;
+  return newArr;
 }
 
 // 第2种 使用Array对象
@@ -662,7 +657,7 @@ function bar(num1, num2) {
 console.log(bar(2, 8));
 ```
 
-这里就第2种方法在做一下说明，就是明明可以直接调用为什么要用call的原因。
+这里就第 2 种方法在做一下说明，就是明明可以直接调用为什么要用 call 的原因。
 
 ```javascript
 Array.prototype.myslice = function (start, end) {
@@ -687,7 +682,7 @@ console.log(newArray);
 这个是函数式编程的一种范畴，Pure Function
 
 - 相同的输入必定有相同的输出
-- 不会产生副作用（不会修改其他的数据，不会产生多余的IO）
+- 不会产生副作用（不会修改其他的数据，不会产生多余的 IO）
 
 ```javascript
 // 相同的输入一定是相同的输出
@@ -729,7 +724,7 @@ baz2(obj);
 console.log(obj);
 ```
 
-React 其实就用这个思想，不能随意的去直接修改props的数值。
+React 其实就用这个思想，不能随意的去直接修改 props 的数值。
 
 ## 18 柯里化 Currying
 
@@ -777,7 +772,6 @@ var fooMini = (m) => (n) => (x) => (y) => {
   return m + n + x + y;
 };
 console.log(fooMini(1)(2)(3)(4));
-
 ```
 
 ## 19 柯里化的好处？
@@ -792,11 +786,11 @@ console.log(fooMini(1)(2)(3)(4));
 var foo = (m) => {
   // 在这里你可以写点别的
   return (n) => {
-      // 在这里你可以写点别的
+    // 在这里你可以写点别的
     return (x) => {
-        // 在这里你可以写点别的
+      // 在这里你可以写点别的
       return (y) => {
-          // 在这里你可以写点别的
+        // 在这里你可以写点别的
         return m + n + x + y;
       };
     };
@@ -826,7 +820,7 @@ console.log(sumCurryAddOne(2));
 console.log(sumCurryAddOne(3));
 ```
 
-在比如打印日志，可以通过一个基础函数，造出来新的2个函数。
+在比如打印日志，可以通过一个基础函数，造出来新的 2 个函数。
 
 ```javascript
 var log = (date) => (type) => (msg) => {
@@ -882,11 +876,11 @@ console.log(curryAdd(10)(20)(30));
 这个比较难实现，主要是因为要考虑一些情况。
 
 - 调用的参数是不定的
-- 关于this指向问题
+- 关于 this 指向问题
 
 → 参数不定最后用的是**递归调用**解决的！
 
-↓  this指向的话 为什么每次都要用call来定向this
+↓ this 指向的话 为什么每次都要用 call 来定向 this
 
 ```javascript
 // fn(...args);
@@ -898,7 +892,7 @@ return fn.call(this, ...args);
 
 ![image-20220407001212850](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220407001212850.png)
 
-不进行强制绑定的话，其实就是为了保证原函数和柯里化的函数都是同一个this
+不进行强制绑定的话，其实就是为了保证原函数和柯里化的函数都是同一个 this
 
 ```javascript
 fn(...args); // this问题，这里会是window
@@ -910,7 +904,7 @@ return fn.call(this, ...args); // 这里的fn的this不是{},会变成window
 这个也是函数式编程的一些技巧
 
 ```
-比如我们现在需要对某一个数据进行函数的调用，执行两个函数fn1和fn2，这两个函数是依次执行的; 
+比如我们现在需要对某一个数据进行函数的调用，执行两个函数fn1和fn2，这两个函数是依次执行的;
 那么如果每次我们都需要进行两个函数的调用，操作上就会显得重复;
 那么是否可以将这两个函数组合起来，自动依次调用呢?
 这个过程就是对函数的组合，我们称之为 组合函数(Compose Function);
@@ -973,11 +967,11 @@ var newFn = myCompose(add, double);
 console.log(newFn(100));
 ```
 
-## 22  with作用域问题
+## 22 with 作用域问题
 
-首先js的作用域只有2
+首先 js 的作用域只有 2
 
-- main.js  就是一个模块整体就是一个作用域 → 全局作用域
+- main.js 就是一个模块整体就是一个作用域 → 全局作用域
 - 函数是一个作用域 → 函数作用域
 
 主要就是这两个作用域，其他都没有。
@@ -988,7 +982,7 @@ var msg = 'hello msg';
 function foo() {
   function bar() {
     // 先在自己找 → 再去的foo找 → 去的全局找
-    // 目前这个作用域的链条是chain是这样的  
+    // 目前这个作用域的链条是chain是这样的
     console.log(msg);
   }
   bar();
@@ -996,20 +990,19 @@ function foo() {
 
 foo();
 
-
 var msg = 'hello msg';
 
 function foo() {
   function bar() {
     // 先在自己找 → 再去的foo找 → 去的全局找
-    // 目前这个作用域的链条是chain是这样的  
+    // 目前这个作用域的链条是chain是这样的
     console.log(msg);
   }
   bar();
 }
 ```
 
-感觉with就像一个任意门，可以随便快速传送一个变量到一个位置，便于代码找到自己想要的变量。
+感觉 with 就像一个任意门，可以随便快速传送一个变量到一个位置，便于代码找到自己想要的变量。
 
 ```javascript
 ('use strict');
@@ -1038,17 +1031,17 @@ with (info) {
 }
 ```
 
-**严格模式下是不能使用with的**
+**严格模式下是不能使用 with 的**
 
 并且很多也不推荐使用
 
-## 23 eval 
+## 23 eval
 
-这个在webpack里打包的时候可能会有这个选项，好多语言都有这个，就是字符串写代码。
+这个在 webpack 里打包的时候可能会有这个选项，好多语言都有这个，就是字符串写代码。
 
 - 可读性很差 → 连个缩进高亮都没
 - 字符串被篡改开发的话不安全
-- eval执行必须经过js解释器，不能被js引擎所优化
+- eval 执行必须经过 js 解释器，不能被 js 引擎所优化
 
 ```javascript
 var jsString = 'var message = "Hello World"; console.log(message);';
@@ -1058,21 +1051,21 @@ eval(jsString);
 
 ## 24 严格模式
 
-strict mode 
+strict mode
 
 - 既可以在整个文件里面开启严格模式
 - 也可以在某个函数开启严格模式
 
 ```
 1. 无法意外的创建全局变量
-2. 严格模式会使引起静默失败(silently fail,注:不报错也没有任何效果)的赋值操作抛出异常 
+2. 严格模式会使引起静默失败(silently fail,注:不报错也没有任何效果)的赋值操作抛出异常
 3. 严格模式下试图删除不可删除的属性
 4.严格模式不允许函数参数有相同的名称
 5. 不允许0的八进制语法
 6. 在严格模式下，不允许使用with
 ```
 
-严格模式下关于一些函数的this指向问题
+严格模式下关于一些函数的 this 指向问题
 
 这里最主要的是默认执行函数和`setTimeout()`
 
@@ -1090,10 +1083,9 @@ foo(); // 严格模式下这里就是 undefined
 obj.foo(); // 这里还是不变的 obj
 var bar = obj.foo;
 bar(); // 严格模式下这里就是 undefined
-
 ```
 
-setTimeout　这里需要仔细看
+setTimeout 　这里需要仔细看
 
 ```javascript
 // setTimeout的this
@@ -1109,7 +1101,7 @@ setTimeout(function () {
 是由于setTimeout()调用的代码运行在与所在函数完全分离的执行环境上。这会导致这些代码中包含的 this 关键字会指向 window (或全局)对象。详细可参考MDN setTimeout
 ```
 
-## 25 关于js的面向对象
+## 25 关于 js 的面向对象
 
 1. **创建对象的方式**
 
@@ -1166,24 +1158,24 @@ for (var key in obj) {
 **数据描述符**
 
 - value
-- **configurable**  
+- **configurable**
 - **enumerable**
 - writable
 
-默认都是false
+默认都是 false
 
 `var obj = {}`
 
 ```javascript
 Object.defineProperty(obj, 'location', {
   // 很多配置
-  value: "China", // 默认值undefined
+  value: 'China', // 默认值undefined
   // 该特殊不可删除/也不可以重新定义属性描述符
   configurable: false, // 默认值false
   // // 该特殊是配置对应的属性(address)是否是可以枚举
   enumerable: true, // 默认值false
   // // 该特性是属性是否是可以赋值(写入值)
-  writable: false // 默认值false
+  writable: false, // 默认值false
 });
 ```
 
@@ -1287,20 +1279,20 @@ console.log(obj);
 
 `Object.freeze()` → 让属性不可以修改(writable: false)
 
-## 27 创建js对象的几种方式
+## 27 创建 js 对象的几种方式
 
 - 字面量
 
 ```javascript
-var obj = {}  
+var obj = {};
 ```
 
 - 工厂模式
 
-缺点 类型过于宽泛，不能获取真实的对象。输出的时候全是Object，不能具体到Animal,Person这种
+缺点 类型过于宽泛，不能获取真实的对象。输出的时候全是 Object，不能具体到 Animal,Person 这种
 
 ```javascript
-  // 工厂模式: 工厂函数
+// 工厂模式: 工厂函数
 function createPerson(name, age, height, address) {
   var p = {};
   p.name = name;
@@ -1329,9 +1321,9 @@ console.log(p1, p2, p3);
 
 - 通过构造函数 new 出来。
 
-## 28 关于js的构造函数
+## 28 关于 js 的构造函数
 
-其实构造函数就是普通函数，只是被new了之后就有了不同的意义。
+其实构造函数就是普通函数，只是被 new 了之后就有了不同的意义。
 
 就像蜘蛛侠也只是个普通人，当他披上战衣的时候他就是蜘蛛侠，人人都可以成为蜘蛛侠，人人又是蜘蛛侠。
 
@@ -1340,23 +1332,25 @@ function foo() {
   console.log('foo');
 }
 new foo(); // 一旦前面加上了new 这个foo就成了构造函数
-new foo; // 依然会被调用，和上面实际上是一模一样的
+new foo(); // 依然会被调用，和上面实际上是一模一样的
 ```
 
 - 构造函数名并非一定要大写，`foo Foo`都是一样的，只是大写是约定俗成的
 - 写`new foo` 也依然会被调用
 
-那么new之后发生了什么呢？
+那么 new 之后发生了什么呢？
 
 ```
 p1. 在内存中创建一个新的对象(空对象);
 p2. 这个对象内部的[[prototype]]属性会被赋值为该构造函数的prototype属性;
 p3. 构造函数内部的this，会指向创建出来的新对象;
 p4. 执行函数的内部代码(函数体代码);
-p5. 如果构造函数没有返回非空对象，则返回创建出来的新对象;
+p5. 如果构造函数没有返回非空对象，则返回创建出来的新对象; return this
 ```
 
-## 29 js构造函数new出来的对象是否为同一个？
+![image-20220512143625659](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220512143625659.png)
+
+## 29 js 构造函数 new 出来的对象是否为同一个？
 
 每一个都是不同的！每一次都会单独搞出来一份！
 
@@ -1401,11 +1395,11 @@ console.log(fn1 === fn2); // false
 
 为了要节省空间，这里先说一下原型的概念。
 
-- 每个对象都是有一个原型的`[[prototype]]` （早期ECMA没有规范去查看原型，这个双括号也只是个es空泛规定的，在不同的地方有自己不同的实现方式的时候他就这样写
-- 后来浏览器为了让大家查看，各家自己规定了一些查看原型的方法，比如 \__proto__，默认是一个空对象
-- 但是这并不是正规的，ES5之后提供的 `Object.getPrototypeOf(obj)` 
+- 每个对象都是有一个原型的`[[prototype]]` （早期 ECMA 没有规范去查看原型，这个双括号也只是个 es 空泛规定的，在不同的地方有自己不同的实现方式的时候他就这样写
+- 后来浏览器为了让大家查看，各家自己规定了一些查看原型的方法，比如 \_\_proto\_\_，默认是一个空对象
+- 但是这并不是正规的，ES5 之后提供的 `Object.getPrototypeOf(obj)`
 
-上面的一段话总结一下就是，每个对象都有一个对象原型（又叫**隐式原型**）。浏览器有浏览器的查看，es有es的查看方法。
+上面的一段话总结一下就是，每个对象都有一个对象原型（又叫**隐式原型**）。浏览器有浏览器的查看，es 有 es 的查看方法。
 
 > 原型有什么用呢？
 
@@ -1419,14 +1413,16 @@ obj.__proto__.age = 18;
 console.log(obj.age);
 ```
 
-其实这个隐式原型，就是浏览器为了实现[[prototype]] 搞出来的  \__proto__ 
+![image-20220512145737319](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220512145737319.png)
+
+其实这个隐式原型，就是浏览器为了实现[[prototype]] 搞出来的 \_\_proto\_\_
 
 ```javascript
 var obj = {
-  id: "chin",
+  id: 'chin',
   // 本质就是每一个对象浏览器都给她弄了一个
-  __proto__:{}
-}
+  __proto__: {},
+};
 ```
 
 ## 31 函数原型出来了 → 显式原型
@@ -1437,7 +1433,7 @@ var obj = {
 
 > 这个显式原型啥作用？
 
-这个只在你的函数成为蜘蛛侠（new）的时候有作用，当你通过 new 让自己成为构造函数的时候，这个时候新建的对象的  \__proto__ 就 **指向**了 函数的 prototype。
+这个只在你的函数成为蜘蛛侠（new）的时候有作用，当你通过 new 让自己成为构造函数的时候，这个时候新建的对象的 \_\_proto\_\_ 就 **指向**了 函数的 prototype。
 
 也就是 `对象.__proto__ = 函数.prototype` （内部自动操作）
 
@@ -1457,7 +1453,7 @@ console.log(f1.__proto__ === foo.prototype);
 
 实际上是不是的，验证一下
 
-之所以打印的是空的，是因为可枚举的那个属性给设置成了false
+之所以打印的是空的，是因为可枚举的那个属性给设置成了 false
 
 - `enumerable:false`
 
@@ -1467,7 +1463,7 @@ function foo() {
 }
 
 console.log(foo.prototype); // {}
-console.log(Object.getOwnPropertyDescriptor(foo.prototype)); 
+console.log(Object.getOwnPropertyDescriptors(foo.prototype));
 /*
   {
     constructor: {
@@ -1494,16 +1490,65 @@ console.log(
 
 ## 32 function 给自己添加属性
 
-JS内部给 prototype 本来是只有一个 constructor 属性，
+可以看到，这里可以验证一下的自己是可以重写的
+
+![image-20220512153250700](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220512153250700.png)
+
+JS 内部给 prototype 本来是只有一个 constructor 属性，
 
 ```javascript
-// 很麻烦的添加方式
+// 由于一个个添加是在是很麻烦的添加方式
+// before
+function Foo() {}
+
+Foo.prototype.id = '1';
+Foo.prototype.age = 99;
+Foo.prototype.eat = function () {
+  console.log('eat');
+};
+
 // 一股脑的全部添加，完全赋值一个新的对象
+// after
+function Foo() {}
+
+Foo.prototype = {
+  id: '2',
+  age: 88,
+  eat: function () {
+    console.log('eat');
+  },
+};
 ```
+
+这里会产生一个问题，就是如果你不写 constructor，就拿不到原来的构造函数（类）
+
+```javascript
+// before
+function Bar() {}
+var b1 = new Bar();
+console.log(b1.constructor.name); // Bar
+
+// after
+function Bar() {}
+Bar.prototype = {
+  id: '1',
+  age: 88,
+};
+var b1 = new Bar();
+// Object 当然你可以发现这里变成了Object，原本应该是Bar的
+console.log(b1.constructor.name);
+```
+
+所以说自己写一个，但是自己写的话需要 2 个注意点
+
+- 手动写指向
+- 可枚举
+
+![image-20220512155251579](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220512155251579.png)
 
 ## 33 对象-函数-原型
 
-**记忆点1**
+**记忆点 1**
 
 ```javascript
 // obj 是一个对象
@@ -1515,29 +1560,29 @@ var obj = {
 console.log(obj.__proto__ === Object.prototype); // true
 ```
 
-**记忆点2**
+**记忆点 2**
 
 ```javascript
 function Foo() {}
 ```
 
-> Q: Foo是什么？
+> Q: Foo 是什么？
 >
 > A: 既是函数，也是对象。
 
 看看函数
 
-> Foo是一个【**函数**】, 那么它会有一个【**显式原型**】对象: `Foo.prototype`
+> Foo 是一个【**函数**】, 那么它会有一个【**显式原型**】对象: `Foo.prototype`
 >
 > Q: `Foo.prototype`来自哪里?
 >
-> A: JS系统内部在创建了一个函数的时候，会自动给你一个 prototype，然后 → `Foo.prototype = { constructor: Foo }`
+> A: JS 系统内部在创建了一个函数的时候，会自动给你一个 prototype，然后 → `Foo.prototype = { constructor: Foo }`
 
 看看对象
 
-> Foo是一个【**对象**】, 那么它会有一个【**隐式原型**】对象: Foo.\__proto__
+> Foo 是一个【**对象**】, 那么它会有一个【**隐式原型**】对象: Foo.\_\_proto\_\_
 >
-> Q: Foo.\__proto__来自哪里?
+> Q: Foo.\_\_proto\_\_来自哪里?
 >
 > A: 既然是对象，就相当于你`new Function()`
 >
@@ -1547,9 +1592,127 @@ function Foo() {}
 >
 > Q: `Function.prototype`又来自哪里?
 >
-> A: 其实就是JS系统内部在创建Function的时候， 给`Function.prototype = {constructor:Function}`
-
-
+> A: 其实就是 JS 系统内部在创建 Function 的时候， 给`Function.prototype = {constructor:Function}`
 
 个人感觉记忆到上面就够了。所谓的原型链，我也是搞懂了。但暂时不在这里总结，等所有课程结束之后进行总结。
 
+## 34 节流
+
+```javascript
+// 关于节流
+function throttle(fn, delay) {
+  // 一开始就是0
+  let pre = 0;
+  return function () {
+    // 记录下现在时间
+    let now = new Date();
+    let context = this;
+    let args = arguments;
+    // 如果当前时间 - pre 是大于的肯定就执行
+    // 因为第一次肯定就是大于的，那么必定是执行的
+    // 所以这一次来思考一下第二次点击
+    if (now - pre > delay) {
+      fn.apply(context, args);
+      pre = now;
+    }
+  };
+}
+
+function test() {
+  console.log('test');
+}
+
+console.log(throttle(test, 1000));
+```
+
+- 目前时间 9 点，第 1 次 0 秒（9:00）点击，间隔时间如果是 1 小时。
+- 因为第一次 `now - pre > delay`是肯定成立的，所以第一次**必定执行**
+- 目前时间 9 点 30，进行第 2 次点击。但是由于`now - pre > delay`不成立，才 30 分钟。取消。
+- 目前时间 9 点 50，进行第 3 次点击。但是由于`now - pre > delay`不成立，才 50 分钟。取消。
+- 目前时间 10 点 10，进行第 4 次点击。这个时候`now - pre > delay`成立了，所以开始执行！并且 pre 已经变成了 10 点 10 分了。
+- 这个时候是 10 点 30，进行第 5 次点击。这个时候 `now - pre > delay`不成立。所以按兵不动！
+
+重点就在于记录下每次执行的时间间隔！！
+
+## 35 防抖
+
+![image-20220510135729795](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220510135729795.png)
+
+## 36 使用闭包的一些东西
+
+闭包的话看了很多老师讲的了，现在把自己的想法说一下吧。
+
+闭包的话就是外面的变量可以访问到你函数内部的变量。这里就有几个重点
+
+那就是
+
+- 函数 → 如果不存在函数 那么请不要讨论闭包
+- 变量 → 作用域（说到变量就有作用域的问题了）
+- 立即执行函数问题 → 因为立即执行相当于就是一个函数
+
+搞懂以上的话其实就很难了。
+
+```javascript
+// ❌ 怎么可能访问到到呢
+function foo() {
+  var a = 1000;
+}
+console.log(a);
+```
+
+那我就想访问的到怎么办呢？
+
+```javascript
+// ✅ 使用闭包就可以在内部访问到a
+function foo() {
+  var a = 1000;
+  return function () {
+    console.log(a);
+  };
+}
+var bar = foo();
+console.log(bar());
+```
+
+其中昨天有一个老师讲的我感觉我还蛮好理解的
+
+- 只要在执行一个函数的时候
+- 另一个函数被定义了 那么就会形成闭包
+- 单纯的函数嵌套调用并不是闭包！
+
+```javascript
+// ❌ 单纯的函数嵌套调用并不是闭包！
+function foo() {
+  bar();
+}
+function bar() {
+  console.log('bar');
+}
+foo();
+```
+
+## 37 作用域的一些问题
+
+因为 JavaScript 的历史原因，作用域一般都会有污染问题。
+
+```javascript
+// before
+(function () {
+  var id = '111';
+})();
+
+console.log(id); // ❌拿不到的
+
+// after
+// 通过立即执行函数执行之后拿到id
+var foo = (function () {
+  var id = '222';
+  var age = 30;
+  return {
+    id,
+    age,
+  };
+})();
+
+console.log(foo.age); // ✅ 可以拿到
+```

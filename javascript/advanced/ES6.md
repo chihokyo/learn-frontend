@@ -413,7 +413,7 @@ bar(); // 同理 ❌不可以！
 在 ES5 以前是没有块级作用域的，只有俩作用域。
 
 - 全局作用域
-- 块级作用域
+- 函数作用域
 
 ```javascript
 function foo() {
@@ -607,6 +607,22 @@ for (let item of arr) {
   console.log(item);
 }
 ```
+
+![image-20220510153237550](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220510153237550.png)
+
+## 作用域链条查找
+
+就是一个函数在当前的块级作用域找不到可以用的变量时，会顺着作用域链条向上查找，直到找到。
+
+- 只能从内到外
+- 不能从外到内
+- 因为作用域是根据在哪里写的，所以说`first()`和`second()`这俩函数由于是同级的，没办法互相访问
+
+![image-20220510154418658](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220510154418658.png)
+
+那么接下来这个函数调用其实也是可以看得懂了
+
+![image-20220510155115734](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220510155115734.png)
 
 ## 模板字符串&标签模板字符串
 
@@ -2780,3 +2796,17 @@ foo(); // abc
 ![image-20220502014811815](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220502014811815.png)
 
 上面红框圈错了，应该是`foo()` 整体的 reject
+
+关于执行顺序的话，也是一样。
+
+![image-20220504225457813](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220504225457813.png)
+
+## 事件循环
+
+为什么会有事件循环呢 ？
+
+因为 js 是单线程的 → 导致一些耗时的任务会有阻塞 → 用事件循环把一些耗时的任务单独处理 → 处理好了再把内容返回到主线程
+
+- JS 线程
+- 其他线程（WebAPI 什么的 click 事件，timer 等等都是 WebAPI）
+- 事件队列（微任务+宏任务）
