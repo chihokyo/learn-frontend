@@ -755,6 +755,8 @@ rest parameter → 首先这个`...`不是前面说的展开运算符，是**前
 
 ※而且必须放在最后
 
+这个是为了代替*arguments*之后出现的
+
 ```javascript
 function foo(x, y, ...args) {
   console.log(args);

@@ -2,13 +2,13 @@
 
 ## 1 作用域提升问题
 
-首先要知道这个 ES 规范的说法问题，本质上没有变化，只是在说法上可能会有些许变化，但是意思是基本上差不多的。
+什么是作用域，就是定义了变量的访问范围。
 
-JS 在执行的时候，首先全局会有一个 GO 的作用域。
+- 全局作用域
+- 函数作用域
+- 块状作用域
 
-这个需要一些图来辅助理解。明天整理。
-
-直接看#3 就行
+![image-20220519202001259](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519202001259.png)
 
 ## 2 代码在内存的执行
 
@@ -21,6 +21,76 @@ JS 在执行的时候，首先全局会有一个 GO 的作用域。
 - 不用销毁释放
 
 ## 3 具体函数的执行
+
+Execution Context Stack 执行上下文调用栈 【保证 js 代码按照一定顺序执行】
+
+Global Execution Context 全局执行上下文 【全局代码整体要执行 就要有上下文】
+
+Functional Execution Context 函数执行上下文 【和全局代码一样 同理】
+
+Activation Object AO AO 中包含形参、arguments、函数定义和指向函数对象、定义的变量
+
+### 代码段 1 无函数
+
+> 引擎会在执行代码之前，会在堆内存中创建一个全局对象:Global Object(GO)
+>
+> → 该对象 所有的作用域(scope)都可以访问
+>
+> → 里面会包含 Date、Array、String、Number、setTimeout、setInterval 等等
+>
+> → 其中还有一个 window 属性指向自己
+
+![image-20220519160333160](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519160333160.png)
+
+> 什么是作用域提升呢？
+>
+> 其实就是上面的在**解析阶段**，代码还没执行的时候。你可以看到 GO 里面已经有当前全局所有的变量初始化了。虽然都是 undefined 的吧。重要的事情说三遍！解析阶段解析阶段解析阶段！！！
+>
+> 所以这就解释了下面的代码
+
+```javascript
+var name = 'chin';
+console.log(foo); // 虽然还没声明 却有了。这就是作用域提升
+var foo = 1;
+```
+
+顺便 GO 也是可以确认的 在 `console.log(window)` 就可以找到。
+
+### 代码段 2 有函数
+
+下面一段代码是怎么执行的呢？
+
+这里先引入一个定义 Functional Execution Context 函数执行上下文 ，FEC 包括
+
+- **A**ctivation **O**bject 对象（包形参、arguments、函数定义和指向函数对象、定义的变量）
+- **S**cope **C**hain 作用域链 （自身 AO + parentScope 父级作用域，如果父级没有，就继续沿着上一层继续，直到找到为止，没找到就是未定义错误 ）
+- this 指向（这个是运行才知道的，这个可以先无视掉）
+
+```javascript
+// 2️⃣ 代码的执行过程（有函数）
+var id = 'chin';
+
+foo(123);
+function foo(num) {
+  console.log(m);
+  var m = 10;
+  var n = 20;
+
+  console.log(id);
+}
+
+console.log(aa);
+```
+
+- 编译阶段
+
+  ![image-20220519171647105](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519171647105.png)
+
+下面开始执行，执行阶段有点复杂。直接也写了编译。
+
+![image-20220519173657455](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519173657455.png)
+
+### 代码段 3 有函数（嵌套 1）
 
 下面一段代码的奇幻旅程（执行过程）。
 
@@ -40,27 +110,95 @@ bar(); // hello global
 
 总体说 1 就是编译阶段生成的，其他都是陆续生成的。
 
-先说几个名词
+编译阶段 → 又叫词法解析，词法解析的时候确定了父级作用域。
 
-> Execution Context Stack 执行上下文调用栈
->
-> Global Execution Context 全局执行上下文
->
-> Functional Execution Context 函数执行上下文
->
-> Activation Object AO AO 中包含形参、arguments、函数定义和指向函数对象、定义的变量
+那么什么是词法解析，其实我感觉这个定义就是和运行相对的，**词法解析的意思就是一个函数的变量跟在哪里定义有关。** 和运行无关的。又不是 this！
 
 ![image-20220326232628199](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220326232628199.png)
 
 ## 4 闭包函数又是什么呢？
 
+这里在经过我又看了几个视频之后，我对闭包又有了新的认识。首先你要知道闭包的含义就要知道 JavaScript 里面函数的执行顺序，作用域，作用域链这些内容。知道这些内容你才能懂得。
+
+- 闭包一定跟函数有关（没有函数就没有闭包）
+- 闭包是基于变量作用域无法从外访问到内的变量的特性决定，你只能通过**函数**访问！无法直接访问变量！
+- 闭包产生跟**函数**出生地有关。
+
+```javascript
+let f; // 虽然f之前就声明了，但是你没【诞生】
+const g = function () {
+  const a = 23;
+  // f函数的出声就伴随着他一系列的环境，此时就是a
+  // 因为f这个函数跟a这个变量在a是函数就绑定了
+  f = function () {
+    console.log(a * 2);
+  };
+};
+
+g(); // g执行完之后所有玩意儿应该消失才对？
+f(); // 利用了闭包，你才能从外到内访问到一个变量，也就是a。那通过什么访问呢？诞生一个新函数f
+```
+
+如果实在不懂，可以问自己几个问题
+
+- 我如何从外部（全局）拿到内部的一个变量 a？※ 按照常理说 ⚠️ 从外不能到内的！
+- `g()`函数都执行完了，怎么后面的`f()`还能访问到变量 a？？？
+- 为什么 f 明明提前就声明了，但是里面还能绑定变量 a 形成一个闭包？
+
+这里同时在给一段代码，证明了闭包永远不会断连他的出生地，即使已经重生。
+
+```javascript
+let f;
+const g = function () {
+  const a = 23;
+  // 因为f这个函数跟a这个变量在a是函数就绑定了
+  f = function () {
+    console.log(a * 2); // 46
+  };
+};
+
+const h = function () {
+  const b = 888;
+  // 永远跟自己出生地有关，即使被重新赋值了
+  // 也依然跟b有关联
+  // 🆕 重生了 重新赋值
+  f = function () {
+    console.log(b * 2);
+  };
+};
+
+g();
+f();
+console.dir(f);
+
+h();
+f(); // 1776
+console.dir(f);
+```
+
 ![image-20220327231220222](/Users/chin/Library/Application Support/typora-user-images/image-20220327231220222.png)
 
 我说一下吧，因为这也涉及到回调函数的问题。
 
+> **所有的回调函数都会产生闭包，因为回调函数每一次都是在某个函数里面诞生的！！！**
+
 回调函数其实就是用的闭包来实现访问内部的数据的。
 
 回调函数传入的参数是函数 → 函数打入内部拿你的财产（这就是闭包的作用） → 你拿到了
+
+这里有一个例子你给解释一下，为什么 header 的 dom 无需重新获取?
+
+![image-20220519150756550](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519150756550.png)
+
+下面直接写几个闭包吧。
+
+其实下面这就是一个函数柯里化，但也会产生闭包。函数柯里化必然产生闭包！！
+
+![image-20220519231357886](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519231357886.png)
+
+其实参数也可以是一个函数的。
+
+![image-20220519232208136](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519232208136.png)
 
 ## 5 什么是闭包的内存泄漏？
 
