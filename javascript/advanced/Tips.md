@@ -10,6 +10,20 @@
 
 ![image-20220519202001259](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519202001259.png)
 
+其实这个作用域提升的问题怎么说呢？
+
+这里有 MDN 关于这段问题的解释 [Hoisting：变量提升](https://developer.mozilla.org/en-US/docs/Glossary/Hoisting)
+
+```javascript
+// 函数是可以被变量提升的
+// 没定义就提前调用？瓦特？我们JavaScript当然可以！🤪
+catName('Tiger');
+
+function catName(name) {
+  console.log("My cat's name is " + name);
+}
+```
+
 ## 2 代码在内存的执行
 
 加载到内存 → CPU 执行 → 根据 CPU 可能会在开辟空间
@@ -83,6 +97,8 @@ console.log(aa);
 ```
 
 - 编译阶段
+
+  这里函数的 AO 也依然是在编译阶段的，只是是在`foo()`执行之后，此时一旦执行就生成了一个 FEC 押入到 stack 里面，然后进行编译创建 AO，此时 `foo()`还没有执行。
 
   ![image-20220519171647105](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519171647105.png)
 
@@ -199,6 +215,123 @@ console.dir(f);
 其实参数也可以是一个函数的。
 
 ![image-20220519232208136](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519232208136.png)
+
+那么闭包在内存中是如何表现的呢？
+
+### 闭包内存执行顺序
+
+```javascript
+function foo() {
+  var id = 100;
+  return function bar() {
+    console.log(id);
+  };
+}
+
+var newBar = foo(); // ← 下面的图到这里截止
+newBar();
+```
+
+![image-20220520001419295](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220520001419295.png)
+
+接下来再看最后一行代码的执行，发现是运行了`newBar()`
+
+```javascript
+function foo() {
+  var id = 100;
+  return function bar() {
+    console.log(id);
+  };
+}
+
+var newBar = foo();
+newBar(); // ← 开始执行这里
+```
+
+下面这幅图是`newBar()`之后的执行情况
+
+![image-20220520002908688](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220520002908688.png)
+
+在这里补充一些小问题。函数嵌套就一定有闭包吗？
+
+```javascript
+// 这里可以很明显的看到确实是【函数嵌套】
+// 但是你执行之后能拿到n吗？
+// 如果按照函数嵌套就会产生闭包的理论 n 就能拿到
+function foo(fn) {
+  var n = 0;
+  fn(); // 这里只是调用，fn这个函数的诞生并非是因为foo的执行！！
+}
+
+function bar() {
+  console.log(n);
+}
+
+foo(bar);
+```
+
+### 一些闭包的案例
+
+```javascript
+// 一段代码只能执行一次
+function once(fn) {
+  let done = false;
+  return function () {
+    if (!done) {
+      done = true;
+      return fn.apply(this, arguments);
+    }
+  };
+}
+let pay = once(function (money) {
+  console.log(`${money} RMB`);
+});
+
+pay(2);
+pay(3); // 这一次不会被执行
+```
+
+### 闭包经常和立即执行函数一起来搞插件
+
+为什么呢，因为以前是没有块级作用域。只有函数作用域，都写在立即函数里面可以保证**不会污染全局变量**
+
+```javascript
+// 创建一个立即执行的匿名函数
+// 该函数立即之后返回一个对象，return包含你要暴露的属性
+// 如下代码如果不使用立即执行函数，就会多一个属性i
+// 如果有了属性i，我们就能调用counter.i改变i的值
+// ↑ 这里利用了一定的闭包
+// 对我们来说这种不确定的因素越少越好
+
+var counter = (function () {
+  var i = 0;
+  return {
+    get: function () {
+      return i;
+    },
+    set: function (val) {
+      i = val;
+    },
+    increment: function () {
+      return ++i;
+    },
+  };
+})();
+
+// counter其实是一个对象
+
+counter.get();
+counter.set(3);
+counter.increment();
+counter.increment();
+
+counter.i; // undefined i并不是counter的属性
+i; // ReferenceError: i is not defined (函数内部的是局部变量)
+```
+
+### 闭包和柯里化也有渊源
+
+因为柯里化
 
 ## 5 什么是闭包的内存泄漏？
 
@@ -620,6 +753,99 @@ console.log(obj.data);
 ```
 
 ## 14 自己实现一个 call/apply/bind
+
+首先在自己实现以前先要理解一下什么是这三个的用法。
+
+这 3 个其实刚开始学习的时候肯定会懵逼，但是现在我先说一下`call()` ，只要解决了这个就差不多解决了其他 2 个。
+
+首先要明白几点，就是我们的 js 和 java 这些语言不一样，没有私有属性，谁都能访问。同时刚开始也没有为面向对象触发，导致类的继承等等比较难。
+
+### call() 基本定义
+
+[MDN:Function.prototype.call()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Function/call)
+
+从上面可以看出来这是一个函数的方法，什么意思的，只有函数才能有的方法。
+
+```javascript
+'hello'.call(); // ❌
+true.call(); // ❌
+111.call(); // ❌
+```
+
+那么基本上就可以解释了。只有前面是一个函数才可以调用`call()`方法
+
+- 参数是什么呢？俩参数
+  - 参数 1 this 指向 → 严格模式下 undefined 和 null 会被转成全局对象
+  - 参数 2 ...参数列表。后面都是参数
+- 返回值
+  - 使用调用者提供的 `this` 值和参数调用该函数的返回值。若该方法没有返回值，则返回 `undefined`。
+  - ↑ 意思就是全看调用者返回啥
+
+### call() 作用
+
+- 直接调用函数
+
+```java
+function foo() {
+  console.log('hello');
+}
+
+foo.call(); // console.log('hello');
+// 这里虽然我没写foo()，但就是调用了
+```
+
+- 改变 this 指向
+
+![image-20220520140213875](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220520140213875.png)
+
+这里还有一个改变 this 指向的方法
+
+```javascript
+// 假如在一个点击事件函数中有一个内部函数 func，当点击事件被触发时，就会出现如下情况：
+// before
+document.getElementById('divBox').onclick = function () {
+  console.log(this.id); // divBox
+  var func = function () {
+    console.log(this.id); // undefined，这里的 this 指向了 window
+  };
+  func(); // 自调用 指向window
+};
+
+// after
+document.getElementById('divBox').onclick = function () {
+  console.log(this.id); // divBox
+  var func = function () {
+    console.log(this.id); // divBox
+  };
+  func.call(this); // 改变方向 这里的this是divbox
+};
+```
+
+- 借用人家方法
+
+比如，aruguments 这个其实是一个类数组。因为不是数组，所以没有 push 的方法。但是我就想用 push 的方法怎么办。于是就借用一下`Array.prototype.push()`的 push 方法
+
+```javascript
+Array.prototype.push.call(类数组);
+Array.prototype.push.call(arguments);
+```
+
+- 实现继承
+
+```javascript
+function Product(name, price) {
+  this.name = name;
+  this.price = price;
+}
+
+function Food(name, price) {
+  Product.call(this, name, price);
+  this.category = 'food';
+}
+
+// 你Food根本就没有这个初始化操作，但是借用了Product的操作 相当于调用了父类（此处是Product）的构造函数
+console.log(new Food('cheese', 5).name);
+```
 
 要实现这个，就要给所有的函数都实现一个方法。用的就是所有函数的母亲`Function` 通过原型链来实现
 
