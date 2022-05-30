@@ -4,7 +4,7 @@
 
 命令式编码 → 让 dom 干嘛你干嘛 其实比如说获取 dom，操作 dom 这种。就是说你通过数据来操纵视图。比如 user 是 true，你就是显示已经登录页面的个人资料。然后 JavaScript 自己就会重新通过数据渲染页面。
 
-**声明式代码** → 我告诉你页面应该是什么样子的，然后 react 帮你全干了。
+**声明式代码** → 我告诉你页面应该是什么样子的，然后 react 帮你全干了。 **是结果导向的。**
 
 JS 和 JQ 那种原生操作 DOM 会浪费大量资源，因为每一次都是更新都是重新渲染进行 repaint，然后 refloat，recalculte the layout。change dom is really expensive operation
 
@@ -30,6 +30,23 @@ ReactDOM.render(VDOM, document.getElementById('test'));
 这里提到了虚拟 DOM，那么虚拟 DOM 是怎么来的。
 
 #### ① 生成虚拟 DOM `React.createElement()`
+
+这是最基础的方法，通过``()`生成的是一个虚拟 DOM 对象。
+
+```javascript
+const button = React.createElement(
+  'button',
+  {
+    type: 'button',
+    className: 'hello',
+    onClick: () => {
+      alert('ok');
+    },
+  },
+  'click me!!'
+);
+// 👇🏻 实际在网页生成的就是一个div元素
+```
 
 ```jsx
 // 因为无需用jsx的话，不需要babel了
@@ -122,11 +139,20 @@ bable 在 react 主要作用其实就是 2 个。
 ```jsx
 ReactDOM.render(VDOM, document.getElementById('test'));
 ReactDOM.render(VDOM2, document.getElementById('test'));
+// ⚠️ 以上写了俩个虚拟dom，但其实后面的会覆盖掉前面的。
+// 重复调用render(),会进行diff比较，确保只修改发生变化的元素。
+// 在React虚拟dom一旦创建就无法修改，只能通过创建新的。只会对第二个DOM进行替换掉，重新渲染。
+// ❓ 为什么不是在基础上修改，而是整体替换？这样效率能高吗？
+// ✅ React内部会对比有一个diff算法，所以效率会很低。
 ```
 
 ## 2 虚拟 DOM PK 真实 DOM
 
 为什么要用虚拟 DOM？ 因为操作真实的 DOM 是特别没有效率的事情。
+
+- 减少原生 DOM 的 API
+- 解决兼容问题
+- 提升性能（不发生变化的情况下，都不会被 diff 渲染。
 
 其实这也是 react 的特色，就是先通过生成虚拟 DOM，然后在生成真实 DOM，最后渲染。
 
@@ -163,3 +189,27 @@ debugger; // 在这里可以看出真实DOM会有很多不需要的属性很重
 > 1. 本质是 Object 类型的对象（是一般对象`{}` 因为不是数组对象，也不是函数对象）
 > 2. 虚拟 DOM 比较“轻”，真实 DOM 比较“重”，因为虚拟 DOM 是 React 内部在用，无需真实 DOM 上那么多的属性。
 > 3. 虚拟 DOM 最终会被 React 转化为真实 DOM，呈现在页面上。
+
+## 关于 React18
+
+在 18 以前，渲染是这样的。
+
+```jsx
+ReactDOM.render(虚拟的DOM, JS原生获取真实的DOM);
+// 通过render这个函数，把虚拟DOM渲染到真实DOM上
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+但是 18 的时候，采取了新的方式
+
+```jsx
+// 自己先创建 root节点，通过root节点来渲染
+// 就是要插入的位置,从此开始所有的操作都要交给react了。
+const root = ReactDOM.createRoot(document.getElementById('root'));
+// react元素渲染到根元素，真实的root下的内容都会被删除
+// 全部交给了虚拟DOM里
+// 重复调用render(),会进行diff比较，确保只修改发生变化的元素。
+root.render(虚拟DOM);
+```
+
+其实这个意思大概率就是每一次渲染不用总是 `document.getElementById('root');`
