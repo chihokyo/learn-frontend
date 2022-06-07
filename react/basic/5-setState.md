@@ -395,6 +395,45 @@ export default class App extends Component {
 }
 ```
 
+但是，如果你的数据是一个对象，或者是数组，那么就是会被覆盖的！
+
+为什么会被覆盖的问题的话，这个其实是这样的。
+
+```jsx
+constructor(props) {
+  super(props);
+  this.state = {
+    prim: 'prim', // 简单数据
+    user: { msg: 'hello world', name: 'chin' },
+  };
+}
+
+changeText() {
+  this.setState({
+    user: { msg: 'hello react' },
+  });
+}
+// { user: { msg: 'hello react' } }
+// ⚠️ 最后的结果是没有chin的，因为这里Object.assign 本质是浅拷贝
+```
+
+上面的 setState 就想当于这种感觉了。
+
+```js
+const a = {
+  prim: 'prim', // 简单数据
+  user: { msg: 'hello world', name: 'chin' }, // 复杂类型数据
+};
+
+const b = {
+  user: { msg: 'hello react' },
+};
+
+const c = Object.assign({}, a, b);
+console.log(c);
+// { prim: 'prim', user: { msg: 'hello react' } }
+```
+
 ## 7 本身的合并
 
 如果对于同一个数据使用多次`setState()`怎么样。
