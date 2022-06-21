@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>只会继承计算值</title>
+    <style>
+      .box {
+        /* 这里相当于自身的字体的父元素  目前没有也就是浏览器默认字体16px  */
+        font-size: 2em; /*此时32px*/
+      }
+      /* 不写的话就默认继承2em */
+      /* 逻辑上应该是64px */
+      /* 但其实是32px 而不是64 */
+      p {
+        /* 继承过来的fon-size 是32px */
+        font-size: 2em; /*这样写就是64了px*/
+      }
+      p {
+        /* 不写就是32 */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      我是box
+      <p>我是p</p>
+    </div>
+  </body>
+</html>

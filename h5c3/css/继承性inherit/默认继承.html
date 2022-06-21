@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>默认继承</title>
+    <style>
+      /* 如果想要左右的元素字体，难道你要这样一个个指定吗？ */
+      /* h1,
+      p,
+      span,
+      strong {
+        color: aquamarine;
+      } */
+      /* 由于color具有继承性 所以可以下面的元素都可以继承 */
+      .box {
+        color: greenyellow;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h1>我是H1元素</h1>
+      <p>
+        p元素
+        <span>span元素</span>
+        <strong>strong元素</strong>
+      </p>
+      <span>span元素2</span>
+    </div>
+  </body>
+</html>

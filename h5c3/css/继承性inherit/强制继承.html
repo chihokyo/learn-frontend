@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>强制继承</title>
+    <style>
+      .box {
+        border: 2px solid gray;
+      }
+      /* 这里会发现span和p都没有继承border */
+      /* 因为boder本身就不是可以被继承的属性 */
+      /* 但是你可以强制继承*/
+      span {
+        border: inherit;
+      }
+      p {
+        border: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <span>span元素</span>
+      <p>p元素</p>
+    </div>
+  </body>
+</html>
