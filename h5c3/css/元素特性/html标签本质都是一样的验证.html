@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      /* 特性都可以是被改变的 */
+      .block {
+        display: inline;
+        background-color: gold;
+      }
+
+      .inline {
+        display: block;
+        background-color: greenyellow;
+        width: 200px;
+        height: 200px;
+      }
+    </style>
+    <title>html标签本质都是一样的验证</title>
+  </head>
+  <body>
+    <div>
+      <div class="block">我是div1 我竟然可以多个占据一行了</div>
+      <div class="block">我是div2 我竟然可以多个占据一行了</div>
+      <span class="inline">我是span 我独占！还能设置宽高</span>
+      <img src="" alt="" />
+    </div>
+  </body>
+</html>

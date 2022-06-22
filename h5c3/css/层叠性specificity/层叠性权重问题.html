@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>层叠性权重问题</title>
+    <style>
+      /* 这个的权重是 10 + 1 = 11 */
+      .box span {
+        color: brown;
+      }
+      /* 这个的权重是 10 */
+      /* 所以这个即使在后面 也要看权重的 */
+      /* 所以最优解就是先看1权重，在看2先后顺序 */
+      .item {
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box item">
+      <span>span</span>
+    </div>
+  </body>
+</html>

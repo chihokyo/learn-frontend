@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>inline-block有什么特性的验证</title>
+    <style>
+      div {
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+        background-color: gold;
+      }
+
+      span {
+        display: inline-block;
+        background-color: greenyellow;
+        width: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>虽然我是div1，但是我现在可以多个占据一行了！</div>
+    <div>虽然我是div2，而且此时依然可以设置宽高</div>
+    <span>虽然我是span，我可以在不独占一行的情况下设置宽高</span>
+  </body>
+</html>
