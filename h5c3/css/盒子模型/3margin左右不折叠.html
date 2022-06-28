@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>3margin左右不折叠</title>
+    <style>
+      /* 测试上下外边距 */
+      /* 会发现margin上下会有折叠，最后不是60px 而是30px */
+      .box {
+        width: 100px;
+        height: 100px;
+        background-color: gold;
+        margin-bottom: 30px;
+      }
+
+      .container {
+        width: 100px;
+        height: 200px;
+        background-color: greenyellow;
+        margin-top: 30px;
+      }
+
+      /* 测试左右外边距 */
+      /* 由于这个div是块级元素，所以想要左右排列，比如转换成inline-block */
+      /* 左右外边距不会发生折叠 */
+      .box2 {
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+        background-color: bisque;
+        margin-right: 30px;
+      }
+
+      .container2 {
+        display: inline-block;
+        width: 100px;
+        height: 200px;
+        background-color: blueviolet;
+        margin-left: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box"></div>
+    <div class="container"></div>
+    <br />
+    <div class="box2">box2</div>
+    <div class="container2">container2</div>
+  </body>
+</html>

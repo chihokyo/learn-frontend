@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=
+    , initial-scale=1.0"
+    />
+    <title>4-1父子margin上下传递解决1</title>
+    <style>
+      .parent {
+        width: 200px;
+        height: 200px;
+        background-color: gold;
+        /* 由margin变为padding 并且使用border-box 防止大小变化 */
+        padding-top: 30px;
+        box-sizing: border-box;
+      }
+      .child {
+        width: 100px;
+        height: 100px;
+        background-color: yellowgreen;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="parent">
+      <div class="child"></div>
+    </div>
+  </body>
+</html>

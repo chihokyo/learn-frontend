@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>7block水平居中</title>
+    <style>
+      .container {
+        width: 100px;
+        height: 100px;
+        background-color: gold;
+        /* ❌ block级别是不能使用居中 text-align: center;*/
+        /* text-align: center; */
+        /* ✅ 用这个 */
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">container</div>
+  </body>
+</html>

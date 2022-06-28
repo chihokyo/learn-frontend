@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=
+    , initial-scale=1.0"
+    />
+    <title>6inline设置padding上下 生效但不占据空间</title>
+    <style>
+      /*
+      padding 生效 不占据空间
+      border 生效 不占据空间
+      margin 压根不生效
+      */
+      .content {
+        color: black;
+        background-color: gold;
+        /* 不生效的 只是被内容撑开 */
+        width: 300px;
+        height: 300px;
+        /* 左右生效的 上下也是看起来生效的
+        但是上下不占据 如果占据的话，div应该不会贴着才对*/
+        padding: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <span class="content">我是span</span>
+    我在外面了
+    <div>我是div</div>
+  </body>
+</html>

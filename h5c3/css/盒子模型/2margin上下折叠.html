@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2margin上下折叠</title>
+    <style>
+      .parent {
+        width: 200px;
+        height: 200px;
+        background-color: gold;
+        /* 父子都设置了10px 但是最后不是20px 而是10px */
+        margin-top: 10px;
+      }
+      .child {
+        width: 100px;
+        height: 100px;
+        background-color: yellowgreen;
+        /* 父子都设置了10px 但是最后不是20px 而是10px */
+        margin-top: 10px;
+      }
+
+      .mario {
+        width: 100px;
+        height: 100px;
+        background-color: gold;
+        /* 马里奥设置了10px向下 路易设置了10px向上 最后不是20 而是10*/
+        margin-bottom: 10px;
+      }
+      .luigi {
+        width: 100px;
+        height: 100px;
+        background-color: yellowgreen;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>父子元素</h2>
+    <div class="parent">
+      <div class="child">child</div>
+    </div>
+    <h2>兄弟</h2>
+    <div class="mario">mario</div>
+    <div class="luigi">luigi</div>
+  </body>
+</html>

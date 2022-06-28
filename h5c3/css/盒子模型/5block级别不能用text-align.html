@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5block级别不能用text-align</title>
+    <style>
+      .box {
+        width: 500px;
+        height: 500px;
+        background-color: gold;
+        /* 根本没用 因为子元素根本不是inline */
+        text-align: center;
+      }
+
+      .container {
+        /* 这样才可以 */
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+        background-color: greenyellow;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="container">container</div>
+    </div>
+  </body>
+</html>
