@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2.static无法设置left/right/top/bottom</title>
+    <style>
+      .box {
+        display: inline-block;
+        position: static;
+        /* 设置下面根本没用 因为不是定位元素 */
+        left: 0;
+        top: 100px;
+        bottom: 20px;
+        right: 80px;
+      }
+    </style>
+  </head>
+  <body>
+    <div>我是div</div>
+    <img
+    src="https://kansai.weblab.co.jp/blog/wp-content/uploads/2020/08/img_management_img_category-order-and-taxonomy-terms-order.jpg"
+    width=" alt="">
+    <strong>我是strong</strong>
+    <span></span>
+  </body>
+</html>

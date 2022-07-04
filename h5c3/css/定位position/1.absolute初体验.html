@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      strong {
+        /* 脱离标准流 所以strong不再占据空间 */
+        /* 相对于谁呢？相对于最临近祖先+定位元素 */
+        /* 没有最临近的就是视口 和fixed就很像了*/
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <span>我是span</span>
+    <strong>我是strong</strong>
+    <img
+    src="https://kansai.weblab.co.jp/blog/wp-content/uploads/2020/08/img_management_img_category-order-and-taxonomy-terms-order.jpg"
+    width=" alt="">
+  </body>
+</html>
