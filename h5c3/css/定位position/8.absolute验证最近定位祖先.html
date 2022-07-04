@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>8.absolute验证最近定位祖先</title>
+    <style>
+      /* 这个时候会发现虽然祖先是box，但是由于不是定位元素。
+      所以还是会以视口为基准进行设置位置 */
+      .box {
+        height: 600px;
+        width: 600px;
+        background-color: gold;
+      }
+      strong {
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <span>我是span</span>
+      <strong>我是strong</strong>
+      <img
+      src="https://kansai.weblab.co.jp/blog/wp-content/uploads/2020/08/img_management_img_category-order-and-taxonomy-terms-order.jpg"
+      width=" alt="">
+    </div>
+  </body>
+</html>

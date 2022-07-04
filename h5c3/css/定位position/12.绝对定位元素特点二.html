@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>12.绝对定位元素特点2不在给父类汇报宽高</title>
+    <style>
+      .container {
+        background-color: yellowgreen;
+      }
+      /* 这里你会看到strong脱标之后就看不到父类的背景色了 */
+      /* 为什么看不到背景色？因为根本没有撑起来 */
+      .container strong {
+        position: absolute;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <strong>我是strong</strong>
+    </div>
+  </body>
+</html>

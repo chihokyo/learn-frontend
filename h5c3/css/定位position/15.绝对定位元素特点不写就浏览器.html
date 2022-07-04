@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>15.绝对定位元素特点不写就浏览器</title>
+    <style>
+      .container {
+        width: 800px;
+        height: 800px;
+        position: relative;
+        background-color: yellowgreen;
+      }
+      .box {
+        height: 100px;
+        position: absolute;
+        background-color: gold;
+
+        /* 写了宽度的情况下 按照公式 其实浏览器默认会给margin-left:auto */
+        /* 定位参照对象的宽度 = left + right + margin-left + margin-right + 绝对定位元素的实际占用宽度 */
+        width: 100px;
+        left: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box">我是内部的box</div>
+    </div>
+  </body>
+</html>

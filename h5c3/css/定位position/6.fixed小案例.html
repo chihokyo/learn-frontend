@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>6.fixed小案例</title>
+    <style>
+      body {
+        /* 为了让滚动 */
+        height: 2000px;
+      }
+      .box {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
+      }
+
+      .box .item {
+        width: 50px;
+        height: 50px;
+        text-align: center;
+        line-height: 50px; /*设置和height一样 就可以达到居中*/
+        background-color: greenyellow;
+        color: red;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+
+      .box .item:hover {
+        background-color: red;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="item">点赞</div>
+      <div class="item">转发</div>
+      <div class="item">评论</div>
+    </div>
+  </body>
+</html>

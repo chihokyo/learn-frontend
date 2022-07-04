@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>11.绝对定位元素特点1</title>
+    <style>
+      .container {
+        height: 800px;
+        width: 800px;
+        background-color: yellowgreen;
+        position: relative;
+      }
+      .box {
+        height: 600px;
+        width: 600px;
+        background-color: gold;
+
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
+      strong {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        /* 这里strong作为一个行内元素 是没办法设置宽高的 */
+        /* 但是由于你是一个绝对定位元素，就是可以设置宽高 */
+        /* display: inline-block; 所以这个就没必要写的 */
+        width: 200px;
+        height: 30px;
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box">
+        <span>我是span</span>
+        <strong>我是strong</strong>
+        <img
+        src="https://kansai.weblab.co.jp/blog/wp-content/uploads/2020/08/img_management_img_category-order-and-taxonomy-terms-order.jpg"
+        width=" alt="">
+      </div>
+    </div>
+  </body>
+</html>

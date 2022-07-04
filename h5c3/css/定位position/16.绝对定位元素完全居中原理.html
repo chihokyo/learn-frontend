@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>16.绝对定位元素完全居中原理</title>
+    <style>
+      .container {
+        width: 800px;
+        height: 800px;
+        position: relative;
+        background-color: yellowgreen;
+      }
+      .box {
+        position: absolute;
+        background-color: gold;
+
+        /*先给个高度宽度 */
+        width: 100px;
+        height: 100px;
+
+        /* 居中原理在此 */
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        /* 设置上下左右 */
+        margin: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box">我是内部的box</div>
+    </div>
+  </body>
+</html>

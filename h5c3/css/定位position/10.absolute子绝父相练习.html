@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10.absolute子绝父相练习</title>
+    <style>
+      /* 现在有一个新的需求
+        box要相对于 container 在右下角
+        strong 要在左上角
+      */
+      /* 代码最好从外到内 */
+      .container {
+        height: 800px;
+        width: 800px;
+        background-color: yellowgreen;
+        /* 给弄个定位  */
+        position: relative;
+      }
+      .box {
+        height: 600px;
+        width: 600px;
+        background-color: gold;
+
+        /* 右下角 */
+        /* 在这里可以发现并非子绝父相 只要是【最近祖先定位】 */
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
+      strong {
+        /* 左上角 */
+        position: absolute;
+        top: 0;
+        right: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="box">
+        <span>我是span</span>
+        <strong>我是strong</strong>
+        <img
+        src="https://kansai.weblab.co.jp/blog/wp-content/uploads/2020/08/img_management_img_category-order-and-taxonomy-terms-order.jpg"
+        width=" alt="">
+      </div>
+    </div>
+  </body>
+</html>

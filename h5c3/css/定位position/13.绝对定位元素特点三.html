@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>13.脱标元素内部是还是按照标准流的</title>
+    <style>
+      .container {
+        background-color: yellowgreen;
+      }
+      /* 这里你会看到strong脱标之后就看不到父类的背景色了 */
+      /* 为什么看不到背景色？因为根本没有撑起来 */
+      .container strong {
+        position: absolute;
+        height: 200px;
+        width: 200px;
+        background-color: gold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <strong>
+        <!-- 可以发现虽然strong脱标了，但是i和span依旧按照标准流 -->
+        <i>我是i</i>
+        <span>我是span</span>
+      </strong>
+    </div>
+  </body>
+</html>
