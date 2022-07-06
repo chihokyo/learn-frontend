@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>6.float元素和行内inline级也不能重叠</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .box {
+        width: 1000px;
+        height: 400px;
+        background-color: gold;
+      }
+      /* 会发现不会重叠，而是把其他的给挤出去，挤到后面的 */
+      strong {
+        float: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <span>我是span</span>
+      <strong>我是strong</strong>
+      <i>我是i元素</i>
+    </div>
+  </body>
+</html>

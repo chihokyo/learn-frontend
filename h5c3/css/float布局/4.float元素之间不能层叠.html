@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4.float元素之间不能层叠</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      .item1,
+      .item2,
+      .item3 {
+        width: 100px;
+        height: 100px;
+        border: 1px solid;
+        /* 浮动会依次进行浮动，不会覆盖 */
+        /* 如果父元素的宽度撑不过，那么就会被换行 */
+        float: left;
+        background-color: greenyellow;
+      }
+
+      .item4,
+      .item5,
+      .item6 {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        background-color: gold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="item1">1</div>
+    <div class="item2">2</div>
+    <div class="item3">3</div>
+
+    <!-- 对比用 -->
+    <br />
+    <h2>这里会发现456层叠在一起了</h2>
+    <div class="item4">4</div>
+    <div class="item5">5</div>
+    <div class="item6">6</div>
+  </body>
+</html>

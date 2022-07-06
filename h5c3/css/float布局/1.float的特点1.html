@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1.float的特点1</title>
+    <style>
+      .item1,
+      .item2 {
+        background-color: gold;
+      }
+      .item1 {
+        /* 可以发现脱离了标准流 并且不会覆盖掉后面的item2 */
+        /* 这点不同于position:fixed 等绝对元素 会被覆盖掉 */
+        float: left;
+        background-color: yellowgreen;
+      }
+
+      /* 对比用 */
+      .item3,
+      .item4 {
+        background-color: gold;
+      }
+      /* 这里会被浮动 */
+      .item3 {
+        position: absolute;
+      }
+      /* ===========结论=========== */
+      /* 定位的脱标会覆盖，float的脱标不会被覆盖 */
+    </style>
+  </head>
+  <body>
+    <h2>下面是float</h2>
+    <div class="item1">1</div>
+    <div class="item2">2</div>
+
+    <h2>下面是绝对定位元素(absolute/fixed)对比</h2>
+    <!-- 对比用 -->
+    <div class="item3">3</div>
+    <div class="item4">4</div>
+  </body>
+</html>

@@ -615,3 +615,15 @@ left + right + margin-left + margin-right + 绝对定位元素的实际占用宽
 > 块级元素 ->width: 包含块的宽度
 >
 > 绝对定位元素 -> width: 包裹内容
+
+## 7 sticky 粘性定位
+
+其实这个属性就是一个混合体。
+
+相对定位 + 达到阈值 → 变身成为fixed or absolute 相对于视口就是fixed，
+
+必须要有方向的！（必须写top/bottom/left/right)
+
+sticky是相对于最近的滚动祖先包含滚动视口的(the nearest ancestor scroll container’s scrollport )
+
+其实这段意思就是不一定相当于视口，而是滚动视口。谁能滚动，才以谁为参照。

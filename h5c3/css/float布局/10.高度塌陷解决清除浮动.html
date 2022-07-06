@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10.高度塌陷解决清除浮动</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      /* 
+      你会发现这个时候父元素撑不起来
+      因为作为float的所有子元素并没有汇报给父类
+      所有的子元素都是浮动的，那么就全部脱离标准流
+      那么父元素那么就没有高度 相当于压根不存在这也就是【高度塌陷】 
+      */
+      .box {
+        height: 200px;
+        width: 200px;
+        background-color: blue;
+      }
+
+      span {
+        float: left;
+        height: 300px;
+        background-color: gold;
+      }
+      strong {
+        float: left;
+        height: 100px;
+        background-color: yellowgreen;
+      }
+
+      /* 这里看到line直接是在最上面的，因为她没有浮动
+      */
+      .line {
+        background-color: brown;
+        height: 20px;
+        /* 如果想指定她在浮动的下面，那么就clear:left
+        表明他将被转移到float:为left的地方下面 */
+        clear: both;
+      }
+      .random {
+        height: 20px;
+        background-color: aquamarine;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <span>我是span</span>
+      <strong>我是strong</strong>
+      <div class="line">line</div>
+      <!-- 清除浮动之后相当于标准流就在这条线上了，那么接下来就会按照顺序排列了 -->
+      <div class="random">random</div>
+    </div>
+  </body>
+</html>
