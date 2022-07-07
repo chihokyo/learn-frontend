@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2.关于em的单位的继承</title>
+    <style>
+      .box {
+        font-size: 2em; /*28px*/
+      }
+      .demo {
+        /* font-size: 28px; */
+        /*相当于先继承了28px 然后你又在自身了1em，所以结果就是28px*/
+        font-size: 1em;
+        width: 5em; /*实际上是140px*/
+        height: 5em; /*实际上是140px*/
+        background-color: gold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="demo">我是demo</div>
+    </div>
+  </body>
+</html>

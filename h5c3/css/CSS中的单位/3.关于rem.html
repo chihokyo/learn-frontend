@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3.关于rem</title>
+    <style>
+      /* 都给转换成10px 这样便于rem计算 便于做移动端适配 */
+      html {
+        font-size: 62.5%; /*相当于这里是10px*/
+      }
+      .box {
+        width: 20rem; /*相当于这里是 20*10px = 200px*/
+        height: 30rem;
+        background-color: gold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">我是box</div>
+  </body>
+</html>

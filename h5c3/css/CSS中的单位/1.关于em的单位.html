@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1.关于em的单位</title>
+    <style>
+      .box {
+        font-size: 1em;
+      }
+      .demo {
+        /* 其实这里比较倾向于，demo是从box那里继承到了1em也就是计算后的16px*/
+        /* font-size:16px 这里其实先继承了*/
+        /* 但是你自己相当于又覆盖了 */
+        font-size: 20px;
+        width: 5em; /*实际上是100px*/
+        height: 5em; /*实际上是100px*/
+        background-color: gold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="demo">我是demo</div>
+    </div>
+  </body>
+</html>
