@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>5.使用overflow解决</title>
+    <style>
+      .box {
+        background-color: gold;
+        /* 这里可以解决！！ */
+        /* 难道形成了一个新的BFC？ */
+        /* 其实不是的！ */
+        /* BFC解决这个问题需要
+        需要height是auto。不设置默认就是auto
+        当一个bfc的告诉是auto的时候
+        1 当只有inline-level的时候，是行盒高度+底部距离
+        2 当有block的时候，margin包含在内算高度
+        3 如果有绝对定位(absolute/fixed)元素 会被忽略 所以才产生了告诉塌陷
+        4 如果有浮动元素，那么会增加高度以包括浮动元素的下边缘
+        */
+        overflow: auto;
+      }
+      .item {
+        float: left;
+        height: 100px;
+        width: 100px;
+        background-color: purple;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="item item1">item1</div>
+      <div class="item item2">item2</div>
+      <div class="item item3">item3</div>
+    </div>
+  </body>
+</html>

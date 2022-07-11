@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1.BFC解决折叠问题</title>
+    <style>
+      .item1 {
+        width: 100px;
+        height: 100px;
+        background-color: gold;
+        /* 这里会被折叠 */
+        margin-bottom: 50px;
+      }
+      .item2 {
+        width: 100px;
+        height: 100px;
+        background-color: yellowgreen;
+        /* 这里会被折叠 */
+        margin-top: 50px;
+      }
+
+      .item3 {
+        width: 100px;
+        height: 100px;
+        background-color: brown;
+        margin-bottom: 50px;
+      }
+      .item4 {
+        width: 100px;
+        height: 100px;
+        background-color: yellow;
+        margin-top: 50px;
+      }
+
+      /* 形成一个新的BFC */
+      .container {
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>before</h1>
+    <div class="box1">
+      <div class="item1">item1</div>
+      <div class="item2">item2</div>
+    </div>
+
+    <h1>after</h1>
+    <div class="box2">
+      <!-- 这样就造成了item3的BFC是container -->
+      <div class="container">
+        <div class="item3">item3</div>
+      </div>
+      <!-- 这样就造成了item4的BFC是box2 -->
+      <!-- 两个不是一个bfc那就不可能折叠 -->
+      <div class="item4">item4</div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>4.使用clearfix解决float塌陷</title>
+    <style>
+      .box {
+        background-color: gold;
+      }
+      .item {
+        float: left;
+        height: 100px;
+        width: 100px;
+        background-color: purple;
+      }
+
+      /* 解决方案 */
+      .clear_fix::after {
+        content: '';
+        display: block;
+        clear: both;
+        height: 0;
+        visibility: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box clear_fix">
+      <div class="item item1">item1</div>
+      <div class="item item2">item2</div>
+      <div class="item item3">item3</div>
+    </div>
+  </body>
+</html>
