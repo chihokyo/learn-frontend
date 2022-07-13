@@ -93,3 +93,8 @@ backface-visibility: hidden;
 /* 在动画被延迟，开始之前适用于0%的状态 也就是消失的状态*/
 animation-fill-mode: backwards;
 ```
+
+### 1-9 一些微调（rem+BEM）
+
+- 为了适配更多的响应式，把 px 统一转换成了 rem
+- 为了让 html 看起来更有层次，使用了 Block Element Modifier 风格记录。
