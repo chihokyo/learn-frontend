@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>1.block高度由内容撑起来</title>
+    <style>
+      .box {
+        background-color: gold;
+      }
+      /* 其实这里用的是行盒的概念 line-box */
+      .small {
+        display: inline-block; /* 只有这样才能设置宽高 */
+        height: 100px;
+        width: 100px;
+        background-color: yellowgreen;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      Lorem ipsum dolor sit amet, <span class="small"></span>consectetur
+      adipisicing elit. Perspiciatis dicta voluptatibus debitis quo odit beatae
+      nemo quos aliquam vitae culpa iste perferendis, ullam possimus voluptatum,
+      corporis odio repellat quis. Impedit!
+    </div>
+  </body>
+</html>

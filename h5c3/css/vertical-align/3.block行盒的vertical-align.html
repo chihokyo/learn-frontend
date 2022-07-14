@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3.block行盒l的vertical-align</title>
+    <style>
+      /* 行盒会把所有东西给包裹进来 所以img和span都包裹了 */
+      /* ❓那么会怎么对齐的？ */
+      /* 答案就是通过 vertical-align */
+      /* vertical-align 1个line-box内部的inline-box的垂直排列方式 */
+      .box {
+        background-color: gold;
+      }
+      /* 会发现这里有缝隙 */
+      .box img {
+        width: 200px;
+      }
+      /* 会发现这里有缝隙 */
+      .small {
+        display: inline-block;
+        height: 400px;
+        width: 100px;
+        background-color: brown;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      Lorem ipsum dolor sit amet consectetur
+      <img src="https://pbs.twimg.com/media/EsBtOH2W4AYnT7p.png" alt="" />
+      <span class="small"></span>
+    </div>
+  </body>
+</html>
