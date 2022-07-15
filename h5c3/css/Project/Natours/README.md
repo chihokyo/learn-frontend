@@ -98,3 +98,80 @@ animation-fill-mode: backwards;
 
 - 为了适配更多的响应式，把 px 统一转换成了 rem
 - 为了让 html 看起来更有层次，使用了 Block Element Modifier 风格记录。
+
+## 2 scss
+
+从这里开始都使用scss的语法来进行书写css。
+
+所以先安装一下
+
+```bash
+npm install node-sass -D # 只有开发才使用
+```
+
+### 2-1 使用scss修改变量+嵌套
+
+全部颜色给变量化
+
+```scss
+$color-primary: #55c57a;
+$color-primary-light: #7ed56f;
+$color-primary-dark: #28b485;
+
+$color-grey-dark: #777;
+$color-white: #fff;
+$color-black: #000;
+```
+
+嵌套大概预览
+
+before
+
+```scss
+.heading-primary {
+  ...
+}
+.heading-primary--main {
+  ...
+}
+.heading-primary--sub {
+  ...
+}
+```
+
+after
+
+```scss
+.heading-primary {
+  ...
+
+  &--main {
+    ...
+  }
+  &--sub {
+    ...
+  }
+}
+```
+
+而且还可以重复嵌套一下
+
+```scss
+.btn {
+  &:link,
+  &:visited {
+    ...
+  }
+  &:hover {
+    ...
+    /*这里替代的就是 .btn.hover 上面.btn的也给嵌套的代替了 */
+    &::after {
+     ...
+    }
+  }
+  &:active {
+    ...
+  }
+}  
+```
+
