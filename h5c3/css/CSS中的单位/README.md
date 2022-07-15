@@ -1,10 +1,18 @@
 # 单位 unit
 
+> ✅ 在学之前起码要明白一个前提就是无论是什么单位，在浏览器显示的时候**最终都会换算成px**
+
+
+
 在学习 css 的时候，最常用的长度单位就是 px（pixel），这个表示 1 个像素。也是在写 css 的时候最常用的。
 
 但其实除了 px 之外还有很多单位。👇
 
 ![CSS Units — px, em, cm, vw, in, ex, pt, pc — TutorialBrain](https://i0.wp.com/www.tutorialbrain.com/wp-content/uploads/2019/06/CSS-UNITS.png?fit=474%2C790&ssl=1)
+
+关于单位，在官方文档里面其实有一节说明可以看到。
+
+https://www.w3.org/Style/Examples/007/units.en.html
 
 ## 1 绝对长度单位（Absolute length units)
 
@@ -57,7 +65,7 @@ screen.height; // 逻辑高度
 
 em 相对的是什么？相对的正确官方给的是
 
->
+>在 font-size 中使用是相对于父元素的字体大小，在其他属性中使用是相对于自身的字体大小，如 width
 
 其实就是相对的**自身 font-size 的尺寸**，虽然经常有地方说是相对于父类的 font-size。但其实这个说法也并非完全正确。
 
@@ -186,3 +194,39 @@ viewport height → 视窗高度的 1%
 <div class="box">我是box</div>
 </body>
 ```
+
+## 3 测试
+
+这里有一个小测验，可以检测一下理解的水平。
+
+```html
+<title>5.单位小测验</title>
+    <style>
+      html,
+      body {
+        font-size: 16px;
+        width: 80vw;
+      }
+      header {
+        font-size: 150%; /*父类的计算值也就是 16px * 150% = 24px */
+        padding: 2em; /*em相当于自身的font-size，也就是 24px * 2em = 48px */
+        margin-bottom: 10rem; /*相当于根元素的font-size 也就是 16px *10rem = 160px*/
+        height: 90vh;
+        width: 1000px;
+      }
+
+      header-child {
+        font-size: 3em; /*相对于父类的font-size 此时父类是24px 继承的是计算值 所以答案就是 24px * 3em = 72px*/
+        padding: 10%; /*相当于包含块的width 也就是 1000px + 10% = 100px*/
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 下面就开始连算一下，这些到底是多少 -->
+    <div class="header">
+      <div class="header-child">header-child</div>
+    </div>
+  </body>
+```
+
+这里考察了很多。建议没事就看两眼👁。

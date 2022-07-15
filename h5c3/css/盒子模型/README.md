@@ -87,6 +87,14 @@ padding: 20px, 30px; /*上下就是20px，左右就是30px*/
 padding: 20px, 30px; /*上下就是20px，左右就是30px*/
 ```
 
+最近发现一个小的TIPS，就是关于百分比的原因。padding的百分比%是相对于谁呢？
+
+[MDN：padding](https://developer.mozilla.org/zh-CN/docs/Web/CSS/padding)的说法
+
+> 相对于包含块的width，以百分比值为内边距。
+
+其实就是以包含块的width为基准。
+
 ## 4 border 边框
 
 这个和其他最大的区别，border 是有样式的。有宽度。有颜色。
