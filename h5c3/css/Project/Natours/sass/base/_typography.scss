@@ -1,0 +1,39 @@
+body {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  /* 相当于是16px*1.7 */
+  line-height: 1.7;
+  /* 三个数字越大 越浅 */
+  color: $color-grey-dark;
+  /* padding不会被继承 */
+  padding: 3rem;
+}
+
+.heading-primary {
+  color: $color-white;
+  text-transform: uppercase;
+  /* 抗震动 主要是动画的 这个很少见 */
+  backface-visibility: hidden;
+  /* 为了跟按钮保持距离 */
+  margin-bottom: 6rem;
+
+  &--main {
+    display: block;
+    font-size: 6rem;
+    font-weight: 400;
+    letter-spacing: 3.5rem;
+    /* transform: translate(0); */
+    animation-name: moveInLeft;
+    animation-duration: 1s;
+    animation-timing-function: ease-in;
+    /* animation-iteration-count: 3; 会发生三次 */
+    /* animation-delay: 3s; 这是一个延迟 */
+  }
+  &--sub {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1.75rem;
+    animation: moveInRight 1s ease-out;
+  }
+}

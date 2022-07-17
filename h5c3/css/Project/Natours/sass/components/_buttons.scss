@@ -1,0 +1,63 @@
+.btn {
+  /* 按钮的原始状态 & 按钮按完之后的状态 */
+  &:link,
+  &:visited {
+    display: inline-block;
+    position: relative; /* 这里是为了按钮的遮盖层1-2 */
+    padding: 1.5rem 4rem;
+    text-transform: uppercase;
+    text-decoration: none;
+    border-radius: 10rem;
+    transition: all 0.2s;
+  }
+  /* 悬浮状态 */
+  &:hover {
+    /* hover向上走一点 */
+    transform: translateY(-0.3rem);
+    box-shadow: 0 1rem 2rem rgba($color-black, 0.2);
+    &::after {
+      /* X轴放大1.4倍 Y轴放大1.6倍 */
+      transform: scaleX(1.4) scaleY(1.6);
+      opacity: 0;
+    }
+  }
+  /* 按下去的时候 */
+  &:active {
+    transform: translateY(-0.1rem);
+    box-shadow: 0 0.5rem 1rem rgba($color-black, 0.2);
+  }
+
+  &--white {
+    background-color: $color-white;
+    color: $color-grey-dark;
+    &::after {
+      background-color: $color-white;
+    }
+  }
+
+  /* 这里要做一个变大的小效果 需要用到伪元素 遮盖在前面 */
+  &::after {
+    content: '';
+    /* 设置块级 使得可以使用高度和宽度 */
+    display: inline-block;
+    /* 1-1 这个伪元素相当于就是btn的子元素了，所以这里的高度宽度相当于是btn */
+    height: 100%;
+    width: 100%;
+    /* 1-2 但是走到这里还是不能覆盖 因为位置是不对的 所以需要重置位置 */
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* 1-3 放在后面 */
+    z-index: -1;
+    border-radius: 100px;
+    /* 这个transition过渡动画必须写在初始状态的时候才能似的all都生效 */
+    transition: all 0.4s;
+  }
+
+  &--animated {
+    animation: moveInBottom 0.5s ease-out 0.75s;
+    /* 这个属性难记忆的 规定对象动画时间之外的状态*/
+    /* 在动画被延迟，开始之前适用于0%的状态 也就是消失的状态*/
+    animation-fill-mode: backwards;
+  }
+}

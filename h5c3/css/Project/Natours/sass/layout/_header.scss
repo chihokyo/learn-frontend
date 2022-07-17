@@ -1,0 +1,34 @@
+.header {
+  height: 95vh;
+  background-image: linear-gradient(
+      to right,
+      rgba($color-primary-light, 0.8),
+      rgba($color-primary-dark, 0.8)
+    ),
+    url(../img/hero.jpg);
+  /* 平铺并保持底部不变 */
+  background-size: cover;
+  background-position: top;
+  clip-path: polygon(0 0, 100% 0, 100% 75vh, 0 100%);
+  position: relative;
+
+  &__logo-box {
+    position: absolute;
+    top: 4rem;
+    left: 4rem;
+  }
+  &__logo {
+    height: 3.5rem;
+    /* 不设置width 就是默认的auto */
+  }
+  &__text-box {
+    /* 一个居中方案 */
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    /* 截止到这里会发现有偏移，下面的变形可以相对于自身进行偏移 */
+    transform: translate(-50%, -50%);
+    /* 这里为了下面的按钮写的 */
+    text-align: center;
+  }
+}
