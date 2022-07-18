@@ -13,6 +13,7 @@
 @import 'components/buttons'; // 按钮
 
 /* 页面上共通的部分 比如header/footer */
+@import 'layout/grid'; // float布局
 @import 'layout/header'; // 头部
 
 /* 具体页面 */

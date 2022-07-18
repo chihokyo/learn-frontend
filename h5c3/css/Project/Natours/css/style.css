@@ -1,93 +1,29 @@
 @charset "UTF-8";
-/*
-COLORS:
-
-Light green: #7ed56f
-Medium green: #55c57a
-Dark green: #28b485
-
-*/
+/* 一些常用的函数 */
+/* 基础类 */
 /* 基本会把充值放在*，其实有些老师不建议。说放在html或者:root这样 */
 * *::after *::before {
   margin: 0;
   padding: 0;
   /* 这里从为什么 border-box 变成了强制继承inherit
-     因为首先box-sizing这个属性无法继承
-     所以全局设置成了 可以继承 然后在body里设置 border-box 就达到了全局效果
-     */
+       因为首先box-sizing这个属性无法继承
+       所以全局设置成了 可以继承 然后在body里设置 border-box 就达到了全局效果
+       */
   box-sizing: inherit; }
 
 html {
   /* ❓这里的百分比怎么算的呢？ */
   /* 其实这里打算所有的都统一成rem，为了让所有的子元素都便于计算
-    所以打算给根元素font-size来一个10px 
-    但是这样写死了之后，就无法随着浏览器的大小改变了。浏览器默认的是16px
-    所以这里使用的是 【10px / 浏览器默认大小(16px) = 62.5%】  */
+      所以打算给根元素font-size来一个10px
+      但是这样写死了之后，就无法随着浏览器的大小改变了。浏览器默认的是16px
+      所以这里使用的是 【10px / 浏览器默认大小(16px) = 62.5%】  */
   /* 这样就可以随着浏览器默认值的大小 随意改变网页大小了 */
   font-size: 62.5%; }
 
 /* 这里经常放一些字体 因为字体基本上都有继承性。为什么不放在html？
-  因为你会发现body下面才是内容 这样继承下来才更有意义。 */
+    因为你会发现body下面才是内容 这样继承下来才更有意义。 */
 body {
-  font-family: 'Lato', sans-serif;
-  font-weight: 400;
-  /* 相当于是16px*1.7 */
-  line-height: 1.7;
-  /* 三个数字越大 越浅 */
-  color: #777;
-  /* padding不会被继承 */
-  padding: 3rem;
   box-sizing: border-box; }
-
-.header {
-  height: 95vh;
-  background-image: linear-gradient(to right, rgba(126, 213, 111, 0.8), rgba(40, 180, 133, 0.8)), url(../img/hero.jpg);
-  /* 平铺并保持底部不变 */
-  background-size: cover;
-  background-position: top;
-  clip-path: polygon(0 0, 100% 0, 100% 75vh, 0 100%);
-  position: relative; }
-  .header__logo-box {
-    position: absolute;
-    top: 4rem;
-    left: 4rem; }
-  .header__logo {
-    height: 3.5rem;
-    /* 不设置width 就是默认的auto */ }
-  .header__text-box {
-    /* 一个居中方案 */
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    /* 截止到这里会发现有偏移，下面的变形可以相对于自身进行偏移 */
-    transform: translate(-50%, -50%);
-    /* 这里为了下面的按钮写的 */
-    text-align: center; }
-
-.heading-primary {
-  color: #fff;
-  text-transform: uppercase;
-  /* 抗震动 主要是动画的 这个很少见 */
-  backface-visibility: hidden;
-  /* 为了跟按钮保持距离 */
-  margin-bottom: 6rem; }
-  .heading-primary--main {
-    display: block;
-    font-size: 6rem;
-    font-weight: 400;
-    letter-spacing: 3.5rem;
-    /* transform: translate(0); */
-    animation-name: moveInLeft;
-    animation-duration: 1s;
-    animation-timing-function: ease-in;
-    /* animation-iteration-count: 3; 会发生三次 */
-    /* animation-delay: 3s; 这是一个延迟 */ }
-  .heading-primary--sub {
-    display: block;
-    font-size: 2rem;
-    font-weight: 700;
-    letter-spacing: 1.75rem;
-    animation: moveInRight 1s ease-out; }
 
 @keyframes moveInLeft {
   0% {
@@ -125,6 +61,42 @@ body {
     opacity: 1;
     transform: translate(0); } }
 
+body {
+  font-family: 'Lato', sans-serif;
+  font-weight: 400;
+  /* 相当于是16px*1.7 */
+  line-height: 1.7;
+  /* 三个数字越大 越浅 */
+  color: #777;
+  /* padding不会被继承 */
+  padding: 3rem; }
+
+.heading-primary {
+  color: #fff;
+  text-transform: uppercase;
+  /* 抗震动 主要是动画的 这个很少见 */
+  backface-visibility: hidden;
+  /* 为了跟按钮保持距离 */
+  margin-bottom: 6rem; }
+  .heading-primary--main {
+    display: block;
+    font-size: 6rem;
+    font-weight: 400;
+    letter-spacing: 3.5rem;
+    /* transform: translate(0); */
+    animation-name: moveInLeft;
+    animation-duration: 1s;
+    animation-timing-function: ease-in;
+    /* animation-iteration-count: 3; 会发生三次 */
+    /* animation-delay: 3s; 这是一个延迟 */ }
+  .heading-primary--sub {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1.75rem;
+    animation: moveInRight 1s ease-out; }
+
+/* 组件类的 */
 .btn {
   /* 按钮的原始状态 & 按钮按完之后的状态 */
   /* 悬浮状态 */
@@ -176,3 +148,59 @@ body {
     /* 这个属性难记忆的 规定对象动画时间之外的状态*/
     /* 在动画被延迟，开始之前适用于0%的状态 也就是消失的状态*/
     animation-fill-mode: backwards; }
+
+/* 页面上共通的部分 比如header/footer */
+.row {
+  max-width: 114rem;
+  background-color: #eee;
+  margin: 0 auto; }
+  .row:not(:last-child) {
+    margin-bottom: 8rem; }
+  .row::after {
+    content: '';
+    display: table;
+    clear: both; }
+  .row [class^='col-'] {
+    float: left;
+    background-color: yellowgreen; }
+    .row [class^='col-']:not(:last-child) {
+      margin-right: 6rem; }
+  .row .col-1-of-2 {
+    width: calc((100% - 6rem) / 2); }
+  .row .col-1-of-3 {
+    width: calc((100% - 2 * 6rem) / 3); }
+  .row .col-2-of-3 {
+    width: calc( 2 * ((100% - 2 * 6rem) / 3) + 6rem); }
+  .row .col-1-of-4 {
+    width: calc((100% - 3 * 6rem) / 4); }
+  .row .col-2-of-4 {
+    width: calc( 2 * ((100% - 3 * 6rem) / 4) + 6rem); }
+  .row .col-3-of-4 {
+    width: calc( 3 * ((100% - 3 * 6rem) / 4) + 2 * 6rem); }
+
+.header {
+  height: 95vh;
+  background-image: linear-gradient(to right, rgba(126, 213, 111, 0.8), rgba(40, 180, 133, 0.8)), url(../img/hero.jpg);
+  /* 平铺并保持底部不变 */
+  background-size: cover;
+  background-position: top;
+  clip-path: polygon(0 0, 100% 0, 100% 75vh, 0 100%);
+  position: relative; }
+  .header__logo-box {
+    position: absolute;
+    top: 4rem;
+    left: 4rem; }
+  .header__logo {
+    height: 3.5rem;
+    /* 不设置width 就是默认的auto */ }
+  .header__text-box {
+    /* 一个居中方案 */
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    /* 截止到这里会发现有偏移，下面的变形可以相对于自身进行偏移 */
+    transform: translate(-50%, -50%);
+    /* 这里为了下面的按钮写的 */
+    text-align: center; }
+
+/* 具体页面 */
