@@ -51,6 +51,7 @@ body {
   );
   // 就像剪贴画囍字镂空那样
   -webkit-background-clip: text;
+  background-clip: text;
   // 背景透明才能表现出镂空 和楼上配合
   color: transparent;
   letter-spacing: 0.2rem;

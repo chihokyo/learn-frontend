@@ -5,3 +5,23 @@
   //   有一个95vh-75vh=20vh的差距
   margin-top: -20vh;
 }
+.section-features {
+  padding: 20rem 0;
+  background-image: linear-gradient(
+      to right bottom,
+      rgba($color-primary-light, 0.8),
+      rgba($color-primary-dark, 0.8)
+    ),
+    url(../img/nat-4.jpg);
+  background-size: cover;
+  // 这里为了做出来斜的效果 整体斜了一下
+  // 但是这样里面的子元素也会被倾斜
+  transform: skewY(-7deg);
+  // 为了向上覆盖住白色的部分
+  margin-top: -10rem;
+  // 为了解决的话 ✅
+  // 这里使用 > 是为了选中【直系】的所有子元素
+  & > * {
+    transform: skewY(7deg);
+  }
+}
