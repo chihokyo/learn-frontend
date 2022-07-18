@@ -101,7 +101,7 @@ animation-fill-mode: backwards;
 
 ## 2 scss
 
-从这里开始都使用scss的语法来进行书写css。
+从这里开始都使用 scss 的语法来进行书写 css。
 
 所以先安装一下
 
@@ -109,7 +109,7 @@ animation-fill-mode: backwards;
 npm install node-sass -D # 只有开发才使用
 ```
 
-### 2-1 使用scss修改变量+嵌套
+### 2-1 使用 scss 修改变量+嵌套
 
 全部颜色给变量化
 
@@ -172,6 +172,168 @@ after
   &:active {
     ...
   }
-}  
+}
 ```
 
+### 2-2 组件化分割
+
+为了让 scss 的结构更加清晰，便于写文件。所以采用语义化分工明确的架构。
+
+又叫做 **7-1 Sass Architecture**
+
+那具体是怎么架构的呢？需要文件是这种形式的
+
+```bash
+styles/
+|
+|-- base/                  # 包含整个项目最基本的基础样式
+|   |-- _reset.scss         # 或者_normalize.scss
+|   |-- _typography.scss     # 排版样式（✅比如字体，标题间距）
+|   |-- _base.scss          # 一些通用的html标签的样式，比如<body/>, <a/>
+|   |-- _animations.scss     # 动画之类的
+|   …
+|
+|-- components/             # 基础组件（✅可通用的组件就放入到这里）
+|   |-- _buttons.scss         # 按钮
+|   |-- _search.scss          # 搜索按钮
+|   …
+|
+|-- helpers/                 # ✅ 一些功能类的 比如变量，函数，常用的代码块
+|   |-- _variables.scss       # Sass Variables
+|   |-- _functions.scss       # Sass Functions
+|   |-- _mixins.scss          # Sass Mixins
+|   …
+|
+|-- layouts/                # ✅ 通用的一些头尾 这些每个网页都有的
+|   |-- _header.scss          # Header
+|   |-- _footer.scss          # Footer
+|   |-- _sidebar.scss         # Sidebar
+|   …
+|
+|-- pages/										# ✅ 具体到每个页面自己的样式
+|   |– _admin.scss            # admin页面的特殊样式
+|   |– _login.scss            # login页面的特殊样式
+|   |– _main.scss             # main页面的特殊样式
+|   …
+|
+|– themes/
+|   |– _theme.scss            # 默认主题
+|   …
+|
+|-- vendor/                   # 来自第三方的CSS或Sass文件，比如Bootstrap, jQuery
+|   |-- _hon-dls.min.scss
+|   |-- _loadMask.scss
+|   |-- _react-bootstrap-table.min.css # 当然可以包含css文件
+|   …
+|
+`-- main.scss                 # 主Sass文件放在最外层目录下 只负责导入
+```
+
+_main.scss_ 👇🏻 就是这种感觉
+
+```scss
+/* 一些常用的函数 */
+@import 'abstracts/functions'; // 函数
+@import 'abstracts/mixins'; // 组件
+@import 'abstracts/variables'; // 变量
+
+/* 基础类 */
+@import 'base/base'; // 基础
+@import 'base/animations'; // 动画
+@import 'base/typography'; // 排版
+@import 'base/utilities'; // 实用性
+
+/* 组件类的 */
+@import 'components/buttons'; // 按钮
+@import 'components/composition'; // 图像
+
+/* 页面上共通的部分 比如header/footer */
+@import 'layout/grid'; // float布局
+@import 'layout/header'; // 头部
+
+/* 具体页面 */
+@import 'pages/home';
+```
+
+### 2-3 字体镂空效果
+
+```scss
+.heading-secondary {
+  font-size: 3.5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  // 为了不占据整行 内容撑起
+  display: inline-block;
+  background-image: linear-gradient(
+    to right,
+    $color-primary-light,
+    $color-grey-dark
+  );
+  // 就像剪贴画囍字镂空那样
+  -webkit-background-clip: text;
+  // 背景透明才能表现出镂空 和楼上配合
+  color: transparent;
+  letter-spacing: 0.2rem;
+  transition: all 0.2s;
+  // 一个简单的效果
+  &:hover {
+    transform: skewY(2deg) skewX(15deg) scale(1.1);
+    text-shadow: 0.5rem 1rem 2rem rgba($color-black, 0.2);
+  }
+}
+```
+
+###
+
+重点就是`-webkit-background-clip: text;` + ` color: transparent;` 就能做出字体镂空效果。
+
+### 2-4 排版组件一下
+
+这里每一个标题如果都有一个边距的话，或者是一些居中等等通用性很强的一些代码。可以就直接添加一个元素
+
+_\_utilities.scss_
+
+```scss
+.u-center-text {
+  text-align: center;
+}
+
+.u-margin-bottom-small {
+  margin-bottom: 1.5rem;
+}
+.u-margin-bottom-medium {
+  margin-bottom: 4rem;
+}
+.u-margin-bottom-big {
+  margin-bottom: 8rem;
+}
+```
+
+> 这样可以最大实现代码的复用
+
+### 2-5 结构伪类的操作
+
+**这俩要好好区分**
+
+`:last-child` 最后一个子元素
+
+`:last-of-type` 最后一个同类的子元素
+
+**否定伪类的骚操作**
+
+```scss
+// 除了当前hover的其他都要缩小
+// .composition:hover .composition__photo:not(:hover)
+&:hover &__photo:not(:hover) {
+  transform: scale(0.95);
+}
+```
+
+这里最大的操作就是，在同级的有 2 个 class 的情况下。某个 class 在 hover 状态下，而另一个 class 除了自己都没有 hover 的状态如何定义
+
+`.composition:hover .composition__photo:not(:hover)`
+
+- `.composition:hover` → composition:hover 在已经 hover 的状态下
+- .composition\_\_photo:not(:hover) → 这个 class（.composition\_\_photo）没有 hover 的元素
+
+这里需要好好 🤔 一下。

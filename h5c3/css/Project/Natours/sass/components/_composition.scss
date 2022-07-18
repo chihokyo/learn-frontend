@@ -1,0 +1,39 @@
+.composition {
+  position: relative;
+  &__photo {
+    width: 55%;
+    box-shadow: 0 1.5rem 4rem rgba($color-black, 0.4);
+    border-radius: 2px;
+    position: absolute;
+    // 层叠设置个10，下面是20。保证有一个前后效果
+    z-index: 10;
+    transition: all 0.2s;
+    // 给边框增加间距
+    outline-offset: 2rem;
+    &--p1 {
+      left: 0;
+      top: -2rem;
+    }
+    &--p2 {
+      right: 0;
+      top: 2rem;
+    }
+    &--p3 {
+      left: 20%;
+      top: 10rem;
+    }
+    &:hover {
+      // 增加边框 + 放大 + 阴影 + 层级放最上
+      outline: 1.5rem solid $color-primary;
+      transform: scale(1.05) translateY(-0.5rem);
+      box-shadow: 0 2.5rem 4rem rgba($color-black, 0.5);
+      z-index: 20;
+    }
+  }
+
+  // 除了当前hover的其他都要缩小
+  // .composition:hover .composition__photo:not(:hover)
+  &:hover &__photo:not(:hover) {
+    transform: scale(0.95);
+  }
+}

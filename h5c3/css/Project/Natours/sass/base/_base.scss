@@ -1,5 +1,7 @@
 /* 基本会把充值放在*，其实有些老师不建议。说放在html或者:root这样 */
-* *::after *::before {
+*,
+*::after,
+*::before {
   margin: 0;
   padding: 0;
   /* 这里从为什么 border-box 变成了强制继承inherit

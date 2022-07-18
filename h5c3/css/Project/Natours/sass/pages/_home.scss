@@ -1,0 +1,7 @@
+.section-about {
+  background-color: $color-grey-light-1;
+  padding: 25rem 0;
+  // 关于这里为什么使用上移个20单位窗口 是因为在设置首页
+  //   有一个95vh-75vh=20vh的差距
+  margin-top: -20vh;
+}

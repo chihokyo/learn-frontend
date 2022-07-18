@@ -37,3 +37,43 @@ body {
     animation: moveInRight 1s ease-out;
   }
 }
+
+.heading-secondary {
+  font-size: 3.5rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  // 为了不占据整行 内容撑起
+  display: inline-block;
+  background-image: linear-gradient(
+    to right,
+    $color-primary-light,
+    $color-grey-dark
+  );
+  // 就像剪贴画囍字镂空那样
+  -webkit-background-clip: text;
+  // 背景透明才能表现出镂空 和楼上配合
+  color: transparent;
+  letter-spacing: 0.2rem;
+  transition: all 0.2s;
+  // 一个简单的效果
+  &:hover {
+    transform: skewY(2deg) skewX(15deg) scale(1.1);
+    text-shadow: 0.5rem 1rem 2rem rgba($color-black, 0.2);
+  }
+}
+
+.heading-tertiary {
+  font-size: $default-font-size;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.paragraph {
+  font-size: $default-font-size;
+  // 不是最后一个元素有下边距
+  // 记住是不是最后元素，不是最后一个paragraph的话是
+  // :last-of-type 和这个要区分一下
+  &:not(:last-child) {
+    margin-bottom: 3rem;
+  }
+}
