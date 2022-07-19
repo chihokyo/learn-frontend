@@ -175,13 +175,15 @@ after
 }
 ```
 
-### 2-2 组件化分割
+### 2-2 7-1 组件化分割
 
 为了让 scss 的结构更加清晰，便于写文件。所以采用语义化分工明确的架构。
 
 又叫做 **7-1 Sass Architecture**
 
 那具体是怎么架构的呢？需要文件是这种形式的
+
+[这篇文章写的还不错 Sass 项目结构之 7-1 模式](https://www.cnblogs.com/lantuoxie/p/8682546.html)
 
 ```bash
 styles/
@@ -389,3 +391,275 @@ transform: skewY(-7deg);
 > **交集选择器** 选择器之间**没有任何**的连接符号 div.text → div 标签 class 为 text
 >
 > **并集选择器** 选择器之间利用,连接
+
+## 4 卡片
+
+这一组比较细节比较多。总体代码如下
+
+```scss
+.card {
+  /*=========反转功能============*/
+  // 立体视角
+  perspective: 150rem;
+  position: relative;
+  // 因为子元素都是absolute之后会有高度塌陷
+  // 所以这里必须重新设置了高度
+  height: 52rem;
+
+  &__side {
+    color: #fff;
+    height: 52rem;
+    transition: all 0.8s ease;
+    font-size: 2rem;
+    top: 0;
+    left: 0;
+    // 因为这里absolute之后就只有内容的宽度
+    // 所以要设置100%
+    width: 100%;
+    // 先给2个卡片做出来绝对定位
+    position: absolute;
+    // 为了让后面的直接隐藏，这样不会产生2张卡片重合的现象
+    backface-visibility: hidden;
+    border-radius: 3px;
+    overflow: hidden; /*这里图片会遮盖上面的圆角 所以做了处理*/
+    box-shadow: 0 1.5rem 4rem rgba($color-black, 0.15);
+    &--front {
+      background-color: $color-white;
+    }
+    &--back {
+      // 默认先给反转1-1
+      transform: rotateY(180deg);
+      &-1 {
+        background-image: linear-gradient(
+          to right bottom,
+          $color-secondary-light,
+          $color-secondary-dark
+        );
+      }
+      &-2 {
+        background-image: linear-gradient(
+          to right bottom,
+          $color-primary-light,
+          $color-primary-dark
+        );
+      }
+      &-3 {
+        background-image: linear-gradient(
+          to right bottom,
+          $color-tertiary-light,
+          $color-tertiary-dark
+        );
+      }
+    }
+  }
+  &:hover &__side--front {
+    transform: rotateY(-180deg);
+  }
+  &:hover &__side--back {
+    // 在恢复到原来位置 形成效果
+    transform: rotateY(0deg);
+  }
+
+  /*=========样式============*/
+  &__picture {
+    background-size: cover;
+    height: 25rem;
+    // CSS 属性定义该元素的背景图片，以及背景色如何混合
+    // 相当于把下面的backimage的2个，1个图片，1个渐变融合在一起
+    background-blend-mode: screen;
+    -webkit-clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    // 这里由于设置了clip-path 导致上面设置的overflow hidden失效
+    // 所以在这里需要重新设置圆角
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    &--1 {
+      background-image: linear-gradient(
+          to right bottom,
+          $color-secondary-light,
+          $color-secondary-dark
+        ), url(../img/nat-5.jpg);
+    }
+    &--2 {
+      background-image: linear-gradient(
+          to right bottom,
+          $color-primary-light,
+          $color-primary-dark
+        ), url(../img/nat-6.jpg);
+    }
+    &--3 {
+      background-image: linear-gradient(
+          to right bottom,
+          $color-tertiary-light,
+          $color-tertiary-dark
+        ), url(../img/nat-7.jpg);
+    }
+  }
+  &__heading {
+    // 绝对定位一下
+    position: absolute;
+    top: 12rem;
+    right: 2rem;
+    width: 75%;
+    font-size: 2.8rem;
+    font-weight: 300;
+    text-transform: uppercase;
+    text-align: right;
+    color: $color-white;
+  }
+  &__heading-span {
+    padding: 1rem 1.5rem;
+    // box-decoration-break 属性用来定义当元素跨多行、多列或多页时，元素的片段应如何呈现。
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    &--1 {
+      background-image: linear-gradient(
+        to right bottom,
+        rgba($color-secondary-light, 0.85),
+        rgba($color-secondary-dark, 0.85)
+      );
+    }
+    &--2 {
+      background-image: linear-gradient(
+        to right bottom,
+        rgba($color-primary-light, 0.85),
+        rgba($color-primary-dark, 0.85)
+      );
+    }
+    &--3 {
+      background-image: linear-gradient(
+        to right bottom,
+        rgba($color-tertiary-light, 0.85),
+        rgba($color-tertiary-dark, 0.85)
+      );
+    }
+  }
+
+  &__details {
+    padding: 3rem;
+    color: $color-grey-dark;
+
+    ul {
+      list-style: none;
+      width: 80%;
+      // 居中
+      margin: 0 auto;
+
+      li {
+        text-align: center;
+        font-size: 1.5rem;
+        padding: 1rem;
+
+        &:not(:last-child) {
+          border-bottom: 1px solid $color-grey-light-2;
+        }
+      }
+    }
+  }
+
+  &__cta {
+    // 块状元素居中
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    // 按钮为了适应cta的长度 所以显示成了两行 这里拉伸一下cta长度
+    width: 90%;
+    // 为了居中
+    text-align: center;
+  }
+  &__price-box {
+    color: $color-white;
+    margin-bottom: 0rem;
+  }
+  &__price-only {
+    font-size: 1.4rem;
+    text-transform: uppercase;
+  }
+  &__price-value {
+    font-size: 6rem;
+    font-weight: 100;
+  }
+}
+```
+
+### 4-1 反转功能
+
+为了有一个反转功能这里的思路大概是这样的
+
+- 先写 2 张正反面的卡 用 absolute 定位重叠
+- 预先让一张先反转个 180 度。这样 hover 上去之后在返回 0 度。达到一种反转效果。
+
+```scss
+.card {
+  /*=========反转功能============*/
+  // 立体视角
+  perspective: 150rem;
+  position: relative;
+  // 因为子元素都是absolute之后会有高度塌陷
+  // 所以这里必须重新设置了高度
+  height: 52rem;
+
+  &__side {
+    color: #fff;
+    height: 52rem;
+    transition: all 0.8s ease;
+    font-size: 2rem;
+    top: 0;
+    left: 0;
+    // 因为这里absolute之后就只有内容的宽度
+    // 所以要设置100%
+    width: 100%;
+    // 先给2个卡片做出来绝对定位
+    position: absolute;
+    // 为了让后面的直接隐藏，这样不会产生2张卡片重合的现象
+    backface-visibility: hidden;
+    border-radius: 3px;
+    overflow: hidden; /*这里图片会遮盖上面的圆角 所以做了处理*/
+    box-shadow: 0 1.5rem 4rem rgba($color-black, 0.15);
+    &--front {
+      background-color: $color-white;
+    }
+    &--back {
+      // 默认先给反转1-1
+      transform: rotateY(180deg);
+    }
+  }
+  &:hover &__side--front {
+    transform: rotateY(-180deg);
+  }
+  &:hover &__side--back {
+    // 在恢复到原来位置 形成效果
+    transform: rotateY(0deg);
+  }
+```
+
+新的属性
+
+`perspective: 150rem;`
+
+`backface-visibility: hidden;`
+
+### 4-2 卡片换行文字整体
+
+为了让换行之后不会出现整体那种锯齿，这里用了一个新的属性
+
+`box-decoration-break: clone;`
+
+### 4-3 absolute 高度塌陷
+
+为了解决子元素都设置成了 absolute 导致父元素会没有高度的问题。
+
+这样手动给父元素设置了一个高度。（以前需要子元素撑开的，后来塌陷之后只能手动设置一下。这个和 float 那种高度塌陷可以清除浮动的不一样）
+
+```scss
+.card {
+  /*=========反转功能============*/
+  // 立体视角
+  perspective: 150rem;
+  position: relative;
+  // 因为子元素都是absolute之后会有高度塌陷
+  // 所以这里必须重新设置了高度
+  height: 52rem;
+}
+```

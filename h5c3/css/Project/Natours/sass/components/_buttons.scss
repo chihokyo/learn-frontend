@@ -35,6 +35,14 @@
     }
   }
 
+  &--green {
+    background-color: $color-primary;
+    color: $color-white;
+    &::after {
+      background-color: $color-primary;
+    }
+  }
+
   /* 这里要做一个变大的小效果 需要用到伪元素 遮盖在前面 */
   &::after {
     content: '';
@@ -67,6 +75,7 @@
   &:visited {
     font-size: $default-font-size;
     color: $color-primary;
+    // 这里要变成块级
     display: inline-block;
     text-decoration: none;
     border-bottom: 1px solid $color-primary;
