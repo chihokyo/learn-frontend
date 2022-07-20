@@ -1,0 +1,77 @@
+.story {
+  width: 75%;
+  margin: 0 auto;
+  box-shadow: 0 3rem 6rem rgba($color-black, 0.1);
+  background-color: rgba($color-white, 0.6);
+  border-radius: 3px;
+  padding: 6rem;
+  // 如果不加这个左内边距 就会发现下面的transform-3rem会无法完全包裹住圆
+  // 因为右边是6rem 所以为了让-3rem之后仍然是6，这边设置了一个9
+  padding-left: 9rem;
+  font-size: $default-font-size;
+
+  // 整体矩形反转
+  transform: skewX(-12deg);
+
+  // 这里只会把文本给扶正 但是图片并不会
+  // 因为shape也设置了trans，css优先级 不能设置
+  // 所以下面的不管用了，需要你单独设置每一个子元素的偏移值
+  // & > * {
+  //   transform: skewX(12deg);
+  // }
+
+  &__shape {
+    width: 15rem;
+    height: 15rem;
+    float: left;
+    // 要求很高 需要浮动+高度设定+形状 缺一不可
+    // 下面就是一段文字像○一样围绕
+    -webkit-shape-outside: circle(50% at 50% 50%);
+    shape-outside: circle(50% at 50% 50%);
+    // 剪辑成一个原型
+    -webkit-clip-path: circle(50% at 50% 50%);
+    clip-path: circle(50% at 50% 50%);
+    // 单独设置1 skewX(12deg)
+    transform: translateX(-3rem) skewX(12deg);
+  }
+  &__image {
+    // 这里必须设置高度为100%而不是宽度，为什么呢
+    // 因为你仔细看的话 如果width是100%，那么相当于也就是占据包含块
+    // 也就是shape的100%，但是此时shape发生了transform: translateX(-3rem);
+    // 宽度是无法撑开全部的，这里用chrome的debug就好
+    height: 100%;
+    // 解决一下图片并没有居中的问题 因为整体偏移了
+    transform: translateX(-4rem) scale(1.4);
+    backface-visibility: hidden;
+    transition: all 0.5s ease;
+  }
+  &__text {
+    // 单独设置2 skewX(12deg)
+    transform: skewX(12deg);
+  }
+  &__caption {
+    // 居中
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 20%); /* 1-a 为了达到从上到下的效果 先放下面*/
+    color: $color-white;
+    text-transform: uppercase;
+    font-size: 1.7rem;
+    text-align: center; /*定义行内内容(例如文字)如何相对它的块父元素对齐;*/
+    opacity: 0; /* 1-b 为了达到从下到上的效果 先隐形*/
+    transition: all 0.5s ease;
+    backface-visibility: hidden;
+  }
+
+  // 一旦hover，caption就发生变化
+  &:hover &__caption {
+    opacity: 1; /*1-c*/
+    transform: translate(-50%, -50%); /*1-d*/
+  }
+  &:hover &__image {
+    transform: translateX(-4rem) scale(1);
+    // 变模糊 变暗色
+    filter: blur(3px) brightness(80%);
+  }
+}

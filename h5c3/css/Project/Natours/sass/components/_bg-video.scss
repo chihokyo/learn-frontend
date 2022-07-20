@@ -1,0 +1,22 @@
+.bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  // 相当于包含块
+  height: 100%;
+  width: 100%;
+  // 为了让层级
+  z-index: -1;
+  opacity: 0.15;
+  //   隐藏溢出
+  overflow: hidden;
+
+  &__content {
+    // 为了让视频本题占据整个父元素框 所以就要设置宽高
+    height: 100%;
+    width: 100%;
+    //  CSS 属性指定可替换元素的内容应该如何适应到其使用的高度和宽度确定的框。
+    // 这样会保持纵横比 这里可以整个拉伸 有点像background
+    object-fit: cover;
+  }
+}
