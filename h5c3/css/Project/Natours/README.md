@@ -748,7 +748,6 @@ transform: skewY(-7deg);
     filter: blur(3px) brightness(80%);
   }
 }
-
 ```
 
 ### 4-1 圆形环绕效果
@@ -763,20 +762,20 @@ float: left;
 shape-outside: circle(50% at 50% 50%);
 ```
 
-### 4-2 transform的各种操作
+### 4-2 transform 的各种操作
 
 形变在位移的时候经常使用，这里运用了大量的位移。
 
 但是位移的时候逻辑上一定要清晰一下。
 
-这里直接看👆🏻整体的代码就好
+这里直接看 👆🏻 整体的代码就好
 
-### 4-3 hover图片模糊效果
+### 4-3 hover 图片模糊效果
 
 这里的思路大概是
 
-- 默认下，使用opacity默认为0，等到hover之后显示为1
-- 默认下，使用位置靠下，等到hover之后向上，这样就有一种从下到上的效果
+- 默认下，使用 opacity 默认为 0，等到 hover 之后显示为 1
+- 默认下，使用位置靠下，等到 hover 之后向上，这样就有一种从下到上的效果
 - `filter()` 可以让图片变模糊，变暗色。
 
 ### 4-4 视频作为背景的操作
@@ -804,11 +803,263 @@ shape-outside: circle(50% at 50% 50%);
     object-fit: cover;
   }
 }
-
 ```
 
 注意点
 
 为了让图片能够保持纵横比覆盖住整体
 
-需要让宽度高度都是100%，然后设置`object-fit: cover;`类似于图片背景。
+需要让宽度高度都是 100%，然后设置`object-fit: cover;`类似于图片背景。
+
+## 6 订购栏
+
+### 6-1 不能继承 font 属性的元素
+
+我才知道，`<input>`和` <textarea>还有``<button> `和`<select>`，表格`<td>`等组件类的不可以继承。
+
+也就是说遇到这些标签的时候，要手动进行强制继承。
+
+```css
+font-family: inherit; /*强制继承*/
+font-fize: inherit; /*强制继承*/
+```
+
+### 6-2 button 和 a 按钮
+
+因为一直以来按钮设置的都是以 a 为 main 调整的。但其实 button 和 a 在设置 css 的时候有很多不同，
+
+button
+
+- 比如没有:link,:visited 这样的状态可选。
+- 会有默认的 border 和 outline （需要手动去掉）
+- 没有`cursor: pointer;` 需要自己设置
+
+### 6-3 平行四边形背景
+
+下面这段代码，最难理解的是
+
+```scss
+background-image: linear-gradient(
+    105deg,
+    rgba($color-white, 0.9) 0%,
+    rgba($color-white, 0.9) 50%,
+    transparent 50%
+  ), url(../img/nat-10.jpg);
+```
+
+这里设置的是一个菱形的背景，用了 linear-gradient 特性，如果第 2,3 个 50%是一样的情况下。会有纯色效果。
+
+这样可以用这个网站来验证一下
+
+[CSS Gradient](https://cssgradient.io)
+
+```scss
+.section-book {
+  padding: 15rem 0;
+  background-image: linear-gradient(
+    to right bottom,
+    $color-primary-light,
+    $color-primary-dark
+  );
+}
+
+.book {
+  background-image: linear-gradient(
+      105deg,
+      rgba($color-white, 0.9) 0%,
+      rgba($color-white, 0.9) 50%,
+      transparent 50%
+    ), url(../img/nat-10.jpg);
+  background-size: 100%;
+  border-radius: 3px;
+  box-shadow: 0 1.5rem 4rem rgba($color-black, 0.2);
+  height: 50rem;
+  // 宽度是包含块的一半
+  &__form {
+    width: 50%;
+    padding: 6rem;
+  }
+}
+```
+
+### 6-4 输入框的效果
+
+输入框为了让输入的时候下面 label 才显示 placeholder 的效果，并且才在下面显现出文字。所以就有点麻烦，是这里最麻烦的。
+
+```scss
+.form {
+  // 只要不是最后一个
+  &__group:not(:last-child) {
+    margin-bottom: 2rem;
+  }
+
+  &__input {
+    display: block; // 这里为了让每一行都独占一行 同时为了设置宽度等
+    width: 90%;
+    font-size: 1.5rem;
+    font-family: inherit; // input的元素不能继承 所以手动
+    color: inherit; // input的元素不能继承 所以手动
+    padding: 1.5rem 2rem;
+    border-radius: 2px;
+    border: none; // 去掉那个外框
+    border-bottom: 3px solid transparent; // 先透明，下面主色
+    transition: all 0.3s;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 1rem 2rem rgba($color-black, 0.1);
+      border-bottom: 3px solid $color-primary;
+    }
+    // 这里验证不对，就是这个效果
+    &:focus:invalid {
+      border-bottom: 3px solid $color-secondary-dark;
+    }
+    // 这里设置的是你输入框内的字体颜色
+    &::-webkit-input-placeholder {
+      color: $color-grey-dark-2;
+    }
+  }
+  &__label {
+    display: block; // 这样才能设置margin等
+    margin-left: 2rem;
+    margin-top: 0.7rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    transition: all 0.3s;
+  }
+  // 选择所有显示占位符 (placeholder) 的元素
+  // + 这里用了一个相邻兄弟选择器
+  // 条件1 第2个紧跟第1个元素之后 条件2 共同的父元素 缺一不可
+  &__input:placeholder-shown + &__label {
+    opacity: 0; // 隐形 （这里为什么还要用这个，是因为opacity可以设置动效
+    visibility: hidden; // 不可见
+    transform: translateY((-4rem)); // 这里为了让动效有一种从上而下的感觉
+  }
+
+  &__radio-group {
+    display: inline-block; // 为了设置宽 而且并不想让占据一行
+    width: 49%; // 用50%这里会被换行
+  }
+  //   隐藏现有按钮的样式，自己添加自己的
+  &__radio-input {
+    display: none;
+  }
+
+  &__radio-label {
+    font-size: $default-font-size;
+    cursor: pointer;
+    position: relative;
+    padding-left: 4.5rem;
+  }
+  &__radio-button {
+    display: inline-block;
+    position: absolute; // 固定一下，为了自制bottom
+    top: -0.4rem;
+    left: 0;
+    height: 3rem;
+    width: 3rem;
+    border: 5px solid $color-primary;
+    border-radius: 50%;
+    &::after {
+      content: '';
+      display: block;
+      height: 1.3rem;
+      width: 1.3rem;
+      border-radius: 50%;
+      // 居中开始
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: $color-primary;
+      opacity: 0; // 1-a 默认是隐藏的 除非你选中！
+      transition: opacity 0.2s;
+    }
+  }
+  // input和span目前是要求一致的
+  // 当__radio-input被check之后
+  // 他的兄弟 __radio-label 元素下的 __radio-button::after 可见性是1
+  // 这里相当于先找兄弟 → 兄弟下儿子 → 儿子的after
+  &__radio-input:checked ~ &__radio-label &__radio-button::after {
+    opacity: 1;
+  }
+}
+```
+
+上面是整体的，现在一个个分析
+
+为了默认的 placeholder 不可见，这里使用了相邻兄弟元素。
+
+- 设置当 place 显示的时候 `&__input:placeholder-shown`
+- 相邻兄弟元素的 label 不可见 `+ &__label`，+是相邻元素，~一般兄弟元素
+
+```scss
+&__input:placeholder-shown + &__label {
+  opacity: 0; // 隐形 （这里为什么还要用这个，是因为opacity可以设置动效
+  visibility: hidden; // 不可见
+  transform: translateY((-4rem)); // 这里为了让动效有一种从上而下的感觉
+}
+```
+
+### 6-5 自定义 radio 按钮
+
+由于默认的按钮样式无法更改，这里使用的方案，从一开始就不让默认的按钮显示，然后自己写一个！
+
+- 隐藏默认按钮
+- 自己写一个按钮样式
+- 为了让实心，使用了伪元素 after
+- 为了让互斥，使用了选择器
+
+```scss
+&__radio-group {
+  display: inline-block; // 为了设置宽 而且并不想让占据一行
+  width: 49%; // 用50%这里会被换行
+}
+//   隐藏现有按钮的样式，自己添加自己的
+&__radio-input {
+  display: none;
+}
+
+&__radio-label {
+  font-size: $default-font-size;
+  cursor: pointer;
+  position: relative;
+  padding-left: 4.5rem;
+}
+&__radio-button {
+  display: inline-block;
+  position: absolute; // 固定一下，为了自制bottom
+  top: -0.4rem;
+  left: 0;
+  height: 3rem;
+  width: 3rem;
+  border: 5px solid $color-primary;
+  border-radius: 50%;
+  &::after {
+    content: '';
+    display: block;
+    height: 1.3rem;
+    width: 1.3rem;
+    border-radius: 50%;
+    // 居中开始
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: $color-primary;
+    opacity: 0; // 1-a 默认是隐藏的 除非你选中！
+    transition: opacity 0.2s;
+  }
+}
+// input和span目前是要求一致的
+// 当__radio-input被check之后
+// 他的兄弟 __radio-label 元素下的 __radio-button::after 可见性是1
+// 这里相当于先找兄弟 → 兄弟下儿子 → 儿子的after
+&__radio-input:checked ~ &__radio-label &__radio-button::after {
+  opacity: 1;
+}
+```
+
+> 这里最难理解的，应该是实心按钮的 after 伪元素，和`&__radio-input:checked ~ &__radio-label &__radio-button::after`
+
+这里注释也拆解了这个效果。仔细看的话应该知道。

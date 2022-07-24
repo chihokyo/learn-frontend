@@ -1,4 +1,5 @@
 .btn {
+  &, // 这里相当于选择了本身，为什么，因为下面的link和visited只能a元素，button不适用 所以要选本身 
   /* 按钮的原始状态 & 按钮按完之后的状态 */
   &:link,
   &:visited {
@@ -9,6 +10,9 @@
     text-decoration: none;
     border-radius: 10rem;
     transition: all 0.2s;
+    // 为了button设置的
+    border: none;
+    cursor: pointer;
   }
   /* 悬浮状态 */
   &:hover {
@@ -22,7 +26,9 @@
     }
   }
   /* 按下去的时候 */
-  &:active {
+  &:active,
+  &:focus {
+    outline: none;
     transform: translateY(-0.1rem);
     box-shadow: 0 0.5rem 1rem rgba($color-black, 0.2);
   }
