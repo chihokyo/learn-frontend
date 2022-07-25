@@ -1063,3 +1063,78 @@ background-image: linear-gradient(
 > 这里最难理解的，应该是实心按钮的 after 伪元素，和`&__radio-input:checked ~ &__radio-label &__radio-button::after`
 
 这里注释也拆解了这个效果。仔细看的话应该知道。
+
+## 7 footer
+
+关于footer的一些tips
+
+```scss
+.footer {
+  background-color: $color-grey-dark-3;
+  padding: 10rem 0;
+  font-size: 1.4rem;
+  color: $color-grey-light-1;
+
+  &__logo-box {
+    text-align: center;
+    margin-bottom: 8rem;
+  }
+
+  &__logo {
+    width: 15rem;
+    height: auto;
+  }
+
+  &__navigation {
+    border-top: 1px solid $color-grey-dark;
+    padding-top: 2rem;
+    // 为什么要用inline-block 是因为上面的有一个solid横线 为了不让横线过场
+    // inline-block 可以保证内容有多宽，线有多长
+    display: inline-block;
+  }
+
+  &__list {
+    list-style: none;
+  }
+
+  &__item {
+    // 为了保证并排，而不是独占一行
+    display: inline-block;
+
+    &:not(:last-child) {
+      margin-right: 1.5rem;
+    }
+  }
+
+  &__link {
+    &:link,
+    &:visited {
+      color: $color-grey-light-1;
+      background-color: $color-grey-dark-3;
+      text-decoration: none;
+      text-transform: uppercase;
+      display: inline-block; // 保证排排站
+      transition: all 0.2s;
+    }
+
+    &:hover,
+    &:active {
+      // hover之后会有效果
+      color: $color-primary;
+      box-shadow: 0 1rem 2rem rgba($color-black, 0.4);
+      transform: rotate(5deg) scale(1.3);
+    }
+  }
+
+  &__copyright {
+    border-top: 1px solid $color-grey-dark;
+    padding-top: 2rem;
+    // 保证左右宽度差不多一致 就测试了一下80%
+    width: 80%;
+    // 这里是为了向右浮动
+    float: right;
+  }
+}
+```
+
+基本上没有什么难度，就只是一些基础的css而已。

@@ -21,6 +21,7 @@
 /* 页面上共通的部分 比如header/footer */
 @import 'layout/grid'; // float布局
 @import 'layout/header'; // 头部
+@import 'layout/footer'; // 尾部
 
 /* 具体页面 */
 @import 'pages/home';
