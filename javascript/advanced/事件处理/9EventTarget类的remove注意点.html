@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>9EventTarget类的add</title>
+  </head>
+  <body>
+    <button>btn</button>
+  </body>
+
+  <script>
+    const btnEl = document.querySelector('button');
+    // 这里写一个 handler
+    const foo = () => {
+      console.log('foo');
+    };
+    // 这样点击就会触发了
+    btnEl.addEventListener('click', foo);
+
+    // 这里要注意的就是每一次必须用同一个 handler 每次都用匿名函数的这种是不行的
+    // 因为这样每一次都是新的函数不行，必须保证删除的handler是和添加的一样的
+    setTimeout(() => {
+      btnEl.removeEventListener('click', foo);
+    }, 2000);
+
+    // ❌
+    setTimeout(() => {
+      btnEl.removeEventListener('click', () => {
+        console.log('没有用');
+      });
+    }, 2000);
+  </script>
+</html>

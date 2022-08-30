@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>10EventTarget类的dispatch</title>
+  </head>
+  <body>
+    <script>
+      // eventtarget就可以实现类似于事件总线的效果
+      window.addEventListener('myEvent', function () {
+        console.log('监听到了我自己定义的事件了');
+      });
+
+      // ② 并且2秒钟后派发
+      setTimeout(function () {
+        // 在这里自定义一个事件 ① myEvent
+        const myEvent = new Event('myEvent');
+        window.dispatchEvent(myEvent);
+      }, 5000);
+    </script>
+  </body>
+</html>
