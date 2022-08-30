@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <button>按钮</button>
+    </div>
+
+    <script>
+      const btnEl = document.querySelector('button');
+      const divEl = document.querySelector('div');
+      btnEl.onclick = function () {
+        // 这里就是 btnEl
+        console.log(this);
+      };
+
+      divEl.onclick = function () {
+        // 这里就是 divEl
+        console.log(this);
+      };
+
+      //   结论就是事件处理对象 eventTarget
+    </script>
+  </body>
+</html>

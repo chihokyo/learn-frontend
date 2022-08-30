@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box {
+        width: 200px;
+        height: 200px;
+        background-color: gold;
+      }
+
+      span {
+        display: inline-block;
+        width: 100px;
+        height: 100px;
+        background-color: greenyellow;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <span>哈哈哈</span>
+    </div>
+    <script>
+      const bodyEl = document.body;
+      const divEl = document.querySelector('.box');
+      const spanEl = document.querySelector('span');
+      // 监听冒泡
+      bodyEl.addEventListener('click', function () {
+        console.log('bodyEl');
+      });
+      divEl.addEventListener('click', function () {
+        console.log('divEl');
+      });
+      spanEl.addEventListener('click', function () {
+        console.log('spanEl');
+      });
+
+      // 监听捕获
+      bodyEl.addEventListener(
+        'click',
+        function () {
+          console.log('bodyEl');
+        },
+        true
+      );
+      divEl.addEventListener(
+        'click',
+        function () {
+          console.log('divEl');
+        },
+        true
+      );
+      spanEl.addEventListener(
+        'click',
+        function () {
+          console.log('spanEl');
+        },
+        true
+      );
+    </script>
+  </body>
+</html>

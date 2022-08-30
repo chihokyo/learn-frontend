@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button class="btn1" onclick="console.log('yes')">btn1</button>
+    <button class="btn1">btn2</button>
+    <button class="btn2">btn3</button>
+    <script>
+      const btnEl1 = document.querySelector('.btn1');
+      const btnEl2 = document.querySelector('.btn2');
+
+      //   方式二，使用属性
+      btnEl1.onclick = function () {
+        console.log('okkk');
+      };
+      // 这个会覆盖前面的okk
+      btnEl1.onclick = function () {
+        console.log('success');
+      };
+
+      //   方式三，使用函数 addEventListener
+      // 添加多个也不冲突
+      btnEl2.addEventListener('click', function () {
+        console.log('OK');
+      });
+      btnEl2.addEventListener('click', function () {
+        console.log('OK2');
+      });
+    </script>
+  </body>
+</html>

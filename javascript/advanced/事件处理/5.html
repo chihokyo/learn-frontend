@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box {
+        display: flex;
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+      }
+
+      .box span {
+        width: 100px;
+        height: 100px;
+        background-color: #f00;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <span>
+        <button>按钮</button>
+      </span>
+    </div>
+
+    <script>
+      var btnEl = document.querySelector('button');
+      var spanEl = document.querySelector('span');
+      var divEl = document.querySelector('div');
+
+      divEl.addEventListener(
+        'click',
+        function (event) {
+          console.log('div的事件捕获监听~');
+          // 到div就停止捕获 下面全部不会显示
+          //   event.stopPropagation();
+        },
+        true
+      );
+      spanEl.addEventListener(
+        'click',
+        function () {
+          console.log('span的事件捕获监听~');
+        },
+        true
+      );
+      btnEl.addEventListener(
+        'click',
+        function (event) {
+          console.log('button的事件捕获监听~');
+        },
+        true
+      );
+
+      divEl.addEventListener('click', function () {
+        console.log('div的事件冒泡监听~');
+      });
+      spanEl.addEventListener('click', function (event) {
+        console.log('span的事件冒泡监听~');
+        event.stopPropagation(); // 防止冒泡
+      });
+      btnEl.addEventListener('click', function () {
+        console.log('button的事件冒泡监听~');
+      });
+    </script>
+  </body>
+</html>

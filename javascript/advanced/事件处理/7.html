@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .active {
+        background-color: greenyellow;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 关于事件委托 难道还要给下面每一个li都写上同样的事件？-->
+    <ul>
+      <li class="1">1</li>
+      <li class="2">2</li>
+      <li class="3">3</li>
+      <li class="4">4</li>
+      <li class="5">5</li>
+      <li class="6">6</li>
+      <li class="7">7</li>
+      <li class="8">8</li>
+      <li class="9">9</li>
+      <li class="10">10</li>
+    </ul>
+  </body>
+
+  <script>
+    // ==========before==========
+    const liEls = document.querySelectorAll('li');
+    for (let liEl of liEls) {
+      liEl.addEventListener('click', (e) => {
+        // liEl.classList.add('active'); // 1使用元素
+        // this.classList.add('active'); // 2使用this也可以 因为this永远指向处理事件！但是缺点就是箭头函数无法使用
+        e.currentTarget.classList.add('active'); // 3 使用 currentTarget 不过this===currentTarget 不言自明了
+      });
+    }
+
+    // ==========after==========
+    const ulEl = document.querySelector('ul');
+    ulEl.addEventListener('click', function (e) {
+      // 判断防止ul本身被赋予active
+      if (e.target !== ulEl) e.target.classList.add('active');
+    });
+  </script>
+</html>

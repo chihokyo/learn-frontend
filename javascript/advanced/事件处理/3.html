@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .box {
+        width: 100px;
+        height: 100px;
+        background-color: pink;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <button>btn</button>
+    </div>
+  </body>
+
+  <script>
+    const divEl = document.querySelector('.box');
+    const btnEl = document.querySelector('button');
+    // 此时点击 btn，这里因为冒泡，div会捕捉到
+    divEl.addEventListener('click', function (e) {
+      console.log(e.type); // 事件类型：click
+      console.log(e.target); // btn 点击的
+      console.log(e.currentTarget); // div 真正处理的
+    });
+  </script>
+</html>
