@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>defer</title>
+  </head>
+  <body>
+    <div class="app">app</div>
+    <div class="title">title</div>
+
+    <!-- <script src="./js/test_defer.js" defer></script> 没有加是会阻塞 下面的box不会显示出来-->
+
+    <script src="./js/test_defer.js" defer></script>
+
+    <script defer>
+      console.log('在这里写是没有任何效果的，必须像👆🏻导入外部文件才行');
+
+      // defer要早于这个执行
+      window.addEventListener('DOMContentLoaded', () => {
+        console.log('DOMContentLoaded');
+      });
+    </script>
+    <div class="box">box</div>
+  </body>
+</html>

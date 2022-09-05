@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div>
+      <button>1</button>
+      <button>2</button>
+      <button>3</button>
+      <button>4</button>
+    </div>
+    <script>
+      // for1: var btnItemEl = btnEls[0]
+      //       btn1.index = 0;
+      //       btnItemEl.onclick = function(){};
+      // for2: var btnItemEl = btnEls[1]
+      //       btn1.index = 0;
+      //       btnItemEl.onclick = function(){};
+      // for3: var btnItemEl = btnEls[2]
+      //       btn1.index = 0;
+      //       btnItemEl.onclick = function(){};
+      // for4: var btnItemEl = btnEls[3]
+      //       btn1.index = 0;
+      //       btnItemEl.onclick = function(){};
+
+      var btnEls = document.querySelectorAll('button');
+      for (var i = 0; i < btnEls.length; i++) {
+        var btnItemEl = btnEls[i];
+        var id = 'id ' + i;
+        // 解决方案2-2
+        btnItemEl.index = i;
+        btnItemEl.onclick = function () {
+          console.log(id); // 3
+          console.log('i ' + i); // 4
+          console.log('btnItemEl ' + btnItemEl);
+          // 解决方案1
+          console.log('this ' + this); // this指向当前元素，在for循环的时候其实已经绑定了，就已经确定了this了，this不需要再想上一层作用域查找了
+          // 解决方案2-1 先获取索引
+          console.log(this.index);
+        };
+      }
+
+      console.log(i); // 4
+      console.log(btnItemEl);
+    </script>
+  </body>
+</html>

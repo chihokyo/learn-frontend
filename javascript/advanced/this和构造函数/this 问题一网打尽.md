@@ -17,7 +17,7 @@ FEC 主要三个板块组成
 - **this** → 就是在这个时候确定的
 - 不同的绑定规则，不同的调用方法，结果也就不一样。
 
-[image-20220328014727949](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220328014727949.png)
+![image-20220328014727949](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220328014727949.png)
 
 ```javascript
 /**
