@@ -2,7 +2,7 @@
 
 为什么要这样写呢？
 
-最近在重新学习 JavaScript 我说一下吧。比如说闭包，为什么很难理解呢？因为我原来用的都是面向对象的思维，面向对象是啥思维，就是封装的时候有私有变量，有公共变量。
+最近在重新学习 JavaScript 我说一下吧。比如说闭包，为什么很难理解呢？因为我原来用的都是面向对象的思维，面向对象是啥思维，就是封装的时候有**私有变量**，有**公共变量**。
 
 > 但是 JavaScript 很不幸的没有私有变量这个玩意儿。
 
@@ -19,7 +19,7 @@
 
 ### 1-1 什么是作用域？
 
-什么是作用域，就是定义了变量的访问范围。 简单的说就是谁能碰到你，谁能访问到你的问题。
+什么是作用域，就是定义了**变量**的**访问**范围。 简单的说就是谁能碰到你，谁能访问到你的问题。
 
 > 什么是作用域，就是定义了变量的访问范围。
 
@@ -30,6 +30,104 @@
 - 块状作用域（ES6 之前没有块状作用域的）
 
 ![image-20220519202001259](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519202001259.png)
+
+👇🏻 有一部分是出自 javascript info 上的解释
+
+```js
+/**
+ * 在外面无法访问的
+ */
+{
+  let msg = 'hello';
+  console.log(msg);
+}
+console.log(msg); // ReferenceError: msg is not defined
+
+/**
+ * 所以就独自美好
+ */
+{
+  let msg = 'hello';
+  console.log(msg);
+}
+
+{
+  let msg = 'world';
+  console.log(msg);
+}
+
+/**
+ * 如果我们使用 let 对已存在的变量进行重复声明，如果对应的变量没有单独的代码块，则会出现错误：
+ */
+let msg = 'hello';
+let msg = 'world'; // variable already declared
+```
+
+对于 `if`，`for` 和 `while` 等，在 `{...}` 中声明的变量也仅在内部可见
+
+```js
+for (let i = 0; i < 3; i++) {
+  // 变量 i 仅在这个 for 循环的内部可见
+  alert(i); // 0，然后是 1，然后是 2
+}
+
+alert(i); // Error, no such variable
+```
+
+这里和 php 对比一下,php 是不可能在外面定义一个普通变量然后被访问到的。
+
+```js
+/**
+ * JS是可以访问cname
+ */
+let cname = 'chin';
+function show() {
+  console.log(cname);
+}
+show(); // chin
+
+/**
+ * PHP根本不可以访问
+ */
+$cname = 'chin';
+function show() {
+  var_dump($cname);
+}
+show(); // undefined variable:cname
+```
+
+### 1-2 var 的特殊性
+
+var 只有函数作用域和全局作用域，没有块状作用域。
+
+```js
+if (true) {
+  var cname = 'chin';
+}
+console.log(cname); // ✅ chin 因为var这个时候就是全局作用域
+
+if (true) {
+  let cname = 'chin';
+}
+console.log(cname); // ❌ 显示错误 因为let就是块级作用域 而var没有
+```
+
+但是在函数级别的作用域上是一样的
+
+```js
+// 在函数作用域的表现上 var和let都是一样的
+function show() {
+  var cname = 'chin';
+  console.log(cname);
+}
+console.log(cname); // ReferenceError: cname is not defined
+
+function show() {
+  let cname = 'chin';
+  console.log(cname);
+}
+console.log(cname); // ReferenceError: cname is not defined
+```
 
 其实这个作用域提升的问题怎么说呢？
 
@@ -71,15 +169,19 @@ const foo = () => {
 
 首先要明白几个单词概念吧。
 
-**Execution Context Stack** 执行上下文调用栈 【保证 JS 代码按照一定顺序执行】
+**【1】Execution Context Stack** 执行上下文调用栈 【保证 JS 代码按照一定顺序执行】
 
-**Global Execution Context** 全局执行上下文
+> 基本上函数执行都需要 stack 这个数据结构，为什么？因为他是 LIFO，先进后出。
+
+![Stack Data Structure and Implementation in Python, Java and C/C++](https://cdn.programiz.com/sites/tutorial2program/files/stack.png)
+
+**【2】Global Execution Context** 全局执行上下文
 
 👆 只要有 JS 代码 【全局代码整体要执行 就要有上下文】
 
-**Functional Execution Context** 函数执行上下文 【和全局代码一样 同理】
+**【3】Functional Execution Context** 函数执行上下文 【和全局代码一样 同理】
 
-Activation Object AO AO 中包含形参、arguments、函数定义和指向函数对象、定义的变量。
+**【4】Activation Object** AO AO 中包含形参、arguments、函数定义和指向函数对象、定义的变量。
 
 > 上面的概念在下面都有解析。
 
@@ -97,7 +199,7 @@ Activation Object AO AO 中包含形参、arguments、函数定义和指向函�
 
 > 什么是作用域提升呢？
 >
-> 其实就是上面的在**解析阶段**，代码还没执行的时候。你可以看到 GO 里面已经有当前全局所有的变量初始化了。虽然都是 undefined 的吧。重要的事情说三遍！解析阶段解析阶段解析阶段！！！
+> 其实就是上面的在**解析阶段**，代码还没执行的时候。你可以看到 GO 里面已经有当前全局所有的变量初始化了。虽然都是 undefined 的吧。重要的事情说三遍！**解析阶段解析阶段解析阶段**！！！
 >
 > 所以这就解释了下面的代码
 
@@ -145,6 +247,18 @@ console.log(aa);
 
 ![image-20220519173657455](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220519173657455.png)
 
+> 更新，函数要优先于所有变量进行解析。所以即使变量写在前面，函数也不会覆盖变量。但是变量会覆盖函数。
+
+```js
+var foo = 'foo';
+function foo() {
+  console.log('function foo');
+}
+
+// 虽然foo定义在前面，但是函数foo是一定会提前被解析的
+// 所以函数最后被覆盖掉了
+```
+
 ### 代码段 3 有函数（嵌套 1）
 
 下面一段代码的奇幻旅程（执行过程）。
@@ -167,7 +281,9 @@ bar(); // hello global
 
 编译阶段 → 又叫**词法解析**，词法解析的时候确定了父级作用域。
 
-那么什么是词法解析，其实我感觉这个定义就是和运行相对的，**词法解析的意思就是一个函数的变量跟在哪里定义有关。** 和运行无关的。又不是 this！
+那么什么是词法解析，其实我感觉这个定义就是和运行相对的，一个为动，一个为静。
+
+**词法解析的意思就是一个函数的变量跟在哪里定义有关。** 是静止的状态，一个程序静止的时候怎么看关系呢，还不是出生在哪里就是哪里的人。完全和运行无关的。又不是 this！
 
 ![image-20220326232628199](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220326232628199.png)
 
