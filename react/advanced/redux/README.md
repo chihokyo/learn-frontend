@@ -1,0 +1,33 @@
+# 总体介绍
+
+这里介绍的是学习redux的一些心路历程
+
+## 1 redux总体介绍
+
+![image-20220912234110212](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220912234110212.png)
+
+### redux01
+
+这里主要介绍的是 redux，只是 redux 而已。
+
+是学习 redux 的第一步，这里不设计具体 react 知识。
+
+一个文件梭哈。就是最简单的 redux 的形式，就是跑通 redux 而已。
+
+拆分文件。就是把 redux 更加细分化。
+
+### redux02
+
+这里结合了react，描述了在react里面直接使用redux是怎么用的。
+
+### redux03
+
+这里进一步封装了一下，上一个重复的代码太多。这里使用了connect进行封装。
+
+### redux04
+
+这里就是进一步的进行封装，因为store要解耦合。所以把store单独拆分出去，用了context。
+
+### redux05
+
+这里就是正式使用了react-redux这个第三方库。

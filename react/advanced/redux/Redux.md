@@ -150,6 +150,96 @@ store.dispatch(subAction(18));
 
 这样的话就会有很多重复的逻辑，所以需要抽取公共逻辑。这个时候就需要 connect 来实现一个桥梁。
 
+这个connect的桥梁是怎么进化过来的呢？
+
+> 因为通过写redux可以发现，除了组件的state+action有变化，其他都是一些很重复的代码，这样的话。只要改变state和action就可以了，于是这俩就成了参数
+
+```js
+// 因为每一个组件的需要的state和actio都是不一样的，
+// 封装的时候就需要这俩参数
+export function connect(mapStateToProps, mapDispatchToprops) {}
+
+```
+
+那么原来的组件就从很臃肿的
+
+before
+
+```jsx
+import React, { PureComponent } from 'react';
+
+import store from '../store';
+import { inAction, addAction } from '../store/actionCreators';
+
+export default class Home extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      counter: store.getState().counter,
+    };
+  }
+
+  //   必须要订阅 才能知道最新的情况
+  componentDidMount() {
+    this.unsubscribe = store.subscribe(() => {
+      this.setState({
+        counter: store.getState().counter,
+      });
+    });
+  }
+
+  //   卸载组件的时候也要取消订阅
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
+
+  render() {
+    const { counter } = this.state;
+    return (
+      <>
+        <h1>Home</h1>
+        <h2>count: {counter}</h2>
+        <button onClick={(e) => this.increment()}>+1</button>
+        <button onClick={(e) => this.addNumber(5)}>+5</button>
+      </>
+    );
+  }
+
+  increment() {
+    store.dispatch(inAction());
+  }
+
+  addNumber(num) {
+    store.dispatch(addAction(num));
+  }
+}
+
+```
+
+想要变成这种感觉 new
+
+```jsx
+import React, { PureComponent } from 'react';
+
+export default class Home extends PureComponent {
+
+  render(props) {
+    return (
+      <>
+        <h1>Home</h1>
+        <h2>count: {props.counter}</h2>
+        <button onClick={(e) => props.increment()}>+1</button>
+        <button onClick={(e) => props.addNumber(5)}>+5</button>
+      </>
+    );
+  }
+
+}
+
+```
+
+那这个进化是怎么搞的呢？就是运用了👇🏻 
+
 而实现桥梁的原理就是使用了高阶组件进行包裹。 这里要理解一下高阶组件的问题！
 
 > 高阶组件 其实就是 **高阶函数** 而已
@@ -174,6 +264,57 @@ newComponent('About'); // 5 6 About
 👇🏻 使用了闭包完成了对元组件的数据注入，state 和 dispatch 都是被注入了。
 
 ![image-20220308155453075](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220308155453075.png)
+
+> 🔥为什么要放的是函数而不是对象？
+>
+> 这里没有直接放进去的对象，而是通过**函数返回的是一个对象的方法**。
+>
+> 为了不会和store进行关联，对比一下下面2个代码。主要就是为了少一些依赖store。但是action还是要依赖的。
+
+```jsx
+// 这里直接写store，那还有什么意义 这样又会直接依赖了store
+const mapStateToProps = {
+   counter:store.getState().counter
+}
+// 这里就是一个函数，相当于调用mapStateToProps之后传来了一个state，state这个参数里面有你想要的依赖
+// 这样你就可以不在关联store的基础上，从传递过来的函数的state里面拿到你【想要】的【最新】的
+const mapStateToProps = (state) => {
+   counter: state.counter;
+}
+```
+
+这里有一个难点，解释一下这个写法
+
+```jsx
+// connect.js
+render() {
+  return (
+    <WrappedComponent
+      {...this.props}
+      {...mapStateToProps(store.getState())}
+      {...mapDispatchToProps(store.dispatch)}
+      />
+  );
+}
+
+// Home.js
+const mapStateToProps = (state) => {
+   counter: state.counter;
+}
+```
+
+为什么要用函数的形式？
+
+```js
+{...mapStateToProps(store.getState())} // 意义在哪里？
+// 相当于其实是
+// ① store.getState() 获取最新的data值，在store里面
+// ② mapStateToProps(store.getState()) 
+// ③ 此时函数返回的是一个对象 {}
+// ④ {...mapDispatchToProps(store.dispatch)} 展开运算符 这样就会把当前返回值所有的对象属性传递到WrappedComponent里面了
+```
+
+
 
 搞定了这个理念的话，接下来继续看。完整版本。
 
