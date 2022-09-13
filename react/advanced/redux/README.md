@@ -1,8 +1,8 @@
 # 总体介绍
 
-这里介绍的是学习redux的一些心路历程
+这里介绍的是学习 redux 的一些心路历程
 
-## 1 redux总体介绍
+## 1 redux 总体介绍
 
 ![image-20220912234110212](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220912234110212.png)
 
@@ -18,16 +18,20 @@
 
 ### redux02
 
-这里结合了react，描述了在react里面直接使用redux是怎么用的。
+这里结合了 react，描述了在 react 里面直接使用 redux 是怎么用的。
 
 ### redux03
 
-这里进一步封装了一下，上一个重复的代码太多。这里使用了connect进行封装。
+这里进一步封装了一下，上一个重复的代码太多。这里使用了 connect 进行封装。
 
 ### redux04
 
-这里就是进一步的进行封装，因为store要解耦合。所以把store单独拆分出去，用了context。
+这里就是进一步的进行封装，因为 store 要解耦合。所以把 store 单独拆分出去，用了 context。
 
 ### redux05
 
-这里就是正式使用了react-redux这个第三方库。
+这里就是正式使用了 react-redux 这个第三方库。
+
+### redux06
+
+展示了在异步请求的时候redux的局限性，必须在组件初始化加载。这样不行。所以需要导入中间件。
