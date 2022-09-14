@@ -388,7 +388,20 @@ const mapStateToProps = (state) => {
 
 **7-2 `componentDidMount()` 这里进行书写请求**
 
-这个看我的 git
+这里直接看redux06，异步操作是在componentDidMount进行的。
+
+```jsx
+componentDidMount() {
+    axios({
+      url: 'http://123.207.32.32:8000/home/multidata',
+    }).then((res) => {
+      //   const data = res.data.data;
+      const { banner, recommend } = res.data.data;
+      this.props.getBanners(banner.list);
+      this.props.getRecommends(recommend.list);
+    });
+  }
+```
 
 **7-3 通过 redux**
 
@@ -418,7 +431,7 @@ const mapStateToProps = (state) => {
 
 ![image-20220310003219483](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220310003219483.png)
 
-接下来有空在补充源码，现在先写一下 thunk 的作用就是其实让 dispatch 可以传入函数，然后进行操作而已。并且还写在了 actionCreators 里面，本质上就这些，但是这些肯定是不够！！
+接下来有空在补充源码（已经补充了，直接看**redux07**就可以），现在先写一下 thunk 的作用就是其实让 dispatch 可以传入函数，然后进行操作而已。并且还写在了 actionCreators 里面，本质上就这些，但是这些肯定是不够！！
 
 于是下面的 saga 闪亮登场！
 
@@ -436,18 +449,18 @@ const mapStateToProps = (state) => {
 
 ```
 
-于是 saga 的实现就要靠
+于是 saga 的实现就要靠generator来实现
 
-## 8 中间件实现原理
+## 8 中间件实现原理（补充
 
-先引入一个案例，比如说你要在一个函数之前之后打印一个日志。如何实现？
+先引入一个需求，比如说你要在一个函数调用前后打印一个日志。如何实现？
 
 其实我以前学习 python 也做过这个，就是@增加一个功能。
 
 但是 js 貌似不是这样。
 
 ```javascript
-// 现在有个需求需要你前后打印
+// 现在有个需求，在action之前打印action，之后打印最新的state
 
 // 1. 基本做法
 console.log('====dispatch之前====', addAction(10));
@@ -459,7 +472,7 @@ store.dispatch(addAction(8));
 console.log('====dispatch之后====', store.getState());
 ```
 
-上面肯定是不行的
+> 上面肯定是不行的，因为万一有1000个。那怎么打印？ 
 
 ```javascript
 // 2. 封装一个函数 参数是函数
@@ -473,7 +486,7 @@ dispatchAndLogging(addAction(10));
 dispatchAndLogging(addAction(80));
 ```
 
-这样也不好，每次调用还要包裹一层别的函数
+> 这样也不好，每次调用还要包裹一层别的函数
 
 所以实现 3
 
@@ -481,13 +494,13 @@ dispatchAndLogging(addAction(80));
 // 3. 函数的基础之上进行优化: 修改原有的dispatch
 // monkey patch 猴补丁
 
-const next = store.dispatch; // 相当于暂存函数体
+const next = store.dispatch; // ① 相当于暂存函数体
 function dispatchAndLogging(action) {
   console.log('====dispatch之前3====', action);
-  next(action); // 这里调用的是暂存的
+  next(action); // ③ 这里调用的是暂存的
   console.log('====dispatch之后3====', store.getState());
 }
-store.dispatch = dispatchAndLogging; // 这里暂存个store.dispatch
+store.dispatch = dispatchAndLogging; // ② 再次暂存个store.dispatch
 
 store.dispatch(addAction(10)); // 本质上执行的dispatchAndLogging()
 store.dispatch(addAction(5)); // 但是内部是next()也就是执行的store.dispatch()
@@ -540,10 +553,12 @@ store.dispatch(addAction(18));
 function patchThunk(store) {
   const next = store.dispatch;
   function dispatchAndThunk(action) {
+    // 如果是对象 就直接dispatch
+    // 如果是函数，就先执行这个函数，然后把dispatch和state传递过去
     if (typeof action === 'function') {
       action(store.dispatch, store.getState);
     } else {
-      next(action);
+      next(action); // 其实这里也就是store.dispatch(action) 这样写没错
     }
   }
   store.dispatch = dispatchAndThunk;
@@ -552,7 +567,9 @@ function patchThunk(store) {
 function foo(dispatch, getState) {
   console.log(dispatch, getState);
 }
+// 增强一下 增强之后dispatch不仅仅能调用action，还能调用函数了
 patchThunk(store);
+// 测试一下放入的是一个函数action
 store.dispatch(foo);
 ```
 
