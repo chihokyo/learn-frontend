@@ -439,17 +439,101 @@ componentDidMount() {
 
 其实 saga 比 thunk 先进在哪里呢？
 
-就是`dispatch(还是对象)`，同时中间件的详情可以写在别的文件里面。
+就是`dispatch(还是对象)`，同时中间件的详情可以写在别的文件里面。这样就可以实现了解耦合。
 
 学习这个首先要有 generator 的基础知识
 
-基础知识如下
+基础知识去看generator生成器的详解。我在生成器的时候也写了。
+
+最最最最核心的就是这段代码。这里是模拟了一段请求数据的流程。
 
 ```javascript
+// generator 配合 Promise
+function* getDataIterator() {
+  console.log('1');
+  const result = yield new Promise((resolve, reject) => {
+    // 这里用2秒模拟请求
+    setTimeout(() => {
+      resolve('请求成功的值来了');
+    }, 2000);
+  });
+  console.log(result);
+}
+
+const ite = getDataIterator();
+// 🔥 这段代码是难点！
+ite.next().value.then((res) => {
+  ite.next(res);
+});
 
 ```
 
+![image-20220918160508553](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220918160508553.png)
+
 于是 saga 的实现就要靠generator来实现
+
+下面一段代码显示了*index.js*里面导入saga中间件的方法
+
+这里必须看到`sagaMiddleware.run(saga);`这一段，saga是从外面的*saga.js*导入的。run负责拦截所有的dispacth。
+
+```js
+// 创建saga的中间件( 这里对比一下thunk，thunk导入之后可以直接添加到中间件)
+// 1-1 但是sage这里需要使用导入的函数，生成中间件
+const sagaMiddleware = createSagaMiddleware();
+
+// 应用中间件
+const storeenhancer = applyMiddleware(thunkMiddleware, sagaMiddleware);
+const store = createStore(reducer, composeEnhancers(storeenhancer));
+
+sagaMiddleware.run(saga); // 1-2 从dispatch → reducer之间中saga进行拦截请求
+// 所以无论是什么dispacth，都会在run这里被拦截
+// run(生成器函数) 这里相当于返回的是迭代器对象，然后用next进行不断的调用
+```
+
+然后*saga.js*如下
+
+```js
+import { takeEvery, put, all } from 'redux-saga/effects';
+import { FETCH_MULTIDATA } from './home/constants';
+
+import { getBannersAction, getRecommendsAction } from './home/actionCreators';
+import axios from 'axios';
+
+// 1-2
+function* fetchMultidata(action) {
+  const res = yield axios.get('http://123.207.32.32:8000/home/multidata');
+  // 1-3 内部会帮你做next()的操作，不需要用then了，saga帮你做生成器函数了
+
+  // 因为axios get出来的是一个promise 结果直接回给res的
+
+  const { banner, recommend } = res.data.data;
+
+  // put(参数) saga帮你yield出去action了
+
+  // 放入，saga内部会next迭代所有的action
+  //   yield put(getBannersAction(banner.list));
+  //   yield put(getRecommendsAction(recommend.list));
+  // 觉得上面一个个写太麻烦了，可以直接用saga的all
+  yield all([
+    yield put(getBannersAction(banner.list)),
+    yield put(getRecommendsAction(recommend.list)),
+  ]);
+}
+
+function* saga() {
+  // 1-1
+  // 你想监听什么事件（action.type)，就在这里写上
+  // 参数1 你想监听的action
+  // 参数2 生成器函数 你想干的事情 你要在dispatch之前拦截要做的事情 主要逻辑
+  yield takeEvery(FETCH_MULTIDATA, fetchMultidata);
+}
+
+// export default 必须是生成器函数
+export default saga;
+
+```
+
+> 其实saga就是帮你做了拦截，帮你利用生成器yield来进行处理逻辑。主要是要理解**Promise + generator**
 
 ## 8 中间件实现原理（补充
 
@@ -607,7 +691,7 @@ https://redux.js.org/tutorials/fundamentals/part-2-concepts-data-flow#reducers
 
 ## 10 reducer 肥大化，臃肿！
 
-怎么办呢？
+为了解决action越来越多，所有的事件都写在一个文件里必然是不现实的，这样会导致项目更加肥大化，臃肿。**怎么办呢？**
 
 拆解`reducer()`
 
@@ -618,3 +702,5 @@ aaReducer(aaState, action);
 bbReducer(bbState, action);
 //
 ```
+
+关于com

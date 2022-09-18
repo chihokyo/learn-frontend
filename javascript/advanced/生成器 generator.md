@@ -420,13 +420,13 @@ console.log(generator.next());
 
 由于上面的写法还是太繁琐了，JS 直接给了你一个语法糖`yield*`
 
-语法
+语法 ⚠️ 一定要是一个**可迭代对象**！！
 
 ```js
 yield * 可迭代对象;
 ```
 
-具体使用
+### 具体使用
 
 这个 yield，每一次就会帮你迭代里面的对象。相当于帮你 yield 每一次 yield 出去了。
 
@@ -457,6 +457,77 @@ console.log(arrGene2.next());
 console.log(arrGene2.next());
 ```
 
+所以说拿上面遍历一个数组来距离总共进化的过程如下。
+
+1 → 2 → 3 → 4 整个步骤
+
+```js
+// 1️⃣ 完全就是迭代器
+const arr = ['aa', 'bb', 'cc'];
+function ite(arr) {
+  let index = 0;
+  return {
+    next: function () {
+      if (index < arr.length) {
+        return {
+          done: false,
+          value: arr[index++],
+        };
+      }
+      return {
+        done: true,
+        value: undefined,
+      };
+    },
+  };
+}
+const it = ite(arr);
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+console.log(it.next());
+
+// 2️⃣ 生成器
+const arr = ['aa', 'bb', 'cc'];
+function* gene1(arr) {
+  let index = 0;
+  while (index < arr.length) {
+    yield arr[index++];
+  }
+}
+const g1 = gene1(arr);
+console.log(g1.next());
+console.log(g1.next());
+console.log(g1.next());
+console.log(g1.next());
+
+// 3️⃣ 由于arr是一个可迭代的
+const arr = ['aa', 'bb', 'cc'];
+function* gene2(arr) {
+  for (const ar of arr) {
+    yield ar;
+  }
+}
+const g2 = gene2(arr);
+console.log(g2.next());
+console.log(g2.next());
+console.log(g2.next());
+console.log(g2.next());
+
+// 4️⃣【语法糖】由于arr是一个可迭代的
+const arr = ['aa', 'bb', 'cc'];
+function* gene3(arr) {
+  yield* arr;
+}
+const g3 = gene3(arr);
+console.log(g3.next());
+console.log(g3.next());
+console.log(g3.next());
+console.log(g3.next());
+```
+
+下面是一个具体应用
+
 具体应用，生成一个范围内连续数字
 
 ```js
@@ -473,3 +544,41 @@ console.log(ite.next()); // { value: 7, done: false }
 console.log(ite.next()); // { value: 8, done: false }
 console.log(ite.next()); // { value: undefined, done: false }
 ```
+
+如果只是想要值的话，直接输出的时候
+
+```js
+console.log(ite.next().value);
+```
+
+## React 中 redux-saga 应用
+
+这个原来在看 redux-saga 的时候总是看不懂，这一次学完了生成器和迭代器之后貌似终于理解了一点了。
+
+这一部分代码就是一个使用场景，就是 saga 可以帮助 redux 在 dispatch 之前，做一些额外的逻辑。
+
+- 第一次`next()`暂停后得到结果。
+
+```js
+// generator 配合 Promise
+function* getDataIterator() {
+  console.log('1');
+  const result = yield new Promise((resolve, reject) => {
+    // 这里用2秒模拟请求
+    setTimeout(() => {
+      resolve('请求成功的值来了');
+    }, 2000);
+  });
+  console.log(result);
+}
+
+const ite = getDataIterator();
+// 🔥 这段代码是难点！
+ite.next().value.then((res) => {
+  ite.next(res);
+});
+```
+
+- `ite.next().value`拿到 Promise 结果，暂停了
+- `ite.next().value.then(res)`拿到 res 之后通过
+- `ite.next(res);`里的再次 next 开启函数继续调用，并通过传参把结果 res 传到`const result`
