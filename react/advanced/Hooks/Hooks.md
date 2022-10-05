@@ -111,6 +111,8 @@ useState(() => {
 
 他们有什么区别呢？其实跟`setState()`的区别差不多
 
+也就是说，在只有一个 setXXX 调用的时候，写成回调函数和直接 set 没别。
+
 ![image-20220227012743236](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220227012743236.png)
 
 话说，每次 setXXX 的时候，虚拟 dom 都会对比，**发生变化**就会重新渲染，重新调用函数的。
@@ -273,6 +275,374 @@ useEffect(() => {
 
 - 1 个函数式组件里面，可以有多个 useEffect
 - 多个按照顺序执行
+
+这里顺便补充一下 useEffect 的执行顺序
+
+下面是一段很简单的代码，你会发现再不写依赖的情况下，她每次都会被渲染。
+
+```jsx
+import { useEffect, useState } from 'react';
+
+const AdvanceEffect = () => {
+  const [number, setNumber] = useState(0);
+  console.count('component render渲染了');
+
+  // 每一次渲染都会被后执行
+  // 且会发现title的number会稍微晚于页面的nubmer 这是因为useEffect总是在页面渲染之后被调用
+  //总结说就是 component:render → component:useEffect→ react dom → brower dom
+  useEffect(() => {
+    console.count('useEffect 被调用了');
+    document.title = `${number} times`;
+  });
+
+  return (
+    <div>
+      <span>number is {number}</span>
+      <button onClick={() => setNumber(number + 1)}> +1</button>
+      <button onClick={() => setNumber((pre) => pre + 2)}> +2</button>
+    </div>
+  );
+};
+
+export default AdvanceEffect;
+```
+
+然后你再上面的代码里增加了一个修改显示姓名的 input 框，你会发现即使 number 没有任何变化，但只要你输入东西，useEffect 都会被再次调用，于是你增加了依赖。
+
+```jsx
+import { useEffect, useState } from 'react';
+
+const AdvanceEffect = () => {
+  const [number, setNumber] = useState(0);
+  const [name, setName] = useState('');
+  console.count('component render渲染了');
+
+  // 每一次渲染都会被后执行
+  // 且会发现title的number会稍微晚于页面的nubmer 这是因为useEffect总是在页面渲染之后被调用
+  //总结说就是 component:render → component:useEffect→ react dom → brower dom
+  useEffect(() => {
+    console.count('useEffect 被调用了');
+    document.title = `${number} times`;
+  });
+
+  return (
+    <div>
+      <span>number is {number}</span>
+      <button onClick={() => setNumber(number + 1)}> +1</button>
+      <button onClick={() => setNumber((pre) => pre + 2)}> +2</button>
+      <hr />
+      <div>name is {name}</div>
+      <label htmlFor="">输入姓名</label>
+      <input type="text" onChange={(e) => setName(e.target.value)} />
+    </div>
+  );
+};
+
+export default AdvanceEffect;
+```
+
+那么，如果我们依赖的数据是一个复杂数据呢？
+
+例如下面的依赖是一个 state，这个 state 是一个对象。这个对象每次渲染的时候都会生成新的对象，这样肯定每次都不一样，肯定每次都被渲染了啊
+
+```jsx
+import { useEffect, useState } from 'react';
+
+const AdvanceEffect2 = () => {
+  const [name, setName] = useState(0);
+  // 此时我们的格式如果不是name那种，而是包裹在一个对象里呢?
+  const [state, setState] = useState({
+    name: '',
+    selected: false,
+  });
+
+  // ❓ 你会发现即使你没修改state，也依然会被重新渲染
+  useEffect(() => {
+    console.log('useEffect 被调用了 state被修改了');
+  }, [state]);
+
+  // 点击修改输入框名字
+  const handleAddName = () => {
+    setState((prev) => ({ ...prev, name }));
+  };
+
+  // 点击修改selected
+  const handleSelect = () => {
+    setState((prev) => ({ ...prev, selected: true }));
+  };
+
+  return (
+    <div>
+      {`name is ${state.name}, selected is ${state.selected.toString()}`}
+      <br />
+      <input type="text" onChange={(e) => setName(e.target.value)} />
+      <br />
+      <button onClick={handleAddName}>点击修改名字</button>
+      <br />
+      <button onClick={handleSelect}>点击修改select为true</button>
+    </div>
+  );
+};
+
+export default AdvanceEffect2;
+```
+
+面对上面的问题，要怎么修改呢？
+
+- 把依赖换成到你的属性 `state.name`
+- 使用 useMemo 来记忆函数返回值为你的对象
+
+下面是俩解决方案
+
+```jsx
+// 解决方案2 1-a 使用useMemo记录函数返回值
+const user = useMemo(
+  () => ({
+    name: state.name,
+    selected: state.selected,
+  }),
+  [state.name, state.selected]
+);
+
+// ❓ 你会发现即使你没修改state，也依然会被重新渲染
+useEffect(() => {
+  console.log('useEffect 被调用了 state被修改了');
+  // 解决方案2 1-b 把依赖改成user
+}, [user]); // 解决方案1 把依赖改成 state→state.name state→state.selected
+```
+
+### 定时器问题 ⭐️
+
+最近在做一个，就是每秒钟增加 1 个数字打印出来的问题。我会发现真的每次都是错误的，`setInterval()`这个真的很难搞，因为你想注册一次定时器而已。如果依赖的 number，每次 number 变化的时候就注册一个定时器，那个时候会发现有 n 个定时器。造成根本达到不想要的效果。🔥 **很重要 要理解！！！**
+
+```jsx
+import { useEffect, useMemo, useRef, useState } from 'react';
+
+/**
+ * 现在要实现一个计数器，每1秒就向前走一下
+ * 这里你会发现一个问题就是会无限
+ * @returns
+ */
+const AdvanceEffect3 = () => {
+  const [number, setNumber] = useState(0);
+
+  // ① 错误写法1 依赖的number 但是number每一秒都在被更改
+  // 造成内存泄漏
+  // useEffect(() => {
+  //   console.log('useEffect 被调用了');
+  //   setInterval(() => {
+  //     setNumber(number + 1);
+  //   }, 1000);
+  // }, [number]);
+
+  // ② 错误写法2 没有依赖 看似没问题
+  // 但是只要一旦页面其他地方发生渲染 这个定时器就会混乱起来
+  // useEffect(() => {
+  //   console.log('useEffect 被调用了');
+  //   setInterval(() => {
+  //     setNumber((number) => number + 1);
+  //   }, 1000);
+  // }, []);
+
+  // ③ 这一次终于对了
+  useEffect(() => {
+    console.log('useEffect 被调用了');
+    const id = setInterval(() => {
+      setNumber((number) => number + 1);
+    }, 1000);
+    return () => {
+      clearInterval(id);
+    };
+  }, []);
+
+  // 这里为什么拿不到最新的count 因为每一次render都是最新的值
+  // 那么怎么才可以呢，使用useRef
+  // const numRef = useRef(number);
+  // useEffect(() => {
+  //   numRef.current = number;
+  // });
+
+  // console.log(`render number:${number}`);
+  // useEffect(() => {
+  //   let id = setInterval(() => {
+  //     // console.log(`useEffect number:${numRef.current}`);
+  //     // console.log(`useEffect number:${number}`);
+  //     // setNumber((pre) => pre + 1);
+  //   }, 1000);
+  //   return () => {
+  //     clearInterval(id);
+  //   };
+  // }, []);
+
+  return (
+    <div style={{ fontSize: '30px' }}>
+      <span>number is {number}</span>
+    </div>
+  );
+};
+
+export default AdvanceEffect3;
+```
+
+好吧，上面说完了定时器的问题，其实原因就是**副作用没清除的**
+
+> 进阶一下，下面这段代码是点 start 开始计时，点 stop 结束计时的，问什么没效果。
+
+```jsx
+import { useState } from 'react';
+
+// 接下来用定时器写一个测试
+// 下面这段代码为什么不可以的问题
+// 只能start，无法stop 根本停不下来
+const AdvanceEffectB = () => {
+  const [number, setNumber] = useState(0);
+  let id = null;
+  const start = () => {
+    console.log('start 调用了');
+    id = setInterval(() => {
+      console.log('setInterval 计时开始');
+      setNumber((pre) => pre + 1);
+    }, 1000);
+  };
+
+  const stop = () => {
+    console.log('stop 调用了');
+    clearInterval(id);
+  };
+
+  return (
+    <div>
+      <h2 style={{ fontSize: '30px' }}>number is {number}</h2>
+
+      <button onClick={start}>start</button>
+      <button onClick={stop}>stop</button>
+    </div>
+  );
+};
+
+export default AdvanceEffectB;
+```
+
+原因如下
+
+其实就是渲染的时候 start 每次都是新的 id。而 stop 永远停留在了 null
+
+![Snipaste_2022-10-05_22-46-38](https://raw.githubusercontent.com/chihokyo/image_host/develop/Snipaste_2022-10-05_22-46-38.png)
+
+怎么解决？使用`useRef()`来解决
+
+```jsx
+import { useRef, useState } from 'react';
+
+// 接下来用定时器写一个测试
+const AdvanceEffectC = () => {
+  const [number, setNumber] = useState(0);
+  const intervalRef = useRef(null); // 1-a 设置一个ref
+
+  const start = () => {
+    console.log('start 调用了');
+    //  1-b 防止start被重复点
+    if (intervalRef.current != null) {
+      return;
+    }
+    // 1-c 每次的结果都给current 因为intervalRef对象不变的(useRef特性)
+    // 所以每次记录的都是最新的
+    intervalRef.current = setInterval(() => {
+      console.log('setInterval 计时开始');
+      setNumber((pre) => pre + 1);
+    }, 1000);
+  };
+
+  const stop = () => {
+    console.log('stop 调用了');
+    // 1-d 防止多次stop
+    if (intervalRef.current == null) {
+      return;
+    }
+    // 1-e 这样清除的肯定就是最新的id
+    clearInterval(intervalRef.current);
+    intervalRef.current = null; // 1-f 最后记得给清空
+  };
+	....
+};
+
+export default AdvanceEffectC;
+```
+
+除此之外，没清除副作用还会引起什么呢？那就是获取数据的时候，网络太慢，我不想获取了，或者是想获取别的了。网页依然还会记录第一次的状态，不会获取最新的，为什么？没消除副作用！！
+
+下面这段代码，本来是把网络设置成 fast 3g，从主页点击个连接跳转到这个组件，但是太慢于是你想回过去，但是发现依旧在请求。
+
+```jsx
+import { useEffect, useState } from 'react';
+
+const AdvanceEffect4 = () => {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/posts')
+      .then((res) => res.json())
+      .then((data) => {
+        alert('post are ready');
+        setPosts(data);
+        console.log(data);
+      });
+  }, []);
+
+  return (
+    <div>
+      {posts?.map((p) => (
+        <p key={p.id}>{p.title}</p>
+      ))}
+    </div>
+  );
+};
+
+export default AdvanceEffect4;
+```
+
+如何解决这种延迟问题呢？
+
+```jsx
+useEffect(() => {
+  let isCancelled = false; // 1-a 新增变量
+  fetch('https://jsonplaceholder.typicode.com/posts')
+    .then((res) => res.json())
+    .then((data) => {
+      if (!isCancelled) {
+        // 1-b 只有在没取消的时候
+        alert('post are ready');
+        setPosts(data);
+        console.log(data);
+      }
+    });
+  return () => {
+    // 1-c 设置为true
+    isCancelled = true;
+  };
+}, []);
+```
+
+如果你不想使用这种不优雅的方式，可以使用一个原生 API，就是`new AbortController()`
+
+```jsx
+useEffect(() => {
+  const controller = new AbortController(); //1-a
+  const signal = controller.signal;
+  //1-b 增加个option{}
+  fetch('https://jsonplaceholder.typicode.com/posts', { signal })
+    .then((res) => res.json())
+    .then((data) => {
+      alert('post are ready');
+      setPosts(data);
+      console.log(data);
+    });
+  return () => {
+    // 1-c 抛弃
+    controller.abort();
+  };
+}, []);
+```
 
 ## 5 useContext
 
