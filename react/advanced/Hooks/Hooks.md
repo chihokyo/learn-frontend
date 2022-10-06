@@ -1671,9 +1671,9 @@ useImperativeHandle(
 function useXXXX() {}
 ```
 
-## 12 自定义 hooks 实际使用场景
+### 自定义 hooks 实际使用场景
 
-场景一，给每个组件增加一个删除和销毁。
+场景一，给每个组件增加一个删除和销毁的 log 提示。
 
 ![image-20220302014943572](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220302014943572.png)
 
@@ -1689,4 +1689,197 @@ function useXXXX() {}
 
 > **其实和普通的函数封装没区别**
 >
-> **就是可以用 hooks！！！**
+> **就是可以用 hooks！！！而且不只是可以放 1 个 hook，多个 hooks 都可以混用。**
+
+## 13 useSeletor
+
+这个用在什么地方呢？答案：redux 才用。主要用于把冗长的`mapStateToProps`给替换掉的。
+
+```jsx
+// =====useSelector 主要是为了替换你的=====
+const mapStateToProps = (state) => ({
+  counter: state.counter.counter,
+});
+//=====useSelector 主要是为了替换你的=====
+
+const mapDispatchToProps = (dispatch) => ({
+  addNumber(num) {
+    dispatch(counterSlice.actions.addNumberAction(num));
+  },
+  subNumber(num) {
+    dispatch(counterSlice.actions.subNumberAction(num));
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReduxHookBefore);
+```
+
+这里主要是对比以前，之前和之后。尤其是配合 rtk 使用之后真的很 easy
+
+before
+
+```jsx
+import { memo } from 'react';
+import { connect } from 'react-redux';
+import counterSlice from './modules/counter';
+
+const ReduxHookBefore = memo((props) => {
+  const { counter, addNumber, subNumber } = props;
+
+  const addNumberHandle = (num) => {
+    addNumber(num);
+  };
+
+  const subNumberHandle = (num) => {
+    subNumber(num);
+  };
+  return (
+    <div>
+      <h1>counter is {counter}</h1>
+      <button onClick={(e) => addNumberHandle(1)}>+1</button>
+      <button onClick={(e) => addNumberHandle(5)}>+5</button>
+      <button onClick={(e) => subNumberHandle(-5)}>-5</button>
+    </div>
+  );
+});
+
+const mapStateToProps = (state) => ({
+  counter: state.counter.counter,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  addNumber(num) {
+    dispatch(counterSlice.actions.addNumberAction(num));
+  },
+  subNumber(num) {
+    dispatch(counterSlice.actions.subNumberAction(num));
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReduxHookBefore);
+```
+
+after
+
+```jsx
+import { memo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import counterSlice from './modules/counter';
+
+const ReduxHookBefore = memo((props) => {
+  //  1-a 将redux中store的数据映射到了这里
+  // 替代以前的mapStateTopProps 主要拿到最新的state
+  // 然后返回你想要的数据 然后这里做了解构
+  const { counter } = useSelector((state) => {
+    return {
+      counter: state.counter.counter,
+    };
+  });
+
+  // 1-b dispatch直接用这个hook就可以拿到了
+  const dispatch = useDispatch();
+  const addNumberHandle = (num) => {
+    dispatch(counterSlice.actions.addNumberAction(num));
+  };
+
+  const subNumberHandle = (num) => {
+    dispatch(counterSlice.actions.subNumberAction(num));
+  };
+
+  return (
+    <div>
+      <h1>counter is {counter}</h1>
+      <button onClick={(e) => addNumberHandle(1)}>+1</button>
+      <button onClick={(e) => addNumberHandle(5)}>+5</button>
+      <button onClick={(e) => subNumberHandle(-5)}>-5</button>
+    </div>
+  );
+});
+export default ReduxHookBefore;
+```
+
+![image-20221006154828059](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20221006154828059.png)
+
+### 浅层比较陷阱
+
+但是这里的 useSelector 有一个陷阱需要演示一下，关于浅层比较的。
+
+这里为了演示一下父组件的 UseSelectorA counter 改变了 但是子组件按照常理说用了 memo 应该不会发生再次渲染的 但是却渲染了
+
+```jsx
+import { memo } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import counterSlice from './modules/counter';
+
+// 这里为了演示一下父组件的 UseSelectorA counter改变了
+// 但是子组件按照常理说用了memo应该不会发生再次渲染的 但是却渲染了
+// 演示了一下这个过程
+const Child = memo((props) => {
+  console.log('Child render');
+  const { msg } = useSelector((state) => {
+    return {
+      msg: state.counter.msg,
+    };
+  });
+
+  return <div>message is :{msg}</div>;
+});
+
+const UseSelectorA = memo((props) => {
+  const { counter } = useSelector((state) => {
+    return {
+      counter: state.counter.counter,
+    };
+  });
+
+  const dispatch = useDispatch();
+  const addNumberHandle = (num) => {
+    dispatch(counterSlice.actions.addNumberAction(num));
+  };
+
+  const subNumberHandle = (num) => {
+    dispatch(counterSlice.actions.subNumberAction(num));
+  };
+
+  return (
+    <div>
+      <h1>counter is {counter}</h1>
+      <button onClick={(e) => addNumberHandle(1)}>+1</button>
+      <button onClick={(e) => addNumberHandle(5)}>+5</button>
+      <button onClick={(e) => subNumberHandle(-5)}>-5</button>
+      <Child />
+    </div>
+  );
+});
+
+export default UseSelectorA;
+```
+
+> 这是为什么呢？
+>
+> 原理就是 useSelector 会监控所有的 state 的状态变化，只要有一个变化了，她就会更新。所以即使 Child 组件里面 msg 没有更新，但是 state 里的 counter 更新了，那就会更新的。
+>
+> 那如何解决呢？很简单`shallowEqual` 这里的`shallowEqual` 会浅层比较 ，只要没有更新就不会渲染
+>
+> **旧 state.msg** PK **新 state.msg**
+
+```jsx
+const Child = memo((props) => {
+  console.log('Child render');
+  const { msg } = useSelector((state) => {
+    return {
+      msg: state.counter.msg,
+    };
+  }, shallowEqual); // 添加shallowEqual 这个的作用就是只要不是检测整个state 而是检测到state.msg发生变化才渲染
+
+  return <div>message is :{msg}</div>;
+});
+```
+
+## 14 useDispatch
+
+直接看上面的 13 就行，替代 redux 里的`mapDispatchToProps()`
+
+## React18 新 hooks
+
+暂时不想写了，用到再说吧。反正都是新的，大部分都是搞性能优化的。
