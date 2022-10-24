@@ -98,6 +98,88 @@ props 指向的是一个对象。它包含了父组件中传递的所有参数
 this.props.name = 'jack'; //此行代码会报错，因为props是只读的
 ```
 
+这里继续详细的看一下 props
+
+props 传递的数据类型
+
+```jsx
+import React, { memo } from 'react';
+
+const App = memo(() => {
+  return (
+    <div>
+      {/* 下面这两种传递的其实都是string 字符串比较特殊 可以2种方式传递都ok*/}
+      <Child text="hello react" />
+      <Child text={'hello react'} />
+    </div>
+  );
+});
+
+const Child = memo((props) => {
+  // 这里传递的是一个string没错
+  console.log(typeof props.text);
+  const greeting = 'Welcome to newyork';
+  return <h1>{greeting}</h1>;
+});
+
+export default App;
+```
+
+传递一个对象
+
+```jsx
+import React, { memo } from 'react';
+
+const App = memo(() => {
+  return (
+    <div>
+      {/* 下面这两种传递的其实都是string 字符串比较特殊 可以2种方式传递都ok*/}
+      <Child text="hello react" />
+      <Child text={'hello yes'} />
+      {/* 第1个{} 是用来表示下面是一段js哦，第2个{}才是你要传递的对象 */}
+      <Child text={{ obj: 'i am obj' }} />
+    </div>
+  );
+});
+
+const Child = memo((props) => {
+  // 然后你会发现这里传递的就是obj了
+  console.log(typeof props.text);
+  const greeting = 'Welcome to newyork';
+  return <h1>{greeting}</h1>;
+});
+
+export default App;
+
+// 下面一段
+import React, { memo } from 'react';
+
+const App = memo(() => {
+  return (
+    <div>
+      {/* 下面这两种传递的其实都是string 字符串比较特殊 可以2种方式传递都ok*/}
+      <Child text="hello react" />
+      <Child text={'hello yes'} />
+      {/* 第1个{} 是用来表示下面是一段js哦，第2个{}才是你要传递的对象 */}
+      <Child text={{ obj: 'i am obj' }} />
+    </div>
+  );
+});
+
+const Child = memo(({ text }) => {
+  return <h1>{text.obj}</h1>;
+});
+
+export default App;
+
+```
+
+> 基本上这就是 React 中 props 从组件传递到组件的方式。您可能已经注意到，props 仅在 React 应用程序的组件层次结构中从上到下传递。没有办法将道具从子组件传递给父组件。我们将在本教程后面重新讨论这个警告。
+>
+> 同样重要的是要注意 React 的 props 是只读的（不可变的）。作为开发人员，你永远不应该改变 props，而只能在你的组件中读取它们。不过，您可以从中派生新值（请参阅稍后的计算属性）。毕竟，props 仅用于将数据从父组件传递给子组件 React。本质上，道具只是将数据沿组件树传输的工具。
+
+![image-20221021161755790](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20221021161755790.png)
+
 ### 父 → 子 传递小 demo
 
 ```jsx
