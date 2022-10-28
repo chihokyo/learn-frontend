@@ -39,7 +39,7 @@ A:平常不设置的情况下，写的那些代码就是默认就是标准流。
 
 **Q:什么是定位元素？**
 
-A:就是设置成了`relative,absolute,fixed,sticky`，可以使用 top/bottom/left/right 这样。可以自己写位置了。
+A:就是设置成了`relative,absolute,fixed,sticky`，可以使用 **top/bottom/left/right** 这样。可以自己写位置了。
 
 **Q:什么是 absolutely positioned element（绝对定位元素类）？**
 
@@ -134,7 +134,7 @@ right: 10px; /* 开始就有了变化 */
 特点如下
 
 - 元素脱离**normal flow**(脱离标准流 脱标)
-- 可以通过 top/bottom/left/right 进行定位
+- 可以通过 **top/bottom/left/right** 进行定位
 - 参照对象是视口 viewpoint
 
 小案例
@@ -203,7 +203,9 @@ right: 10px; /* 开始就有了变化 */
 </body>
 ```
 
-> 只要理解相对于视口+脱标，几乎就没问题。
+> 只要理解相对于**视口+脱标**，几乎就没问题。
+>
+> 主要用在固定不变的，比如侧边栏等等。
 
 ## 4 absolute 绝对定位 ⭐️
 
@@ -212,7 +214,7 @@ right: 10px; /* 开始就有了变化 */
 这个定位首先是脱离标准流的，就是不会按照顺序排排站。
 
 - 脱离标准流
-- 可以用 top/bottom/left/right 进行定位
+- 可以用 **top/bottom/left/right** 进行定位
 - 定位参照对象是**最邻近**的**定位祖先**元素
   - 重点 1 最邻近的祖先
   - 重点 2 必须是定位元素！！祖先 + 定位（可用 top..）元素，缺一不可。
@@ -276,7 +278,7 @@ right: 10px; /* 开始就有了变化 */
 
 > 在绝大数情况下，子元素的绝对定位都是相对于**父元素**进行定位
 >
-> 如果希望子元素相对于父元素进行定位，又不希望父元素脱标（只能 relative）。因为 fixed 也是脱标，absolute 也是脱标。
+> 如果希望子元素相对于父元素进行定位，又不希望父元素脱标（只能 relative）。因为 fixed 也是脱标，absolute 也是脱标。relative 不是脱标元素。
 >
 > 1.父元素设置`position: relative`(让父元素成为定位元素，而且父元素不脱离标准流)
 >
@@ -620,10 +622,10 @@ left + right + margin-left + margin-right + 绝对定位元素的实际占用宽
 
 其实这个属性就是一个混合体。
 
-相对定位 + 达到阈值 → 变身成为fixed or absolute 相对于视口就是fixed，
+相对定位 + 达到阈值 → 变身成为 fixed or absolute 相对于视口就是 fixed，
 
-必须要有方向的！（必须写top/bottom/left/right)
+必须要有方向的！（必须写 top/bottom/left/right)
 
-sticky是相对于最近的滚动祖先包含滚动视口的(the nearest ancestor scroll container’s scrollport )
+sticky 是相对于最近的滚动祖先包含滚动视口的(the nearest ancestor scroll container’s scrollport )
 
 其实这段意思就是不一定相当于视口，而是滚动视口。谁能滚动，才以谁为参照。

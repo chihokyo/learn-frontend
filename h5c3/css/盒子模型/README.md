@@ -253,7 +253,7 @@ block 默认情况下是独占一行的。独占一行肯定没有居中这一�
 
 一旦设置了宽度之后，就有了居中问题。
 
-TODO 少一个 block 不能用 text-align 例子。
+下面是一个例子。
 
 ```html
 <title>5block级别不能用text-align</title>
@@ -284,9 +284,9 @@ TODO 少一个 block 不能用 text-align 例子。
 
 所以如何居中呢？使用 margin:0,auto
 
-原理，block box width = width + padding + border +margin
+原理，**block box width = width + padding + border +margin**
 
-由于没有设置其他的。所以现在就是 ↓
+由于没有设置其他的。所以现在就是 ↓	
 
 原理，block box width = 100 + 0 + 0 +margin
 
