@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo2</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600');
+
+      :root {
+        --padding: 16px 32px;
+        --products-width: 490px;
+        --products-height: 280px;
+        --developers-width: 390px;
+        --developers-height: 260px;
+        --company-width: 260px;
+        --company-height: 300px;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: 'Open Sans', sans-serif;
+        background: linear-gradient(-45deg, #19c5fe, #4553ff);
+        padding: 20px;
+      }
+
+      .popover {
+        position: relative;
+      }
+
+      .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: var(--products-width);
+        height: var(--products-height);
+        padding: var(--padding);
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25),
+          0 30px 60px -30px rgba(0, 0, 0, 0.3);
+        transform-origin: 0 0;
+        transition: transform 0.4s;
+      }
+
+      .content {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        padding: var(--padding);
+      }
+
+      .section {
+        position: absolute;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .section.active {
+        opacity: 1;
+      }
+
+      /* Products Popover ----------------------------- */
+
+      .section-products {
+        width: var(--products-width);
+        height: var(--products-height);
+      }
+
+      .navlist-primary li {
+        display: flex;
+        padding: 16px 0;
+      }
+
+      .circle {
+        flex: 0 0 48px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+      }
+
+      .circle.small {
+        flex: 0 0 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .navlist-primary-payments h3 {
+        color: #6772e4;
+      }
+      .navlist-primary-billing h3 {
+        color: #23b47e;
+      }
+      .navlist-primary-connect h3 {
+        color: #3297d3;
+      }
+
+      .navlist-primary-payments .circle {
+        background: #87bbfd;
+      }
+      .navlist-primary-billing .circle {
+        background: #74e3a2;
+      }
+      .navlist-primary-connect .circle {
+        background: #68d4f8;
+      }
+
+      .navlist-primary-text {
+        flex: 1 1 auto;
+        margin-left: 24px;
+      }
+
+      .navlist-primary h3 {
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        line-height: 22px;
+        letter-spacing: 0.025em;
+        font-weight: 600;
+      }
+
+      .navlist-primary p {
+        font-size: 14px;
+        line-height: 22px;
+        color: #7b8ca3;
+      }
+
+      /* Developers Popover --------------------------------- */
+
+      .section-developers {
+        width: var(--developers-width);
+        height: var(--developers-height);
+      }
+
+      .subtle {
+        margin-left: 30px;
+        color: #7b8ca3;
+        font-size: 14px;
+        margin: 3px 0 32px 30px;
+      }
+
+      .two-col {
+        display: grid;
+        margin-left: 30px;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      h4 {
+        font-size: 14px;
+        line-height: 22px;
+        letter-spacing: 0.025em;
+        color: #8898aa;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+
+      .navlist-subtle {
+        color: #6772e5;
+        font-size: 14px;
+      }
+
+      .navlist-subtle li {
+        padding: 6px 0;
+      }
+
+      /* Company Popover ------------------------------------ */
+
+      .section-company {
+        width: var(--company-width);
+        height: var(--company-height);
+      }
+
+      .navlist {
+        color: #6772e5;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .navlist li {
+        padding: 8px 0;
+      }
+
+      .navlist .feather {
+        position: relative;
+        top: 6px;
+        width: 18px;
+        margin-right: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="popover">
+      <div class="content">
+        <!-- PRODUCTS POPOVER -->
+
+        <div class="section section-products active">
+          <ul class="navlist-primary">
+            <li class="navlist-primary-payments">
+              <div class="circle"></div>
+              <div class="navlist-primary-text">
+                <h3>Payments</h3>
+                <p>A complete payments platform engineered for growth</p>
+              </div>
+            </li>
+            <li class="navlist-primary-billing">
+              <div class="circle"></div>
+              <div class="navlist-primary-text">
+                <h3>Billing</h3>
+                <p>Build and scale your recurring business model.</p>
+              </div>
+            </li>
+            <li class="navlist-primary-connect">
+              <div class="circle"></div>
+              <div class="navlist-primary-text">
+                <h3>Connect</h3>
+                <p>Everything platforms need to get sellers paid.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- DEVELOPERS POPOVER -->
+
+        <div class="section section-developers active">
+          <ul class="navlist">
+            <li><i data-feather="info"></i>Documentation</li>
+          </ul>
+          <p class="subtle">Start integrating Stripe's products and tools.</p>
+          <div class="two-col">
+            <div>
+              <h4>Get started</h4>
+              <ul class="navlist-subtle">
+                <li>Elements</li>
+                <li>Checkout</li>
+                <li>Mobile apps</li>
+                <li>Libraries</li>
+              </ul>
+            </div>
+            <div>
+              <h4>Popular topics</h4>
+              <ul class="navlist-subtle">
+                <li>Apple Pay</li>
+                <li>Testing</li>
+                <li>Launch checklist</li>
+                <li>Plug-ins</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPANY POPOVER -->
+
+        <div class="section section-company active">
+          <ul class="navlist">
+            <li><i data-feather="info"></i>About Stripe</li>
+            <li><i data-feather="users"></i>Customers</li>
+            <li><i data-feather="server"></i>Partner program</li>
+            <li><i data-feather="briefcase"></i>Jobs</li>
+            <li><i data-feather="image"></i>Environment</li>
+            <li><i data-feather="layout"></i>Newsroom</li>
+          </ul>
+        </div>
+      </div>
+      <div class="background"></div>
+    </div>
+    <script>
+      const sections = document.querySelectorAll('.section');
+      let sectionCount = 0;
+      setInterval(() => {
+        for (let section of sections) {
+          section.classList.remove('active');
+        }
+        sections[sectionCount % 3].classList.add('active');
+        sectionCount++;
+      }, 2000);
+    </script>
+  </body>
+</html>

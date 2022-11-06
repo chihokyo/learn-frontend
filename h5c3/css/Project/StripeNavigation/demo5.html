@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demo2</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css?family=Open+Sans:400,600');
+
+      :root {
+        --padding: 16px 32px;
+        --transition-duration: 0.3s;
+        --products-width: 490px;
+        --products-height: 280px;
+        --developers-width: 390px;
+        --developers-height: 266px;
+        --company-width: 260px;
+        --company-height: 296px;
+      }
+
+      * {
+        box-sizing: border-box;
+        font-family: 'Open Sans', sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: 'Open Sans', sans-serif;
+        background: linear-gradient(-45deg, #19c5fe, #4553ff);
+        padding: 20px;
+      }
+
+      /* Root element */
+      .header {
+        perspective: 2000px;
+      }
+
+      /* Top nav ----------------------------- */
+
+      .nav {
+        display: flex;
+      }
+      .nav-link {
+        height: 50px;
+        padding: 0 25px;
+        line-height: 50px;
+        border: 0;
+        font-size: 16px;
+        color: white;
+        background: none;
+        font-weight: 500;
+        -webkit-font-smoothing: antialiased;
+        transition: opacity 0.2s;
+      }
+
+      .nav-link:hover {
+        opacity: 0.5;
+      }
+
+      /* Popover ----------------------------- */
+
+      .popover {
+        position: absolute;
+        left: 0;
+        right: 0;
+        opacity: 0;
+        transform-origin: center -20px;
+        transform: rotateX(-15deg);
+        transition: transform var(--transition-duration),
+          opacity var(--transition-duration);
+        background: red;
+        display: inline-block;
+      }
+
+      .popover.open {
+        opacity: 1;
+        transform: rotateX(0);
+      }
+
+      .arrow {
+        position: absolute;
+        top: -6px;
+        left: 0;
+        width: 12px;
+        height: 12px;
+        margin-left: -6px;
+        background: red;
+        box-shadow: -3px -3px 5px rgba(80, 90, 120, 0.05);
+        border-radius: 4px 0 0 0;
+        transform: rotate(15deg);
+        transition: transform var(--transition-duration),
+          opacity var(--transition-duration);
+        will-change: transform;
+      }
+
+      .background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: var(--products-width);
+        height: var(--products-height);
+        padding: var(--padding);
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 50px 100px -20px rgba(50, 50, 93, 0.25),
+          0 30px 60px -30px rgba(0, 0, 0, 0.3);
+        transform-origin: 0 0;
+        transition: transform var(--transition-duration),
+          opacity var(--transition-duration);
+      }
+
+      .content {
+        position: absolute;
+        overflow: hidden;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        padding: var(--padding);
+        transition: transform var(--transition-duration),
+          opacity var(--transition-duration);
+      }
+
+      .section {
+        position: absolute;
+        opacity: 0;
+        transition: opacity 0.2s;
+        overflow: hidden;
+      }
+
+      .section.active {
+        opacity: 1;
+      }
+
+      /* Products Popover ----------------------------- */
+
+      .section-products {
+        width: var(--products-width);
+        height: var(--products-height);
+      }
+
+      .navlist-primary li {
+        display: flex;
+        padding: 16px 0;
+      }
+
+      .circle {
+        flex: 0 0 48px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+      }
+
+      .circle.small {
+        flex: 0 0 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .navlist-primary-payments h3 {
+        color: #6772e4;
+      }
+      .navlist-primary-billing h3 {
+        color: #23b47e;
+      }
+      .navlist-primary-connect h3 {
+        color: #3297d3;
+      }
+
+      .navlist-primary-payments .circle {
+        background: #87bbfd;
+      }
+      .navlist-primary-billing .circle {
+        background: #74e3a2;
+      }
+      .navlist-primary-connect .circle {
+        background: #68d4f8;
+      }
+
+      .navlist-primary-text {
+        flex: 1 1 auto;
+        margin-left: 24px;
+      }
+
+      .navlist-primary h3 {
+        text-transform: uppercase;
+        margin-bottom: 5px;
+        line-height: 22px;
+        letter-spacing: 0.025em;
+        font-weight: 600;
+      }
+
+      .navlist-primary p {
+        font-size: 14px;
+        line-height: 22px;
+        color: #7b8ca3;
+      }
+
+      /* Developers Popover --------------------------------- */
+
+      .section-developers {
+        width: var(--developers-width);
+        height: var(--developers-height);
+      }
+
+      .section-developers .navlist {
+        margin-top: 10px;
+      }
+
+      .subtle {
+        color: #7b8ca3;
+        font-size: 14px;
+        margin: 3px 0 32px 0;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      h4 {
+        font-size: 14px;
+        line-height: 22px;
+        letter-spacing: 0.025em;
+        color: #8898aa;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+
+      .navlist-subtle {
+        color: #6772e5;
+        font-size: 14px;
+      }
+
+      .navlist-subtle li {
+        padding: 6px 0;
+      }
+
+      /* Company Popover ------------------------------------ */
+
+      .section-company {
+        width: var(--company-width);
+        height: var(--company-height);
+      }
+
+      .navlist {
+        color: #6772e5;
+        text-transform: uppercase;
+        font-weight: 600;
+      }
+
+      .navlist li {
+        padding: 8px 0;
+      }
+
+      .navlist .feather {
+        position: relative;
+        top: 6px;
+        width: 18px;
+        margin-right: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header">
+      <section>
+        <nav class="nav">
+          <button class="nav-link" data-nav="products">
+            Products
+          </button>
+          <button class="nav-link" data-nav="developers">
+            Developers
+          </button>
+          <button class="nav-link" data-nav="company">
+            Company
+          </button>
+        <nav>
+      </section>
+      <div class="popover">
+        <div class="content">
+          <!-- PRODUCTS POPOVER -->
+          <section class="section section-products">
+            <ul class="navlist-primary">
+              <li class="navlist-primary-payments">
+                <div class="circle"></div>
+                <div class="navlist-primary-text">
+                  <h3>Payments</h3>
+                  <p>A complete payments platform engineered for growth</p>
+                </div>
+              </li>
+              <li class="navlist-primary-billing">
+                <div class="circle"></div>
+                <div class="navlist-primary-text">
+                  <h3>Billing</h3>
+                  <p>Build and scale your recurring business model.</p>
+                </div>
+              </li>
+              <li class="navlist-primary-connect">
+                <div class="circle"></div>
+                <div class="navlist-primary-text">
+                  <h3>Connect</h3>
+                  <p>Everything platforms need to get sellers paid.</p>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <!-- DEVELOPERS POPOVER -->
+          <section class="section section-developers">
+            <ul class="navlist">
+              <li>Documentation</li>
+            </ul>
+            <p class="subtle">Start integrating Stripe's products and tools.</p>
+            <div class="two-col">
+              <div>
+                <h4>Get started</h4>
+                <ul class="navlist-subtle">
+                  <li>Elements</li>
+                  <li>Checkout</li>
+                  <li>Mobile apps</li>
+                  <li>Libraries</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Popular topics</h4>
+                <ul class="navlist-subtle">
+                  <li>Apple Pay</li>
+                  <li>Testing</li>
+                  <li>Launch checklist</li>
+                  <li>Plug-ins</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <!-- COMPANY POPOVER -->
+          <section class="section section-company">
+            <ul class="navlist">
+              <li><i data-feather="info"></i>About Stripe</li>
+              <li><i data-feather="users"></i>Customers</li>
+              <li><i data-feather="server"></i>Partner program</li>
+              <li><i data-feather="briefcase"></i>Jobs</li>
+              <li><i data-feather="image"></i>Environment</li>
+              <li><i data-feather="layout"></i>Newsroom</li>
+            </ul>
+          </section>
+        </div>
+        <div class="background"></div>
+        <div class="arrow"></div>
+      </div>
+    </header>
+    <script>
+      // 获取元素
+      const sectionEls = document.querySelectorAll('.section');
+      const navLinkEls = document.querySelectorAll('.nav-link');
+
+      const headerEl = document.querySelector('.header');
+      const popoverEl = document.querySelector('.popover');
+      const contentEl = document.querySelector('.content');
+      const arrowEl = document.querySelector('.arrow');
+      const backgroundEl = document.querySelector('.background');
+
+      const sections = ['products', 'developers', 'company'];
+
+      const dimensions = {
+        products: { width: 490, height: 280, x: 0 },
+        developers: { width: 390, height: 266, x: 100 },
+        company: { width: 260, height: 296, x: 200 },
+      };
+
+      // 获取pop距离窗口左边的位置
+      const popoverLeft = popoverEl.getBoundingClientRect().x;
+      navLinkEls.forEach((navLink) => {
+        // 获取名字
+        let section = navLink.getAttribute('data-nav');
+        // console.log(section);
+        // getBoundingClientRect 这是一个获取位置很好的API方法
+        let rect = navLink.getBoundingClientRect();
+        // 这里相当于是获取(左边的位置 + 宽度的一半 / 2) - pop的位置
+        console.log(dimensions[section]);
+        dimensions[section].arrowX = rect.left + rect.width / 2 - popoverLeft;
+      });
+
+      // Set initial arrow position
+      // 设置箭头的初始位置 如果不设置这个就会让箭头有一个从左到右的划入的感觉 这是不行的
+      arrowEl.style.transform = `
+        translateX(${dimensions.products.arrowX}px)
+        rotate(45deg)`;
+
+        // 书写显示逻辑
+      function showSection(section) {
+        // 增加open active
+        popoverEl.classList.add('open');
+        sectionEls.forEach((el) => el.classList.remove('active'));
+        document.querySelector(`.section-${section}`).classList.add('active');
+
+        // Position arrow 以下都是动效
+        // 设置箭头的属实位置
+        arrowEl.style.transform = `
+          translateX(${dimensions[section].arrowX}px)
+          rotate(45deg)`;
+
+        // Resize and position background
+        // 这里很重要 主要是设置transform的一些动效
+        backgroundEl.style.transform = `
+          translateX(${dimensions[section].x}px)
+          scaleX(${dimensions[section].width / dimensions['products'].width})
+          scaleY(${dimensions[section].height / dimensions['products'].height})
+        `;
+
+        // Resize and position content
+        // 这里设置大小
+        contentEl.style.width = dimensions[section].width + 'px';
+        contentEl.style.height = dimensions[section].height + 'px';
+        // 依然要有动效
+        contentEl.style.transform = `translateX(${dimensions[section].x}px)`;
+
+        // size container? If we remove from CSS and do everything dynamically.
+      }
+
+      // 当鼠标划入每个nav-link的时候增加事件
+      navLinkEls.forEach((navLink) => {
+        navLink.addEventListener('mouseenter', (event) => {
+          // 获取到点击了哪个元素的pop
+          let targetPopover = event.target.getAttribute('data-nav');
+          console.log(targetPopover);
+          showSection(targetPopover);
+        });
+      });
+
+      headerEl.addEventListener('mouseleave', () => {
+        popoverEl.classList.remove('open');
+      });
+    </script>
+  </body>
+</html>

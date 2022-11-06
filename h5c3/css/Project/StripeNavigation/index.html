@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <!-- 主要参考了https://lokeshdhakar.com/dev-201-stripe.coms-main-navigation/ 这篇文章 -->
+    <!-- 代码是这里https://codepen.io/lokesh/pen/MLOBjV -->
+    <!-- 要是看拆解步骤，直接看demo1~5 -->
+    <title>stripe 主要演示了一个划入stripe的效果</title>
+  </head>
+  <body>
+    <header class="header">
+      <section>
+        <nav class="nav">
+          <button class="nav-link" data-nav="products">Products</button>
+          <button class="nav-link" data-nav="developers">Developers</button>
+          <button class="nav-link" data-nav="company">Company</button>
+        </nav>
+      </section>
+      <div class="popover">
+        <div class="content">
+          <!-- PRODUCTS POPOVER -->
+          <section class="section section-products">
+            <ul class="navlist-primary">
+              <li class="navlist-primary-payments">
+                <div class="circle"></div>
+                <div class="navlist-primary-text">
+                  <h3>Payments</h3>
+                  <p>A complete payments platform engineered for growth</p>
+                </div>
+              </li>
+              <li class="navlist-primary-billing">
+                <div class="circle"></div>
+                <div class="navlist-primary-text">
+                  <h3>Billing</h3>
+                  <p>Build and scale your recurring business model.</p>
+                </div>
+              </li>
+              <li class="navlist-primary-connect">
+                <div class="circle"></div>
+                <div class="navlist-primary-text">
+                  <h3>Connect</h3>
+                  <p>Everything platforms need to get sellers paid.</p>
+                </div>
+              </li>
+            </ul>
+          </section>
+
+          <!-- DEVELOPERS POPOVER -->
+          <section class="section section-developers">
+            <ul class="navlist">
+              <li>Documentation</li>
+            </ul>
+            <p class="subtle">Start integrating Stripe's products and tools.</p>
+            <div class="two-col">
+              <div>
+                <h4>Get started</h4>
+                <ul class="navlist-subtle">
+                  <li>Elements</li>
+                  <li>Checkout</li>
+                  <li>Mobile apps</li>
+                  <li>Libraries</li>
+                </ul>
+              </div>
+              <div>
+                <h4>Popular topics</h4>
+                <ul class="navlist-subtle">
+                  <li>Apple Pay</li>
+                  <li>Testing</li>
+                  <li>Launch checklist</li>
+                  <li>Plug-ins</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <!-- COMPANY POPOVER -->
+          <section class="section section-company">
+            <ul class="navlist">
+              <li><i data-feather="info"></i>About Stripe</li>
+              <li><i data-feather="users"></i>Customers</li>
+              <li><i data-feather="server"></i>Partner program</li>
+              <li><i data-feather="briefcase"></i>Jobs</li>
+              <li><i data-feather="image"></i>Environment</li>
+              <li><i data-feather="layout"></i>Newsroom</li>
+            </ul>
+          </section>
+        </div>
+        <div class="background"></div>
+        <div class="arrow"></div>
+      </div>
+    </header>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>
