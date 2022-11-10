@@ -10,7 +10,7 @@
 
 这里主要介绍的是 redux，只是 redux 而已。
 
-是学习 redux 的第一步，这里不设计具体 react 知识。
+是学习 redux 的第一步，这里不设计涉及 react 知识。
 
 一个文件梭哈。就是最简单的 redux 的形式，就是跑通 redux 而已。
 
@@ -56,3 +56,5 @@ redux-saga 登场
 ### redux09
 
 reducer 承受了太多，于是接下来了拆分。拆分就是为每个组件都搞一个 store 文件夹，然后进行拆分。
+
+### react toolkit

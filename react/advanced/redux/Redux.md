@@ -34,6 +34,8 @@ npm i redux
 
 ![image-20220215224046602](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220215224046602.png)
 
+- 大概的流程感觉就是，一旦调用dispatch就会立马就找reducer。（这是为什么？因为你用store调用的dispatch，store生成的时候自动放进去了reducer这个控制器。
+
 ![image-20220215233757128](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20220215233757128.png)
 
 一些补充
