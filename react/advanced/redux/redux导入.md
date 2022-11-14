@@ -496,7 +496,7 @@ function bindActionCreators(actionCreators, dispatch) {
 }
 ```
 
-这样就一步步推导出来了。
+这样就一步步推导出来了。 这个函数最大的作用就是只用 addTodo 就完成了**action+dispatch 的任务。进一步封装。**
 
 最后的完成版是这样的。
 
@@ -807,4 +807,19 @@ const dispatch = useCallback(
   },
   [todos, count]
 );
+```
+
+差不多了。
+
+这里的重点就是把 dispatch 拆分成了 reducer 这里。老数据，经过 reducer 之后，就变成了新数据。
+
+为了让新数据产生变化，于是就到了这些。
+
+```jsx
+const newState = reducer(state, action);
+
+for (let key in newState) {
+  // 一股脑的把所有数据全部都更新了，这里就是新数据 → newState[key]
+  setters[key](newState[key]);
+}
 ```
