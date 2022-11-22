@@ -1,6 +1,6 @@
 # TypeScript
 
-这里有一个可以用来写 Type Script 的 PlayGround
+这里有一个可以用来写 TypeScript 的 PlayGround
 
 [PlayGround](https://www.typescriptlang.org/play?#code/PTAEHUFMBsGMHsC2lQBd5oBYoCoE8AHSAZVgCcBLA1UABWgEM8BzM+AVwDsATAGiwoBnUENANQAd0gAjQRVSQAUCEmYKsTKGYUAbpGF4OY0BoadYKdJMoL+gzAzIoz3UNEiPOofEVKVqAHSKymAAmkYI7NCuqGqcANag8ABmIjQUXrFOKBJMggBcISGgoAC0oACCbvCwDKgU8JkY7p7ehCTkVDQS2E6gnPCxGcwmZqDSTgzxxWWVoASMFmgYkAAeRJTInN3ymj4d-jSCeNsMq-wuoPaOltigAKoASgAywhK7SbGQZIIz5VWCFzSeCrZagNYbChbHaxUDcCjJZLfSDbExIAgUdxkUBIursJzCFJtXydajBBCcQQ0MwAUVWDEQC0gADVHBQGNJ3KAALygABEAAkYNAMOB4GRonzFBTBPB3AERcwABS0+mM9ysygc9wASmCKhwzQ8ZC8iHFzmB7BoXzcZmY7AYzEg-Fg0HUiQ58D0Ii8fLpDKZgj5SWxfPADlQAHJhAA5SASPlBFQAeS+ZHegmdWkgR1QjgUrmkeFATjNOmGWH0KAQiGhwkuNok4uiIgMHGxCyYrA4PCCJSAA)
 
@@ -291,13 +291,11 @@ const hello = () => {};
 npm list -g --depth=0
 ```
 
-
-
 ## 接口
 
-普通属性 → 多1个少1个都不行
+普通属性 → 多 1 个少 1 个都不行
 
-可选属性 → age？ 可选可不选，只能有or没有，不能突然多1个age之外的
+可选属性 → age？ 可选可不选，只能有 or 没有，不能突然多 1 个 age 之外的
 
 任意属性 → 任意属性 反正啥类型都行（但是定义的类型必须包含的可选类型的类型
 
@@ -305,8 +303,6 @@ npm list -g --depth=0
 // 使用 [propName: string] 定义了任意属性取 string 类型的值。
 // 一旦定义了任意属性，那么确定属性和可选属性的类型都必须是它的类型的子集：
 ```
-
-
 
 ## 爬虫
 
