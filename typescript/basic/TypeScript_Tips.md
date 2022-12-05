@@ -659,7 +659,7 @@ console.log(add('hello', 'ts'));
 
 官方文档也写了，一般选联合类型。只有联合类型做不到，才选择重载。
 
-## 6. 关于对象
+## 7. 关于对象
 
 其实对象的类型注解方式总共有 2 种。
 
@@ -715,6 +715,42 @@ console.log(getInfo({ name: 'chin', age: 88 })); // CHIN
 ```
 
 对象也有可选类型和只读类型
+
+索引签名
+
+```typescript
+/**
+ * 索引签名 index signatures
+ *
+ * 这个是第二次开始写了 说实话 这个理解起来有点难
+ * 因为我在其他资料里也看了 这个也叫任意属性 是接口里的
+ *  JS里我们定义了一个对象/数组的话 访问的时候用的下标
+ * 虽然是一个数字，但是JS内部默认会转换(隐式调用)成一个string的
+ * arr[0] → arr["0"]
+ *
+ * 重点1 索引只能有两种数据类型 [index:number] or [index:string]
+ * 重点2 数字类型索引范围一定要小于字符的 [index:number] 范围小 子类
+ */
+
+interface Person {
+  // [index: number | string]: string; 不能在index写联合类型
+  [key: number]: string;
+  [index: string]: any; // 这样是可以的
+
+  //*********** */
+  // 数字索引的类型 范围一定要小于 字符串类型的索引
+  // [index: number]: number|string;❌ 这个太大了
+  // [index:string]:string
+
+  // [index: number]: string; ✅
+  // [index:string]:number|string
+}
+
+const p: Person = ['aa', 'bb', 'cc'];
+
+console.log(p[1]);
+export {};
+```
 
 ### this 的处理
 
@@ -947,9 +983,11 @@ IStore & ThisType<IState>
 
 写法就是上面的
 
-## 7. 面向对象
+## 8. 面向对象
 
-JS 从 ES6 开始用 class 类实现面向对象等等特性了。比如继承。以前都是原型链的。
+JS 从 ES6 开始用 class 类实现面向对象等等特性了。比如继承。以前都是原型链的。面向对象的三个特征，不是说封装，继承，多态么。TS 里都有体现的。
+
+### 类
 
 最基本使用
 
@@ -1024,4 +1062,715 @@ c1.showAge(); // 88
 // 这样可以访问吗
 // 当然是不可以，因为已经脱离类内部了 即使是继承
 // c1.age;  ❌ 子类才行
+```
+
+### 构造函数 PK 类
+
+当我们写一个类的时候，其实会得到 2 个类型。
+
+- 构造函数的函数类型（函数
+- 类的实例类型（类
+
+这是为什么呢？这是因为 JS 出生的缺陷啊。类用函数表示的！
+
+没有 new 的话，这个就代表函数类型。
+
+有的 new 的话 就代表 new 之后的实例类型。
+
+```typescript
+// 没有new 只是描述一个普通函数类型
+interface WithNameClassA {
+  // 描述构造函数类型
+  (id: string): any;
+}
+
+const w1: WithNameClassA = (id: string) => {};
+
+// 此时描述的就是一个构造函数
+class Animal {}
+interface WithNameClassB {
+  // 描述构造函数类型
+  new (id: string): Animal;
+}
+const w2: WithNameClassB = Animal;
+```
+
+那么接下来是什么呢
+
+```typescript
+// 这是什么呢？这代表一个对象里有a这个属性 a的属性是一个函数
+interface WithNameClassC {
+  a: (name: string) => any;
+}
+
+const w3: WithNameClassC = {
+  a: function (name) {
+    console.log(name);
+  },
+};
+w3.a('hello');
+```
+
+那么接下来这个怎么描述呢
+
+```typescript
+// 这样就可以了
+const t1: Type1 = (name) => console.log('name');
+t1.age = 100;
+
+export {};
+```
+
+js 的 typeof 和 TS 的 typeof 不一样。
+
+### 接口 interface
+
+ts 的接口和其他语言最大的不同就是，这里我只说 java，java 的接口标识一个行为。和 java 一样。也是一种 shape，**类型**。
+
+- 可以被实现
+- 可以定义一个对象类型 shape
+
+```typescript
+// 属性不能多，不能少
+
+interface Iinfo {
+  uuid: string;
+  age: number;
+}
+
+const i1: Iinfo = {
+  uuid: 'chin',
+  age: 222,
+  //   height: 11; 不可以多 不可以少
+};
+```
+
+任意属性
+
+```typescript
+interface IPerson {
+  name: string;
+  age: number;
+  // 加上这个就可以是任意属性了
+  // 但是要注意 这个key必须是字符串
+  [key: string]: any;
+}
+
+const p1: IPerson = {
+  name: 'chin',
+  age: 99,
+  height: 1999,
+  11: 11, // 这种看起来不是字符串 内部会转换成字符串
+  // Symbol(a):99  ❌ 都不是字符串了
+};
+```
+
+可选属性
+
+```typescript
+interface Iinfo {
+  uuid: string;
+  age?: number;
+}
+
+const i1: Iinfo = {
+  uuid: 'chin',
+};
+```
+
+只读属性
+
+```typescript
+interface Iinfo {
+  uuid: string;
+  readonly age: number;
+}
+
+const i1: Iinfo = {
+  uuid: 'chin',
+  age: 99,
+};
+
+// i1.age = 100 只读不能写入
+```
+
+#### 函数类型接口
+
+在之前的函数类型定义的时候用的都是 type
+
+现在其实用 interface 也可以表示一个函数类型
+
+```typescript
+interface DiscountA {
+  // 这就是一个函数类型
+  // 表示接受一个number类型的参数price 返回number
+  (price: number): number;
+}
+
+type DiscountB = (price: number) => number;
+
+const d1: DiscountA = (price: number): number => {
+  return price * 0.8;
+};
+
+const d2: DiscountB = (price: number): number => {
+  return price * 0.5;
+};
+
+console.log(d1(100));
+console.log(d2(100));
+```
+
+索引签名（可索引接口 可以对数组和对象进行约束）
+
+```typescript
+interface IUser {
+  //表示index是一个数字 返回是一个string
+  [index: number]: string;
+}
+
+let user: IUser = {
+  0: 'hello',
+  1: 'ts',
+};
+```
+
+#### 构造函数类型
+
+这个也可以和上面的**构造签名**一起看，还可以跟
+
+```typescript
+// 构造函数类型
+class Animal {
+  constructor(public id: string) {}
+}
+
+// 一个接口类型（包含一个构造函数
+interface WithNameClass {
+  new (id: string): Animal;
+}
+
+// 方法这里要新建一个动物
+function createAnimal(clazz: WithNameClass, id: string) {
+  return new clazz(id);
+}
+
+const a1 = createAnimal(Animal, 'wangwang');
+console.log(a1);
+```
+
+#### 接口兼容性
+
+为什么会有这个说法呢。因为 TS 的特点吧。传入的变量和声明的类型不匹配，TS 就会进入兼容性检查。（也有个老师说是新鲜度检测。
+
+具体是什么现象呢。这种也被称为是鸭子类型 duckcheck
+
+```typescript
+interface Animal {
+  name: string;
+  age: number;
+}
+interface Person {
+  name: string;
+  age: number;
+  gender: number;
+}
+
+function getName(a: Animal): string {
+  return a.name;
+}
+
+let p: Person = {
+  name: 'chin',
+  age: 99,
+  gender: 0,
+};
+// 你可以看到 即使传入的不是animal
+// 因为person里面具有了animal所有特性 所以也可以传入
+const p1Name = getName(p);
+console.log(p1Name); //chin
+```
+
+> 只有在传参的时候两个变量之间才会进行兼容性的比较，赋值的时候并不会，会直接报错
+
+```typescript
+let a: Animal = {
+  name: 'duck',
+  age: 7,
+  //   gender: 1, 这里会报错
+};
+```
+
+> 另一个老师说这是新鲜度问题，因为刚开始赋值的时候这个变量还是新鲜的，等到了传参的时候已经不是最新鲜的状态了。
+
+### 基本类型兼容
+
+鸭子类型
+
+```typescript
+// 鸭子类型
+class Person {
+  constructor(public name: string, public age: number) {
+    this.name = name;
+    this.age = age;
+  }
+
+  eat() {
+    console.log(`${this.name} is eating...`);
+  }
+}
+
+// 按理说这里应该接受一个Person类型
+function printP(p: Person) {
+  console.log(p.name, p.age);
+}
+printP(new Person('chin', 99));
+
+// 但事实上鸭子类型的话 只要有Person的属性和方法 我们都认为就是Person类型
+printP({
+  name: 'chin2',
+  age: 88,
+  eat() {
+    console.log('eating... now');
+  },
+});
+
+export {};
+```
+
+#### 基本数据类型兼容
+
+```typescript
+let a: Animal = {
+  name: 'duck',
+  age: 7,
+  //   gender: 1, 这里会报错
+};
+
+let num: string | number;
+let str: string = 'chin';
+num = str; // str是字符串类型也可以赋值给number 因为这里联合类型相当于是一个父类了。
+```
+
+还有一个例子
+
+```typescript
+// 一个对象里面有toString()这个方法
+let num: {
+  toString(): string;
+};
+let str: string = 'chin';
+
+num = str; // 这里不会错 因为string也有toString这个方法
+```
+
+## 9 泛型 generic
+
+其实这个就是类型编程的一种，把类型当做变量传递出去。
+
+这种把数据类型给变量话的就是 type variable
+
+基本写法，写在函数名后面。
+
+> 在接口里面定义函数的时候，写在函数名前面。
+>
+> `interface Cal{ <T>(x:T,y:T):T}`
+
+```typescript
+// 这样写 只是单纯的js 编译器会认为arg就是any 返回值也认为是any
+// function print(arg) {
+//   console.log(arg);
+// }
+
+function printA<Type>(arg: Type): Type {
+  return arg;
+}
+
+// 完整写法
+printA<number>(1);
+printA<string>('hello');
+printA<{ id: string; age: number }>({ id: 'uu1', age: 19 });
+
+// 省略写法 这种属于类型推导的一种 所以叫 type argument inference
+const a = printA('a'); // 但会推导出来的事字面量类型
+```
+
+两个类型也可以写的
+
+```typescript
+// 当然 你也可以写俩类型
+function printTwoParam<T, E>(x: T, y: E) {
+  console.log(`t is ${x},and e is ${y}`);
+}
+
+printTwoParam<number, string>(100, 'yes');
+```
+
+### 泛型类
+
+在类名后面写<>
+
+`class MyClass<写泛型>{}`
+
+```typescript
+// 泛型类
+class MyArray<T> {
+  private list: T[] = [];
+
+  add(value: T) {
+    this.list.push(value);
+  }
+  getMax(): T {
+    return this.list[0];
+  }
+}
+
+let arr = new MyArray<number>();
+arr.add(1);
+arr.add(2);
+arr.add(3);
+
+console.log(arr.getMax());
+```
+
+构造函数的写法
+
+```typescript
+// new
+function factory<T>(type: new () => T) {
+  return new type();
+}
+
+class Person {}
+class Man {}
+
+// 需要传入一个可以被new的类型
+const p1 = factory<Person>(Person);
+const m1 = factory<Man>(Man);
+console.log(p1);
+console.log(m1);
+```
+
+### 泛型接口
+
+其实就是把类型推断用在了接口上，在接口后面写<>
+
+```typescript
+// 下面是一个普通的接口
+interface IPerson {
+  id: string;
+  age: number;
+  hobby: string;
+}
+
+interface IPersonA<Type> {
+  id: Type; // 不指定这里的类型 让传入决定
+  age: number;
+  hobby: Type;
+}
+
+const iPerson: IPersonA<string> = {
+  id: 'uu1',
+  age: 99,
+  hobby: 'string',
+};
+```
+
+在接口里面定义函数的时候，写在函数名前面。
+
+```typescript
+interface Sum {
+  // 函数接受一个T泛型
+  <T>(a: T, b: T): T;
+}
+
+const sum: Sum = function <T>(x: T, y: T): T {
+  return x;
+};
+
+sum<number>(10, 20);
+```
+
+下面这种写法也可以，而且也可以相加
+
+```typescript
+// 这两者的区别是什么
+interface SumA<T> {
+  (a: T, b: T): T;
+}
+// 这样就可以直接相加了
+const sum2: SumA<number> = function (x: number, y: number): number {
+  return x + y;
+};
+```
+
+> 那么上面两个的区别是什么呢？
+>
+> 区别就是一个在前面定义的话 `interface SumA<T>` sum 在定义的时候就一定要确定类型了。
+>
+> 放在里面的话，在函数调用的时候才确定类型。因为在调用时候才确定类型。所以要检查的多。
+
+下面有一个，定义+调用双重确定
+
+```typescript
+// 1
+const sum: Sum = function <T>(x: T, y: T): T {
+  return x;
+};
+sum<number>(10, 20); // 调用才写类型
+
+// 2
+interface SumA<T> {
+  (a: T, b: T): T;
+}
+const sum2: SumA<number> = function (x: number, y: number): number {
+  return x + y;
+};
+sum2(5, 6); // 无需写类型 定义的时候就写了
+
+// 3
+interface SumB<T> {
+  <U>(a: T, b: T): T;
+}
+const sum3: SumB<number> = function <U>(x: number, y: number): number {
+  return x as any;
+};
+sum3<number>(1, 99);
+```
+
+### 默认泛型
+
+既然类型可以被编程，那么泛型其实也可以有默认参数的。
+
+```typescript
+// 泛型的默认类型
+// 传了就用传递的，没有传递就用默认的
+function createArray<T = number>(length: number, value: T): Array<T> {
+  let res: T[] = [];
+  for (let i = 0; i < length; i++) {
+    res[i] = value;
+  }
+  return res;
+}
+
+// 不写就是类型推断 推断成string
+let res = createArray(3, 'x');
+console.log(res);
+```
+
+第 2 个例子
+
+```typescript
+interface T2<T = string> {}
+
+type T2A = T2;
+```
+
+### 泛型约束（很难 重点）
+
+为什么会有泛型约束？有什么我们让传进来的泛型不仅仅只是这种 number string 的类型约束。还想有更具体的，比如参数里有 length 属性的泛型才能传递过来。这个时候就需要类型约束，所谓类型约束就是约束类型的。
+
+```typescript
+interface Ilength {
+  length: number;
+}
+
+function logger<T>(value: T) {
+  // 这里我们想要这个泛型支持length
+  // 怎么办呢？ 泛型约束就来了
+  console.log(value.length);
+}
+```
+
+正确解决
+
+```typescript
+interface IlengthA {
+  length: number;
+}
+
+// 使用extends来约束一个泛型
+// 要注意这个extends关键字 她不是继承的意思
+// 而是一种约束，表示你的类型一定要包含IlengthA所需要的所有要素
+function logger<T extends IlengthA>(value: T) {
+  console.log(value.length);
+}
+```
+
+为什么说不只是单纯继承的意思呢？
+
+```typescript
+// 这里有一个继承
+class A {}
+class B extends A {}
+class C extends B {}
+// 这里案例说需要T继承的
+function foo<T extends B>(value: T): T {
+  return value;
+}
+// 最后你会发现 其实ABC都可以 要知道A可不是呢
+// 也就是说TS里这个泛型 不是严格意义上的继承
+// 而是一种约束，一种类似的鸭子类型的约束
+foo(A);
+foo(B);
+foo(C);
+```
+
+> 此时你可以写一个这样的，验证并非严格的继承。
+>
+> 判断兼容不兼容跟 extends 继承没有一点关系，只看形状。
+
+```typescript
+// 这里有一个继承
+class A {
+  a: number;
+}
+class B extends A {
+  b: number;
+  age: number;
+}
+class C extends B {
+  c: number;
+}
+// 这里案例说需要T继承的
+function foo<T extends B>(value: T): T {
+  return value;
+}
+// 这里你会发现ABC都不行了
+// 为什么呢？
+// foo(A); ❌
+// 因为b需要有b和age这俩属性 此时传入的B并不符合
+// foo(B); ❌
+// foo(C); ❌
+// ✅ 解决方法 因为B继承了A 所以都要有
+foo({
+  a: 100,
+  age: 200,
+  b: 0,
+});
+```
+
+> 以`function foo<T extends B>`为例，T 一定要是 B 的子类型，最简单的测试就是你看 T 能不能赋值给 B 就行。
+
+## 类型别名 type
+
+这个慢慢看吧。还有 type 和 interface 的区别。
+
+```typescript
+type Car<T> =
+  | {
+      list: T[];
+    }
+  | T[];
+
+const c1: Car<string> = {
+  list: ['hello', 'tes'],
+};
+const c2: Car<number> = [1, 2, 3];
+```
+
+这里有一个案例，是 redux 的 compose 源码
+
+[compose](https://github.com/reduxjs/redux/blob/master/src/compose.ts)
+
+```typescript
+type Func<T extends any[], R> = (...a: T) => R;
+
+export default function compose(): <R>(a: R) => R;
+
+export default function compose<F extends Function>(f: F): F;
+
+/* two functions */
+export default function compose<A, T extends any[], R>(
+  f1: (a: A) => R,
+  f2: Func<T, A>
+): Func<T, R>;
+
+/* three functions */
+export default function compose<A, B, T extends any[], R>(
+  f1: (b: B) => R,
+  f2: (a: A) => B,
+  f3: Func<T, A>
+): Func<T, R>;
+
+/* four functions */
+export default function compose<A, B, C, T extends any[], R>(
+  f1: (c: C) => R,
+  f2: (b: B) => C,
+  f3: (a: A) => B,
+  f4: Func<T, A>
+): Func<T, R>;
+
+/* rest */
+export default function compose<R>(
+  f1: (a: any) => R,
+  ...funcs: Function[]
+): (...args: any[]) => R;
+
+export default function compose<R>(...funcs: Function[]): (...args: any[]) => R;
+
+export default function compose(...funcs: Function[]) {
+  if (funcs.length === 0) {
+    return <T>(arg: T) => arg;
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0];
+  }
+
+  return funcs.reduce(
+    (a, b) =>
+      (...args: any) =>
+        a(b(...args))
+  );
+}
+```
+
+分隔看看
+
+```typescript
+// 首先看看这一句话
+// 这定义了一个函数类型
+// 函数的参数 是一个剩余参数 剩余参数的类型相当于就是一个any[]数组
+type Func<T extends any[], R> = (...a: T) => R;
+```
+
+第一个啥函数都没有的相当于
+
+```typescript
+// 无参的
+compose()('hello');
+// 这里规定了 <R>(a: R) => R;
+// 相当于传入的是啥 就返回什么
+export default function compose(): <R>(a: R) => R;
+```
+
+```typescript
+// 1个参数 这个参数必须是一个函数
+// F extends Function 表明F必须是一个函数
+// 传入一个函数 传出来一个函数
+// add 是一个函数
+compose(add)('hello');
+export default function compose<F extends Function>(f: F): F;
+```
+
+接下来有点难理解了。
+
+```typescript
+// 2个参数 此时写了3个泛型
+// f1参数1 代表一个函数 函数的第一个参数必须是A类型 返回R
+// f2 参数2 代表一个函数  这个函数的参数1 是一个T的剩余参数的类型数组 参数2 是一个A
+// 所以说
+compose(add1, add2)('hello');
+export default function compose<A, T extends any[], R>(
+  f1: (a: A) => R,
+  f2: Func<T, A>
+): Func<T, R>;
+
+// 传入了ATR 三个泛型类型
+// A 相当于f2的返回值 也就是  compose(add1, add2)('hello');里add2的返回值
+// T 相当于任意一个类型的数组 也就是 compose(add1, add2)('hello');的hello
+// R 相当于最终的返回值
+
+【感觉A很像一个中间桥梁，中间的一个值】
 ```
