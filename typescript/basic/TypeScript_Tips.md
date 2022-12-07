@@ -292,11 +292,19 @@ function handleMsg(msg: string | number) {
 >
 > **※ strictNullCheck= false 的情况下 可以把 null 赋值成为 void。true 不行。**
 
+never 是 unknown 的子类型
+
+```typescript
+// never是unknown的子类型
+type isNever = never extends unknown ? true : false;
+type keys = keyof unknown; // type keys = never
+```
+
 ### 3-6 unknown
 
 相对安全，用于描述不确定的类型。为什么说安全？因为只有进行类型缩小判断后才能用。
 
-> 和 any 区别 any 有个情况就是可以赋值为任何类型 **unknown 进行任何操作都不合法**
+> 和 any 区别 any 有个情况就是可以赋值为任何类型 **unknown 进行任何操作（主要是方法和属性）都不合法**
 >
 > - any 是什么都可以 叫任意
 > - unknown 是不确定 所以什么都不行 需要类型缩小
@@ -308,12 +316,12 @@ let fooA: any = 'aaa';
 fooA = 123; // ✅ 就可以赋值了
 
 let fooB: unknown = '111';
-fooB = 22; // ✅ 可以赋值
+fooB = 22; // ✅ 可以任意赋值
 fooB.length  ❌ 任何方法都是非法的 因为不确定是啥类型 所以有安全隐患
 
 ```
 
-> 那我们为什么要使用？类型缩小后可使用 un 要求必须校验后才能使用
+> 那我们为什么要使用？类型缩小后可使用 un 要求必须校验后才能使用。类型断言也可以。只要是类型缩小的话，用断言，typeof instanceof
 
 下面是一个类型缩小的例子
 
@@ -352,6 +360,162 @@ export {};
 ```
 
 number 不是 Number，bigint 也不是 BigInt。前者是一个数据类型，后者是类。
+
+## 高级类型
+
+### 联合类型
+
+最基本的使用
+
+联合类型使用 `|` 分隔每个类型。
+
+这里的 `let myFavoriteNumber: string | number` 的含义是，允许 `myFavoriteNumber` 的类型是 `string` 或者 `number`，但是不能是其他类型。
+
+```typescript
+let myFavoriteNumber: string | number;
+myFavoriteNumber = 'seven';
+myFavoriteNumber = 7;
+```
+
+注意点
+
+```typescript
+// 联合类型中的unknown会吸收所有其他类型
+type U1 = unknown | null;
+type U2 = unknown | undefined;
+type U3 = unknown | number;
+type U4 = unknown | string;
+```
+
+### 交叉类型
+
+直接看下面代码区分会比较快
+
+```typescript
+// 交叉类型（满足双方的条件）
+//1-对象
+interface A {
+  name: string;
+}
+interface B {
+  age: number;
+}
+type C = A & B;
+
+const c: C = {
+  name: 'chin1',
+  age: 99,
+  // 多少都不行
+};
+//2-基础类型
+type AA = string | number;
+type BB = string | boolean;
+type CC = AA & BB; //string 都要满足的话 那就只有string 不要简单的拿交集并集理解
+```
+
+要注意下面这个，不是简单的并集
+
+```typescript
+interface X {
+  a: string | number;
+  b: string;
+}
+
+interface Y {
+  a: number | boolean;
+  b: string;
+}
+// 如果是简单的并集
+// 那么a的类型就是 string | number | boolean了
+// 可是结果只是number而已
+type XY = X & Y;
+
+let xy = {
+  a: 1,
+  b: 'hello',
+};
+```
+
+主要的应用就是进行混入，感觉好像 `Object.assign()`
+
+```typescript
+function mixin<T, U>(one: T, two: U) {
+  const res = <T & U>{};
+  for (let key in one) {
+    (<T>res)[key] = one[key];
+  }
+  for (let key in two) {
+    (<U>res)[key] = two[key];
+  }
+  return res;
+}
+// 两个结合成一个
+const m = mixin({ id: 'uu1' }, { age: 11 });
+console.log(m); // { id: 'uu1', age: 11 }
+```
+
+这是官方给的一个例子
+
+```typescript
+function extend<T, U>(first: T, second: U): T & U {
+  let result = <T & U>{};
+  for (let id in first) {
+    (<any>result)[id] = (<any>first)[id];
+  }
+  for (let id in second) {
+    if (!(<T & U>result!.hasOwnProperty(id))) {
+      (<any>result)[id] = (<any>second)[id];
+    }
+  }
+  return result;
+}
+
+class Person {
+  constructor(public name: string) {}
+}
+interface Loggable {
+  log(): void;
+}
+class ConsoleLogger implements Loggable {
+  log() {
+    // ...
+  }
+}
+var jim = extend(new Person('Jim'), new ConsoleLogger());
+var n = jim.name;
+jim.log();
+```
+
+### typeof
+
+typeof 用法 用于获取一个变量的数据类型
+
+适用于先定义类型 在定义变量
+
+```typescript
+let p = {
+  name: 'hello',
+};
+
+type p = typeof p;
+```
+
+### 映射类型 Mapped Types
+
+这个映射类型是怎么来的呢。有的时候我们想对一个已知的接口进行批量修改，或者在此基础上稍微改变一下。
+
+映射类型，就是使用了 PropertyKeys 联合类型的泛型，其中 PropertyKeys 多是通过 keyof 创建，然后循环遍历键名创建一个类型
+
+```typescript
+type PersonCopy = {
+  // 通过in keyof 可以拿到所有的属性
+  // 这样就可以稍加修改了
+  [key in keyof Person]?: Person[key];
+};
+
+// 其实上面就是Partial的源码的原型
+type PersonCopyB = Partial<Person>;
+```
 
 ## 4. 类型断言 Type Assertion
 
@@ -402,6 +566,31 @@ let msg = 'hello'; // 推导出来的是string类型
 let num = 123;
 // Type 'string' is not assignable to type 'number'
 num = 'hello';
+```
+
+以下有几个好记忆的
+
+```typescript
+// 这属于从右向左判断 ←
+let a = 1;
+let str = 'hello';
+
+// 这属于从下到上判断 ↑
+// 这里你没有给的话 会自动推断add的返回值是一个number
+function add(x: number, y: number) {
+  return x + y;
+}
+
+// 这属于从左到右 →
+type Sum = (x: number, y: number) => number;
+const fn = (a, b) => a + b;
+const sum: Sum = fn;
+
+let person = {
+  name: 'chin',
+  age: 99,
+};
+let name = person.name;
 ```
 
 ## 6. 关于函数
@@ -1004,6 +1193,26 @@ class Info {
 }
 ```
 
+#### **Parameter Properties**
+
+省略语法糖写法，可以直接在里面写上。
+
+```typescript
+// before
+class Point {
+  private x: number;
+  private y: number;
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+}
+// after 一下子少写好几行
+class Point {
+  constructor(public x: number, public y: number) {}
+}
+```
+
 成员修饰符
 
 - private 私有的 **同一类中可见**
@@ -1063,6 +1272,10 @@ c1.showAge(); // 88
 // 当然是不可以，因为已经脱离类内部了 即使是继承
 // c1.age;  ❌ 子类才行
 ```
+
+看一下这篇文章 关于顺序问题
+
+[TypeScript class 构造函数和成员的初始化顺序](https://cloud.tencent.com/developer/article/1850169)
 
 ### 构造函数 PK 类
 
@@ -1774,3 +1987,101 @@ export default function compose<A, T extends any[], R>(
 
 【感觉A很像一个中间桥梁，中间的一个值】
 ```
+
+## 逆变 协变
+
+协变：covariance
+
+逆变：contravariance
+
+双向协变：bivariant
+
+不变：Invariant
+
+这也是一个很难的概念，以前在别的语言里没有看过。
+
+首先前置知识
+
+- `A ≼ B` 意味着 `A` 是 `B` 的子类型。
+- `A → B` 指的是以 `A` 为参数类型，以 `B` 为返回值类型的函数类型。
+- `x : A` 意味着 `x` 的类型为 `A`
+
+TS 不同于 Java 这些。都是鸭子类型。
+
+> 要判断两个类型是否是兼容的，只需要看两个类型的结构是否兼容就可以了，不需要关心类型的名称是否相同。比如下面这个。
+
+```typescript
+interface Info {
+  name: string;
+}
+class Person {
+  name: string;
+}
+
+let i1: Info;
+i1 = new Person(); // 因为结构相同，所以不会报错
+```
+
+可以看这篇文章
+
+[TypeScript 进阶之类型兼容——逆变、协变、双向协变和不变](https://juejin.cn/post/7019565189624250404)
+
+然后参透这个例子
+
+```typescript
+class Animal {}
+class Dog extends Animal {
+  public name: string = 'Dog';
+}
+class WhiteDog extends Animal {
+  public name: string = 'WhiteDog';
+}
+class BlackDog extends Animal {
+  public name: string = 'BlackDog';
+}
+
+let animal: Animal;
+let dog: Dog;
+let whiteDog: WhiteDog;
+let blackDog: BlackDog;
+
+type Callback = (dog: Dog) => Dog;
+function exec(cb: Callback): void {}
+
+type ChildToChild = (blackDog: BlackDog) => BlackDog;
+let childToChild: ChildToChild;
+exec(childToChild);
+
+type ChildToParent = (blackDog: BlackDog) => Animal;
+let childToParent: ChildToParent;
+exec(childToParent);
+
+type ParentToParent = (animal: Animal) => Animal;
+let parentToParent: ParentToParent;
+exec(parentToParent);
+
+type ParentToChild = (animal: Animal) => BlackDog;
+let parentToChild: ParentToChild;
+exec(parentToChild); // 只有这个可以
+
+/**
+ * 结论
+ *
+ * 参数：自己和自己的父类 （除非你设置strictFunctionTypes 这样就是双向协变 你传自己，子类，父类都可以）
+ * 返回值：自己和自己的子类
+ */
+```
+
+我这里来简单总结一下
+
+协变：允许子类型转换成父类型 参数只能放大的
+
+> 其实这个很好理解，为什么参数只能放更大的呢。因为如果你参数传入进去是一个小的，此时子类型特有的函数你怎么调用呢。肯定是无法调用的。本质还是类型安全问题。
+
+逆变：允许父类型转换成子类型 只能返回更小的
+
+> 这个也是，你的返回值只能是更小的。如果是更大的，那么返回值可能
+
+双向协变：都可以
+
+不变：不能变，鸭子类型失效
