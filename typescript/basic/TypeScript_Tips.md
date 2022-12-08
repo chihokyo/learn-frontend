@@ -502,15 +502,74 @@ type p = typeof p;
 
 ### 映射类型 Mapped Types
 
+记得不能用 interface，而是用 type
+
 这个映射类型是怎么来的呢。有的时候我们想对一个已知的接口进行批量修改，或者在此基础上稍微改变一下。
 
+- 大部分内置类型都是通过映射类型来实现的
+- 映射类型建立在索引签名的基础上
+
+```typescript
+// 这只是一个普通的索引签名
+type Mapeed<T> = {
+  // 此时index没有任何约束
+  [index: number]: any;
+};
+
+// 此时我们假设把IPerson传入到<T>里面
+// 但是此时的Property是没有任何类型约束的
+interface Mapeed<Type> {
+  [Property]: Type[Property];
+}
+```
+
+所以此时映射类型就横空出世了，为了限制 Property 的类型
+
+```typescript
+type Imapped<Type> = {
+  [Proper in keyof Type]: Type[Proper];
+};
+
+// 1定义原始
+interface IAnimal {
+  name: string;
+  age: number;
+  cow: number;
+}
+
+// 2这个时候使用映射类型进行赋值一下的话
+type IMappedAnimal<T> = {
+  [prop in keyof T]: T[prop];
+  // 这里的本质就是遍历 相当于是这样的感觉
+  // 2-1 keyof T 获取了一个联合类型 type props = "name" | "age" | "cow"
+  // 2-2 进行逐个遍历
+  // [name] :T[name]
+  // [age] :T[age]
+  // [cow] :T[cow]
+};
+
+// 3 这样IAnimalCopy就是原原本本拷贝过来的了
+type IAnimalCopy = IMappedAnimal<IAnimal>;
+```
+
 映射类型，就是使用了 PropertyKeys 联合类型的泛型，其中 PropertyKeys 多是通过 keyof 创建，然后循环遍历键名创建一个类型
+
+#### 映射类型修饰符
+
+只是单纯的复制一个类型那是没啥意义的，所以还需要对一些属性进行修改等等。
+
+- 一个是 readonly，用于设置属性只读
+- 一个是 ? ，用于设置属性可选;
+- **通过前缀** **-** **或者** **+** **删除或者添加这些修饰符，如果没有写前缀，相当于使用了** **+** **前缀。**
 
 ```typescript
 type PersonCopy = {
   // 通过in keyof 可以拿到所有的属性
   // 这样就可以稍加修改了
-  [key in keyof Person]?: Person[key];
+  +readonly [key in keyof Person]?: Person[key];
+  // 没写就是+ 写了-就是删除掉这个修饰符
+  [key in keyof Person]+?: Person[key];
+  -readonly [key in keyof Person]-?: Person[key];
 };
 
 // 其实上面就是Partial的源码的原型
@@ -1581,6 +1640,10 @@ num = str; // 这里不会错 因为string也有toString这个方法
 
 其实这个就是类型编程的一种，把类型当做变量传递出去。
 
+> 学了一周才意识到一个问题，就是泛型里面确实只能传入类型，而不能是随随便的变量
+>
+> `<只能放进去类型>` 不能是`<aaa>`这样
+
 这种把数据类型给变量话的就是 type variable
 
 基本写法，写在函数名后面。
@@ -1781,7 +1844,52 @@ type T2A = T2;
 
 ### 泛型约束（很难 重点）
 
-为什么会有泛型约束？有什么我们让传进来的泛型不仅仅只是这种 number string 的类型约束。还想有更具体的，比如参数里有 length 属性的泛型才能传递过来。这个时候就需要类型约束，所谓类型约束就是约束类型的。
+首先类型约束是 TS 里面最难理解的概念。
+
+为什么会有泛型约束 **Generic Constraints**？有什么我们让传进来的泛型不仅仅只是这种 number string 的类型约束。还想有更具体的，比如参数里有 length 属性的泛型才能传递过来。这个时候就需要类型约束，所谓类型约束就是约束类型的。
+
+```typescript
+// 1- 首先这是一个不需要泛型的例子
+interface Ilength {
+  length: number;
+}
+// 其实这种例子的情况下是没有必要使用泛型的
+// 为什么呢？因为你确定args已经是有这个length属性的
+function getLength(args: Ilength) {
+  return args.length;
+}
+// 下面这些都是可以的
+getLength('aa');
+getLength(['a', 'b', 'c']);
+getLength({ length: 19 });
+```
+
+下面是一个虽然约束了，但是类型最后会丢失的例子。
+
+```typescript
+// 2-丢失了
+function getInfo(args: Ilength) {
+  return args;
+}
+// 这种情况下 会发生丢失类型的问题
+// 下面就是一个Ilength类型 而不是你传入的"aa"是一个字符串
+const re1 = getInfo('aa');
+getInfo(['a', 'b', 'c']);
+getInfo({ length: 19 });
+```
+
+这个时候加入类型编程的话虽然可以解决类型丢失问题，但却没办法解决类型约束问题。
+
+```typescript
+// 3-这样定义不就好了 但是这里产生的问题就是类型没有约束
+// T变成了传入什么都可以的
+function getInfo<T>(args: T):<T> {
+  return args;
+}
+getInfo({})
+```
+
+所以类型约束就有了。
 
 ```typescript
 interface Ilength {
@@ -1794,6 +1902,12 @@ function logger<T>(value: T) {
   console.log(value.length);
 }
 ```
+
+#### extends
+
+type 相当于是一个变量，用于记录本次调用的类型。所以在整个函数的执行周期中，一直保留参数的属性。
+
+所以自始至终都会有类型约束。
 
 正确解决
 
@@ -1810,7 +1924,7 @@ function logger<T extends IlengthA>(value: T) {
 }
 ```
 
-为什么说不只是单纯继承的意思呢？
+为什么说 extends 不只是单纯继承的意思呢？
 
 ```typescript
 // 这里有一个继承
@@ -1864,6 +1978,196 @@ foo({
 ```
 
 > 以`function foo<T extends B>`为例，T 一定要是 B 的子类型，最简单的测试就是你看 T 能不能赋值给 B 就行。
+
+#### keyof
+
+```typescript
+// 单纯的JS写法 这样调用完全就没有了属性约束
+// 比如key可以随便写了 加入你写个hello也行 但是这就失去了TS的意义
+// 那么我们怎么能验证的 这个时候就出现了映射类型
+const obj = {
+  name: 'string',
+  age: 19,
+};
+function getProper(obj, key) {
+  return obj[key];
+}
+
+getProper(obj, 'name');
+```
+
+那么这样写呢？
+
+```typescript
+// O是可以的，单此时的K就没了约束  你会发现你写啥都行 目前K被定义成了string
+// 那么怎么约束K呢
+function getProper<O, K>(obj: O, key: K) {
+  return obj[key];
+}
+
+getProper(obj, 'name');
+```
+
+最后的解决 使用 `extends keyof`
+
+```typescript
+function getProper<O, K extends keyof O>(obj: O, key: K) {
+  return obj[key];
+}
+
+getProper(obj, 'name');
+```
+
+keyof 是什么呢？keyof 本质就是一个所有 key 的联合类型。
+
+```typescript
+interface IKey {
+  name: string;
+  age: number;
+}
+
+type a = keyof IKey;
+// 本质就是下面的
+// type a = "name" | "age"
+```
+
+> 到目前为止，有俩地方用到了 keyof
+>
+> - 索引类型 `[Proper in keyof Type]:Type[Proper]`
+> - 在类型的约束的时候对于参数
+
+```typescript
+// 用处1:索引签名 in keyof
+type Info<T> = {
+  [prop in keyof T]: T[prop];
+};
+
+// 用处2:参数类型约束 extends keyof
+const obj = {
+  name: 'hello',
+  age: 100,
+};
+function getObjValue<O, K extends keyof O>(obj: O, key: K) {
+  return obj[key];
+}
+```
+
+### 映射类型 Mapped Types
+
+这也是类型约束的一种 直接看上面的高级类型得了。
+
+### 类型推断 infer
+
+这个貌似是 TS 里让人最难理解的一部分。非常非常难。但我感觉也没有十分特别的难就是了。差不多熟悉了都不难，经常用就不难的东西。
+
+首先先学一个**在条件类型中进行推断 inferring within conditional types**，这个是什么意思呢。
+
+首先我们这里有一个需求，就是想获得一个函数的返回。
+
+```typescript
+// 简单的定义一个函数类型
+type CalcFnType = (x: number, y: number) => number;
+// 其实TS内部有一个工具函数 传入一个. 型获取返回值类型
+// ReturnType<传入类型>
+// 比如 下面就可以获取到CalcFnType的类型
+type CalcFnReturnType = ReturnType<CalcFnType>;
+
+// 目前有一个需求 想获得一个函数的返回值类型
+function foo() {
+  return 'hello';
+}
+
+// 那么我们想获取foo的返回值类型怎么办，首先要先获取foo的类型
+// 使用typeof 就可以先获取类型
+type FooFnReturnType = ReturnType<typeof foo>;
+```
+
+> 上面差不多解决了，这个问题。但是这个工具函数是怎么实现的呢？就引出了主题 infer。
+>
+> 下面自己实现一个`ReturnType`
+
+```typescript
+// 首先自己要接受一个类型 那么这个T类型有啥限制吗
+// 首先这个类型必须是一个函数 (...args:any[]) => any
+type MyReturnType<T> = any;
+
+// 所以下面的T是一个函数 返回值的类型也应该是一个函数才是
+// 但是下面这种全部返回any是没有意义的
+type MyReturnType<T extends (...args: any[]) => any> = T extends (
+  ...args: any[]
+) => any
+  ? any
+  : false;
+```
+
+所以这里类型推断就出来了，需要谁，你就推断一下，内部就可以做出正确的类型。infer 这个关键字就是根据实际类型进行推断。R 相当于一个占位符，这个推断你想要的类型。
+
+`infer R ? R : never` 推断是 R，不是的话就是 never
+
+```typescript
+type MyReturnType<T extends (...args: any[]) => any> = T extends (
+  ...args: any[]
+) => infer R
+  ? R
+  : never;
+
+const bar = (x: string) => {
+  return 111;
+};
+// 测试 👌
+type FnType = MyReturnType<typeof bar>;
+```
+
+> 一旦理解了这个之后，你想获取参数的类型也可以推断了。想获取什么就推断什么。最后在结果的时候返回就行。
+>
+> 注意 必须要在类型推断的时候进行推断，也就是在 extends 里的?:里用 infer
+
+```typescript
+type MyParamaterType<T extends (...args: any[]) => any> = T extends (
+  ...args: infer A
+) => any
+  ? A
+  : never;
+
+function boo(x: [number, boolean]) {
+  return 11;
+}
+// 测试 👌
+type mp = MyParamaterType<typeof boo>;
+```
+
+### 分发条件类型 distributive
+
+这个其实也蛮难理解的。当在泛型中使用条件类型的时候，如果传入一个联合类型，就会变成分发的**(distributive)**。这种现象英文叫 distributive conditional types
+
+感觉还是直接上例子比较清晰。
+
+```typescript
+// 1首先定义一个类型 传入一个类型 返回类型数组
+type toArray<T> = T[];
+// 2 下面这种就可以
+type NumArr = toArray<number>;
+type StrArr = toArray<string>;
+// 那么思考一下 如果我们使用联合类型 那么最后的答案是什么呢？
+type U1 = toArray<number | string>; // (string | number)[]
+// 也就是说把这个联合类型当做一个整体 返回了一个既可以放入number，也可以放入string的数组
+const u1: U1 = [1, 'hello'];
+```
+
+> 如果我想要的是 `string[] | number[]` 呢？
+>
+> 这个时候分发条件类型就会登场了
+
+```typescript
+// 你传入的类型会一次又一次的透过这里
+type toArrayA<T> = T extends any ? T[] : never;
+
+type U2 = toArrayA<number | string>;
+
+// const u2: U2 = [1, 'hello']; ❌ 这样就错误了
+const u2: U2 = [1, 1, 1, 1]; // ✅
+const u3: U2 = ['ok', 'ok', 'ok', 'ok']; // ✅
+```
 
 ## 类型别名 type
 
