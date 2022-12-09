@@ -488,9 +488,7 @@ jim.log();
 
 ### typeof
 
-typeof 用法 用于获取一个变量的数据类型
-
-适用于先定义类型 在定义变量
+typeof 用法 用于获取一个变量的数据类型，适用于先定义类型，在定义变量的情况。
 
 ```typescript
 let p = {
@@ -575,6 +573,10 @@ type PersonCopy = {
 // 其实上面就是Partial的源码的原型
 type PersonCopyB = Partial<Person>;
 ```
+
+> 重点就在于 key 是一个`in keyof `
+>
+> in keyof 你可以简单的理解成 in 代表的就是一个遍历，既然 keyof 得到的是一个联合类型。那么最后的 in keyof 就是遍历一个联合类型
 
 ## 4. 类型断言 Type Assertion
 
@@ -1979,6 +1981,12 @@ foo({
 
 > 以`function foo<T extends B>`为例，T 一定要是 B 的子类型，最简单的测试就是你看 T 能不能赋值给 B 就行。
 
+extends 不是单纯的意思，主要用在以下几个场面。
+
+- 联合类型 extends → 主要是分发
+- 类继承
+- 泛型约束 → 表示一种条件
+
 #### keyof
 
 ```typescript
@@ -2138,7 +2146,7 @@ type mp = MyParamaterType<typeof boo>;
 
 ### 分发条件类型 distributive
 
-这个其实也蛮难理解的。当在泛型中使用条件类型的时候，如果传入一个联合类型，就会变成分发的**(distributive)**。这种现象英文叫 distributive conditional types
+这个其实也蛮难理解的。当在**泛型中**使用条件类型的时候，如果传入一个联合类型，就会变成分发的**(distributive)**。这种现象英文叫 distributive conditional types
 
 感觉还是直接上例子比较清晰。
 
@@ -2168,6 +2176,11 @@ type U2 = toArrayA<number | string>;
 const u2: U2 = [1, 1, 1, 1]; // ✅
 const u3: U2 = ['ok', 'ok', 'ok', 'ok']; // ✅
 ```
+
+> 主要条件就是
+>
+> - 泛型里的类型是**联合类型**
+> - 关键字 **extends** 进行分发
 
 ## 类型别名 type
 
@@ -2389,3 +2402,221 @@ exec(parentToChild); // 只有这个可以
 双向协变：都可以
 
 不变：不能变，鸭子类型失效
+
+几个容易出问题的关键字
+
+- in
+- keyof
+- extends
+- as
+
+### 内置类型
+
+这个代码写完了。可以慢慢看
+
+```typescript
+export {};
+
+/**
+ *  下面开始写内置工具
+ */
+
+interface Info {
+  name: string;
+  age?: number;
+  gender: boolean;
+}
+
+/**
+ * 1.Partial 返回一个可选的类型
+ */
+
+type OptinalTypes = Partial<Info>;
+
+// 自己手写
+// 原理就是使用了映射类型
+type MyPartial<T> = {
+  [P in keyof T]?: T[P];
+};
+type MyOptinalTypes = MyPartial<Info>;
+
+/**
+ *2. Required 所有属性都必须是必选
+ */
+
+type InfoRequiredType = Required<Info>;
+
+// 自己手写
+// 其实只要把?修饰符减掉就可以
+type MyRequired<T> = {
+  [P in keyof T]-?: T[P];
+};
+
+type MyInfoRequiredType = MyRequired<Info>;
+
+/**
+ *3.Readonly 表示一个类型的属性全部都是readonly
+ */
+
+type InfoReadOnlyTypes = Readonly<Info>;
+
+// 自己手写 这个原理其实和上面的一模一样
+type MyReadonly<T> = {
+  readonly [P in keyof T]: T[P];
+};
+
+type MyInfoReadOnlyTypes = MyReadonly<Info>;
+
+/**
+ * 4 Record<K,T> 返回一个键值对的对象
+ * key都是key的类型，T的话是Types类型
+ * 代码可能更清晰
+ */
+
+type T1 = 'foo' | 'bar' | 'far';
+type T2 = Info;
+type r1 = Record<T1, T2>;
+// type d = {
+//   foo: Info;
+//   bar: Info;
+//   far: Info;
+// }
+
+// 自己手写的
+type MyRecord<K extends keyof any, T> = {
+  // 这样感觉貌似就可以了  [P in keyof K]: T;
+  // 1.代表K必须是一个对象类型 因为keyof返回的就是一个对象联合类型
+  // 所以要这样 [P in 联合类型] :T 所以不能是加上了keyof
+  // [P in keyof K]: T; → [P in  K]: T;
+  // 2.但是这里有了新问题，K万一传入的不是一个对象呢，万一传入的是boolean
+  // 如何确定传进来的K一定可以作为一个对象的key呢？答案 → keyof any 固定用法记住就行
+  // keyof any 返回一个 string|number|symbol 正好都是可以做key的
+  [P in K]: T;
+};
+
+type Myr1 = MyRecord<T1, T2>;
+
+/**
+ * 5.Pick<T,K>
+ * 返回一个包含K属性的类型
+ * 看看例子更好了解
+ */
+
+type PickedInfo = Pick<Info, 'gender'>;
+// 这里只会返回gender 也就是你要的
+// type PickedInfo = {
+//   gender: boolean;
+// }
+
+// 自己手写
+// 这里K 拿到的其实是T的所有key的联合类型
+// in后面是一个联合类型
+type MyPick<T, K extends keyof T> = {
+  // 到这里此时的其实是 K extend  "name" | "age" | "gender"
+  // K是 "name" | "gender"
+  // 这里为什么直接用P in K 其实道理和的MyRecord是一样的
+  //
+  [P in K]: T[P];
+};
+
+type MyPickedInfo = MyPick<Info, 'name' | 'gender'>;
+
+/**
+ * 6.Omit<T,K>
+ * 返回一个不包含K的属性的类型
+ * 这个也是看例子，其实和Picked有异曲同工之妙
+ */
+
+type OmitInfo = Omit<Info, 'name'>;
+
+// 自己手写一个
+type MyOmit<T, K> = {
+  // 主要用的思考是P里面是否包含在K 包含的话就是never 否则就是P
+  // 难点1 keyof T 里面放的是全部的属性 as P 这里相当于又断言了
+  // 难点2
+  [P in keyof T as P extends K ? never : P]: T[P];
+};
+
+type MyOmitInfo = MyOmit<Info, 'gender'>;
+
+/**
+ * 7.Exclude<T,U>
+ * 首先这个是联合类型特定的
+ * T是一个联合类型，U是一个key
+ * 得到一个去掉U的类型
+ */
+
+type UnionType = 'sleep' | 'swim' | 'sing';
+
+type ExcludeType = Exclude<UnionType, 'sing'>;
+
+// 自己写
+// 难点1 T extends U 如果T是一个联合类型 那么就是一个分发
+type MyExclude<T, U> = T extends U ? never : U;
+// 相当于下面就是这样的
+// type MyExclude<T, U> = 'sleep' extends 'sing' ? never 'sleep';
+// type MyExclude<T, U> = 'swim' extends 'sing' ? never 'swim';
+// type MyExclude<T, U> = 'sing' extends 'sing' ? never;
+
+/**
+ * 8.Extract 提取
+ * 你直接理解成Exclude的相反就行
+ * 联合类型中返回自己要的那个
+ */
+
+type ExtractType = Extract<UnionType, 'sing'>;
+
+// 自己写
+// 难点都在上面的Exclude写了
+type MyExtract<T, U> = T extends U ? U : never;
+type MyExtractType = MyExtract<UnionType, 'sing'>;
+
+/**
+ * 9. NonNullablue<Type>
+ * 联合类型 返回一个去除掉了null和undefined的类型
+ */
+
+type NullType = 'sleep' | 'swim' | 'sing' | undefined | null;
+
+type NullTypes = NonNullable<NullType>;
+
+// 自己写
+// 难点就是是否是null和undefined否则就pass
+type MyNonNullable<T> = T extends null | undefined ? never : T;
+
+/**
+ * 10.InstanceType<这里放入构造函数类型>
+ * 用于构造一个由Type的构造函数的实例类型组成的类型
+ */
+
+class Person {}
+// 先拿到构造函数类型
+type person = typeof Person;
+// 这里的p就是正确的Person类型了
+type p = InstanceType<person>;
+
+// 这个主要用于在哪里呢？
+// 比如我们需要一个生成类的工厂函数
+// 此时T约束成为一个构造函数 返回也是
+function factory<T extends new (...args: any[]) => any>(clazz: T): T {
+  return new clazz();
+}
+
+const p1 = factory(Person); // ❓ const p1: typeof Person
+// 这里只会被认为是一个构造器类型 而不是一个Person实力类型
+// 此时怎么办呢？就用到了 InstanceType
+
+function factory2<T extends new (...args: any[]) => any>(
+  clazz: T
+): InstanceType<T> {
+  return new clazz();
+}
+const p2 = factory2(Person); // ✅ const p2: Person
+
+// 自己写
+
+type MyInstanceType<T extends new (...args:any) => any> = T extends new (..args:any[]) => infer R ? R :never
+
+type p3 = MyInstanceType<typeof Person> // ✅
+
+```
