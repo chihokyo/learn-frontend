@@ -387,9 +387,13 @@ type U3 = unknown | number;
 type U4 = unknown | string;
 ```
 
-### 交叉类型
+> 联合类型刚开始看的时候会很容易。但是到后面配合 extends 会觉得有点容易混淆的地方。
 
-直接看下面代码区分会比较快
+关于联合类型和交叉类型让人困扰的地方。其实官方给了一个 issue 的解答。在这里[Naming of TypeScript's union and intersection types](https://stackoverflow.com/questions/38855908/naming-of-typescripts-union-and-intersection-types)
+
+### 交叉类型 intersection types &
+
+首先写在前面的就是，不能直接拿她跟数学里的 & 与直接画等号。直接看下面代码区分会比较快
 
 ```typescript
 // 交叉类型（满足双方的条件）
@@ -407,6 +411,7 @@ const c: C = {
   age: 99,
   // 多少都不行
 };
+
 //2-基础类型
 type AA = string | number;
 type BB = string | boolean;
@@ -484,6 +489,44 @@ class ConsoleLogger implements Loggable {
 var jim = extend(new Person('Jim'), new ConsoleLogger());
 var n = jim.name;
 jim.log();
+```
+
+这里做一个总结
+
+- 接口类型的交叉类型 → 要满足所有的特性（好像并集
+- 联合类型的交叉类型 → 可以理解成交集
+
+```typescript
+// 1.接口类型的交叉类型
+interface Interface1 {
+  id: number;
+  name: string;
+}
+
+interface Interface2 {
+  age: number;
+}
+
+// id name age 都要有
+type IntersectionType = Interface1 & Interface2;
+
+// 2.联合类型的交叉类型
+type UnionA = 'px' | 'em' | 'rem' | '%';
+type UnionB = 'vh' | 'em' | 'rem' | 'pt';
+type IntersectionUnion = UnionA & UnionB; // "em" | "rem"
+```
+
+作为对比，这里也写一下联合类型。
+
+```typescript
+// id name age 都要有
+type IntersectionType = Interface1 | Interface2;
+
+// Interface1任意选一个属性，Interface2任意选一个属性
+const i: IntersectionType = {
+  name: 'chin',
+  age: 99,
+};
 ```
 
 ### typeof
@@ -577,6 +620,22 @@ type PersonCopyB = Partial<Person>;
 > 重点就在于 key 是一个`in keyof `
 >
 > in keyof 你可以简单的理解成 in 代表的就是一个遍历，既然 keyof 得到的是一个联合类型。那么最后的 in keyof 就是遍历一个联合类型
+
+在别的地方看到的比较好的理解方法，关于这个 in
+
+```typescript
+interface Info {
+  age: number;
+}
+type ReadonlyType<T> = { readonly [P in keyof T]?: T[P] };
+type ReadonlyInfo = ReadonlyType<Info>;
+let info: ReadonlyInfo = {};
+
+注意了，我们在这里用到了一个新的操作符 in，TS 内部使用了 for … in，定义映射类型，这里涉及到三个部分：
+// 【类型变量】也就是上例中的 P，它就像 for…in 循环中定义的变量，用来在每次遍历中绑定当前遍历到的属性名 → 这个比喻好
+// 【属性名联合】也就是上例中keyof T，它返回对象 T 的属性名联合 → 这个也好理解
+//【属性的结果类型】也就是 T[P]。
+```
 
 ## 4. 类型断言 Type Assertion
 
@@ -1987,6 +2046,75 @@ extends 不是单纯的意思，主要用在以下几个场面。
 - 类继承
 - 泛型约束 → 表示一种条件
 
+这里也有一篇关于 extends 文章的补充，我觉得写的还不错。整理了一下。https://github.com/MuYunyun/blog/issues/140
+
+```typescript
+// 若位于 extends 两侧的类型相同，则 extends 在语义上可理解为 ===，可以参考如下例子:
+type result1 = 'a' extends 'abc' ? true : false; // false
+type result2 = 123 extends 1 ? true : false; // false
+// 若位于 extends 右侧的类型包含位于 extends 左侧的类型(即狭窄类型 extends 宽泛类型)时，结果为 true，反之为 false。可以参考如下例子:
+type result3 = string extends string | number ? true : false; // true
+// 当 extends 作用于对象时，若在对象中指定的 key 越多，则其类型定义的范围越狭窄。可以参考如下例子:
+type result4 = { a: true; b: false } extends { a: true } ? true : false; // true
+
+/**
+ * 后两个感觉可以简单理解 窄的范围 extends 宽的范围 true
+ */
+```
+
+这里写一个终极案例
+
+```typescript
+/**
+ * 写一个转换成交叉类型的案例
+ */
+type T1 = { name: string };
+type T2 = { age: number };
+
+// 相当于你推断出来的这个U，既要满足 T1 也要满足 T2
+type ToInersection<T> = T extends {
+  a: (x: infer U) => void;
+  b: (x: infer U) => void;
+}
+  ? U
+  : never;
+
+// 既要满足T1，也要满足T2，然后T1和T2 又是一个对象 相当于T1&T2
+// 也就是既要有name属性，也要有age，这样就可以同时满足。
+type T3 = ToInersection<{
+  a: (x: T1) => void;
+  b: (x: T2) => void;
+}>;
+```
+
+> 这里思考一下，如果把 T1,T2 改成普通类型呢？
+
+```typescript
+type T1 = string;
+type T2 = number | string;
+
+type ToInersection<T> = T extends {
+  a: (x: infer U) => void;
+  b: (x: infer U) => void;
+}
+  ? U
+  : never;
+
+// T3就是一个string
+type T3 = ToInersection<{
+  a: (x: T1) => void;
+  b: (x: T2) => void;
+}>;
+
+type T1 = string;
+type T2 = number | string;
+// T3 string
+
+type T1 = string;
+type T2 = number;
+// T3 never
+```
+
 #### keyof
 
 ```typescript
@@ -2108,7 +2236,7 @@ type MyReturnType<T extends (...args: any[]) => any> = T extends (
   : false;
 ```
 
-所以这里类型推断就出来了，需要谁，你就推断一下，内部就可以做出正确的类型。infer 这个关键字就是根据实际类型进行推断。R 相当于一个占位符，这个推断你想要的类型。
+所以这里类型推断就出来了，需要谁，你就推断一下，内部就可以做出正确的类型。infer 这个关键字就是根据实际类型进行推断。R 相当于一个占位符，这个推断你想要的类型。R 你可以把他当成一个一个变量。
 
 `infer R ? R : never` 推断是 R，不是的话就是 never
 
@@ -2128,7 +2256,7 @@ type FnType = MyReturnType<typeof bar>;
 
 > 一旦理解了这个之后，你想获取参数的类型也可以推断了。想获取什么就推断什么。最后在结果的时候返回就行。
 >
-> 注意 必须要在类型推断的时候进行推断，也就是在 extends 里的?:里用 infer
+> 注意 必须要在类型推断的时候进行推断，也就是在 extends 里的?:里用 infer。至于这个 infer 后面是不是一定要立刻就加上？这种判断。那是未必的，只要在最后加上就是可以的。
 
 ```typescript
 type MyParamaterType<T extends (...args: any[]) => any> = T extends (
@@ -2142,11 +2270,72 @@ function boo(x: [number, boolean]) {
 }
 // 测试 👌
 type mp = MyParamaterType<typeof boo>;
+
+// <这里面写T extend 是为了放入的类型约束>
+// 也就是你在调用这个类型的时候帮你检测传入的函数的
+
+// 后面那个T extends 是为了做判断的
+```
+
+再次解析，有可能一段时间不看 infer 可能就会搞错。所以这里再次拆分一下上面那个实现`Parameters<T>`
+
+```typescript
+type Parameters<T extends (...args: any[]) => any> = T extends (
+  ...args: infer P
+) => any
+  ? P
+  : never;
+
+type Parameters<T extends (...args: any[]) => any> = (这里相当于一个整体，一个判断语句，如果是子类型，就返回P，否则就是never)
+  ? P
+  : never;
+```
+
+下面这还有一个例子
+
+```typescript
+/**
+ * 应用案例 tuple 转 union
+ * [string,number] → string | number
+ */
+
+// 这是一个tuple
+type Ttuple = [string, number];
+// 自己手写 难点1 首先元祖也是数组 所以是符合Array<infer E>的
+// 这里是把整体都放进去 infer E，因为有可能是一个string 也有可能是一个 number
+type Element<T> = T extends Array<infer E> ? E : never;
+// 测试转换是否成功
+type TupleTpUnion = Element<Ttuple>;
 ```
 
 ### 分发条件类型 distributive
 
-这个其实也蛮难理解的。当在**泛型中**使用条件类型的时候，如果传入一个联合类型，就会变成分发的**(distributive)**。这种现象英文叫 distributive conditional types
+这个其实也蛮难理解的。当在**泛型中**使用条件类型的时候，如果传入一个联合类型，就会变成分发的**(distributive)**。这种现象英文叫 distributive conditional types。
+
+```typescript
+interface Fish {
+  n1: string;
+}
+
+interface Water {
+  n2: string;
+}
+
+interface Bird {
+  n3: string;
+}
+
+interface Sky {
+  n4: string;
+}
+
+type Condition<T> = T extends Fish ? Water : Sky; // ✅ 可分发的
+// type Condition<T> = { t: T } extends { t: Fish } ? Water : Sky; // ❓ 这种就不是分发 因为写在里面 同时T[],[T]也是不行的
+
+// 如果是非naked 整体都要被送进去比较  如果是就1个个进去比较
+let c1: Condition<Fish | Bird> = { n4: 'helllo' };
+let c2: Condition<Fish | Bird> = { n4: 'helllo' };
+```
 
 感觉还是直接上例子比较清晰。
 
