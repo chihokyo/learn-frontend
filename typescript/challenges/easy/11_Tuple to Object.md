@@ -51,7 +51,18 @@ type TupleToObject<T extends readonly (string | number)[]> = {
 
 > [Indexed Access Types 索引访问类型](https://www.typescriptlang.org/docs/handbook/2/indexed-access-types.html) 使用任意类型进行索引的另一个示例是**使用数字来获取数组元素的类型**。我们可以将其与 typeof 结合使用，以方便地捕获数组文字的元素类型
 
+> `T[number]`可以获取到一个联合类型。
+>
+> 如果我们访问 `T[number]`，TypeScript 将返回 T 中所有元素的联合。
+
 ```typescript
+// 1.例如
+type T = [1, 2, 3];
+T[number]; // 将返回 1|2|3 是一个联合类型。
+```
+
+```typescript
+// 2.例如
 const MyArray = [
   { name: 'Alice', age: 15 },
   { name: 'Bob', age: 23 },
