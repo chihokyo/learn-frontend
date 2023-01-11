@@ -15,7 +15,7 @@ type Result = Concat<[1], [2]>; // expected to be [1, 2]
 直接看答案类型。
 
 ```typescript
-type If<C extends boolean, T, F> = C extends true ? T : F;
+type Concat<T extends any[], U extends any[]> = [...T, ...U];
 ```
 
 ## 3. 难点

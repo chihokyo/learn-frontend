@@ -107,22 +107,11 @@ type TupleToObject<T extends readonly (string | number)[]>
 type TupleToObject<T extends readonly string | number[]> // 别忘记加上括号
 ```
 
-## 4. 内置 built-in
+### 难点3 as const
 
-首先这是一个内置 bulit-in 的，因为 TS 自己实现了。TS 自己实现的如下。
-
-```typescript
-/**
- * Make all properties in T readonly
- */
-type Readonly<T> = {
-  readonly [P in keyof T]: T[P];
-};
-```
+这篇文章写的很不错[详细介绍TypeScript 中的'as const'](https://www.jiyik.com/tm/xwzj/prolan_1286.html)
 
 ## 补充
-
-这个不是很难，都不想说了。
 
 [Github 类型体操-Tuple to Object](https://github.com/type-challenges/type-challenges/blob/d535735ae6cebd15019b14661577e67683a00461/questions/00011-easy-tuple-to-object/README.zh-CN.md)
 

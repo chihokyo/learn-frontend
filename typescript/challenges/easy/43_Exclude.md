@@ -86,6 +86,9 @@ const u3: U2 = ['ok', 'ok', 'ok', 'ok']; // ✅
 所以上面的那一题就可以分解成下面这样。
 
 ```typescript
+type Result = MyExclude<'a' | 'b' | 'c', 'a'>; // 'b' | 'c'
+type MyExclude<T, U> = T extends U ? never : T;
+
 'a' extends 'a'  ? never : T → 选never
 'b' extends 'a'  ? never : T → 选T也就是'b'
 'c' extends 'a'  ? never : T → 选T也就是'c'

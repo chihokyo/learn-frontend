@@ -7,14 +7,14 @@
 例如：
 
 ```typescript
-type Result = Unshift<[1, 2], 0> // [0, 1, 2,]
+type Result = Unshift<[1, 2], 0>; // [0, 1, 2,]
 ```
 
 ## 2. 自己实现
 
-这一题简直就是Push的翻版。直接两个一起看就行。
+这一题简直就是 Push 的翻版。直接两个一起看就行。
 
-JS里是这样的
+JS 里是这样的
 
 ```typescript
 const array1 = [1, 2, 3];
@@ -24,18 +24,17 @@ console.log(array1.unshift(4, 5));
 
 console.log(array1);
 // expected output: Array [4, 5, 1, 2, 3]
-
 ```
 
 自己实现
 
 ```typescript
-type Unshift<T extends any[], U> = [U,...T];
+type Unshift<T extends any[], U> = [U, ...T];
 ```
 
 ## 3. 难点
 
-没啥难的。太easy。
+没啥难的。太 easy。
 
 ## 补充
 
