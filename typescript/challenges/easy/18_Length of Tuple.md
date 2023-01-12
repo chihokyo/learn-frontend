@@ -50,6 +50,12 @@ type Length<T extends any> = T['length'];
 type Length<T extends { length: number }> = T['length'];
 ```
 
+这两天发现了正确答案。原来是继承一个只能是 string 类型的数组（元组不可改，所以 readonly）
+
+```typescript
+type Length<T extends readonly string[]> = T['length'];
+```
+
 ## 补充
 
 这个不是很难，都不想说了。
