@@ -4,6 +4,10 @@
 
 JavaScript ＋ XML = JSX。**但浏览器无法直接识别 JSX**，所以需要 babel 来转换。
 
+.jsx 结尾的文件和.js 结尾的文件有什么区别
+
+有时候在 vscode 里，会不识别 jsx 语法。你设置成 jsx 就可以识别 jsx 语法了。
+
 ## 2 在 React 里干什么的？
 
 用来**创建虚拟的 DOM** 元素对象，既不是字符串，也不是 XML 标签。最终就是一个**对象 Object**。
@@ -20,9 +24,17 @@ JavaScript ＋ XML = JSX。**但浏览器无法直接识别 JSX**，所以需要
 <script>
 ```
 
+这里就印出来一个问题，react 里 jsx 的本质是什么？
+
+> 本质其实就是一个**对象**
+
+```jsx
+React.
+```
+
 ## 3 基本语法
 
-`{ JS 表达式 }`
+`{ JS 表达式 }` `{}` 这个也叫胡子语法。
 
 ```jsx
 const VDOM = '<h1>Hello,React</h1>'; /* ❌ 这种只是字符串 */
@@ -63,6 +75,61 @@ const VDOM = (
 > ⚠️ if 语句/ switch-case 语句/ 变量声明语句，这些叫做语句，不是表达式，不能出现在 `{}` 中！！
 >
 > ⚠️ 如果表达式是 null, boolean,undefined，将不会显示。
+
+这里总结一下
+
+7 大基本类型。
+
+- number/string 你写的值是什么，就渲染出来什么
+- 其他全是空
+
+```jsx
+import React from 'react';
+
+export function App(props) {
+  return (
+    <div className="App">
+      {/*字符串*/}
+      {'hello'}
+      <br />
+      {/*数字*/}
+      {88}
+      {/*boolean /undefined/void 0/null*/}
+      {true}
+      {false}
+      {void 0}
+      {undefined}
+      {null}
+      {/*symbol bigint*/}
+      {Symbol(100)}
+      {10n}
+    </div>
+  );
+}
+```
+
+其他复杂类型（地址）
+
+- 普通对象不支持渲染
+- 特殊对象（虚拟 DOM 对象）支持渲染
+- 特殊对象（style 的行内样式）
+- 数组对象 → 数组每一项拿出来分别进行渲染（并不是变为字符串渲染）
+- 其他都不行，比如正则，各种 new Date 这种包装类
+
+```jsx
+{
+  /*普通报错的 除非你是虚拟DOM对象*/
+}
+{
+  /*{{x:20}} */
+}
+{
+  /* new Date() */
+}
+{
+  /** 函数不支持渲染，但如果是函数式组件就可以渲染 */
+}
+```
 
 ## 4 特别注意
 
@@ -333,7 +400,9 @@ export default App;
 
 ## 6 JSX 本质
 
-其实 JSX 的本质就是返回一个对象，这个对象就是 React.Componet。
+其实 JSX 的本质就是返回一个对象，这个对象就是 React.Componet。这个就是虚拟 DOM 的本质。
+
+我们不是操作实际的 DOM，而是操作虚拟 DOM，什么是虚拟 DOM 呢？其实就是对象罢了。只不过这个对象里有你想要的格式。
 
 所以只要是这样的对象，随便写。
 
@@ -364,4 +433,75 @@ class Home extends React.Component {
 export default Home;
 
 // 打印的结果
+```
+
+### 虚拟 DOM 的好处是什么呢？
+
+就是我们在修改一个页面的时候，可以不去操作真实的 DOM，只是做对象的对比。也就是 DOM-DIFF 语法。第一次渲染之后，第二次渲染的时候，只要做自己修改部分的渲染就行。
+
+### JSX 底层处理机制
+
+你写的 jsx → 使用 babal-preset-react-app 插件 → 编译成`React.createElement()`这种语法糖 → render 渲染到页面。
+
+> 上面就是一整套流程。
+
+![image-20230221014327092](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20230221014327092.png)
+
+也就是说，你可以直接
+
+```jsx
+// before
+ReactDOM.createRoot(document.querySelector('#root')).render(<App />);
+
+// after 可以把App替换掉,替换成虚拟DOM
+ReactDOM.createRoot(document.querySelector('#root')).render(
+  React.createElement(
+    'div',
+    {
+      className: 'home',
+    },
+    React.createElement(
+      'h1',
+      {
+        title: '\u6807\u9898',
+      },
+      '\u6211\u662F\u6807\u9898'
+    ),
+    React.createElement('span', null, 'hello')
+  )
+);
+```
+
+这个时候我们打印一下`React.createElement()`看看是什么呢？
+
+![image-20230221014619711](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20230221014619711.png)
+
+下面手写一个简单版本的`React.createElement()`
+
+```js
+export function createElement(ele, props, ...children) {
+  let virtualDOM = {
+    $$typeof: Symbol('react.element'),
+    key: null,
+    ref: null,
+    type: null,
+    props: {},
+  };
+
+  let len = children.length;
+  virtualDOM.type = ele;
+  if (props !== null) {
+    virtualDOM.props = {
+      // 其实这一步就是简单的浅拷贝而已
+      ...props,
+    };
+  }
+
+  // 只有1个子的话
+  if (len === 1) virtualDOM.props.children = children[0];
+  // 多项子
+  if (len > 1) virtualDOM.props.children = children;
+
+  return virtualDOM;
+}
 ```
