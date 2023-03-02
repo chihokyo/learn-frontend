@@ -1,0 +1,9 @@
+$body-color: red;
+
+body {
+  background-color: $body-color;
+  h2 {
+    color: blue;
+    user-select: none;
+  }
+}

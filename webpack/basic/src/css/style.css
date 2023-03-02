@@ -1,0 +1,7 @@
+body {
+  background-color: gold;
+}
+
+h2 {
+  user-select: none;
+}

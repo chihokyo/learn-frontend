@@ -1,0 +1,1 @@
+console.log("aaaa"),[2,2,2].map((function(a){return 2*a}));
