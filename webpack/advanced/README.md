@@ -127,7 +127,7 @@ PHP →→**编译器**→→JS
 
 此时介绍一个小型编译器代码，这个是中文化之后的**[the-super-tiny-compiler-cn](https://github.com/starkwang/the-super-tiny-compiler-cn)**
 
-### 和 webpack 配合
+### webpack 配合
 
 上面说了这么多都是单独 babel 的使用，即使没有 webpack 你可以使用的方法。那先安装 webpack
 
@@ -383,4 +383,95 @@ console.log(name);
 
 const msg = 'hello';
 console.log(msg.includes('he'));
+```
+
+### react 配合
+
+假设我们是从零搭建一个 react 环境，那需要怎么搭建呢？
+
+除了上面搭建的 babel 之后，还需要针对 react 的一些包和预设。
+
+- 安装 react 和 react-dom 这俩包 `npm i react react-dom`
+- 编写 react 代码
+- 新建模板 index.html
+- 安装 html-webpack-plugin 加上支持 `npm i html-webpack-plugin -D`
+- 为了处理 jsx 所以需要 babel 对 jsx 进行支持 → 安装 react 预设 `npm i @babel/preset-react -D`
+
+下面具体执行如下
+
+安装 4 个包
+
+```js
+npm i react react-dom
+npm i html-webpack-plugin -D
+npm i @babel/preset-react -D
+```
+
+修改`webpack.config.js`和`babel.config.js`配置
+
+![image-20230308000846200](https://raw.githubusercontent.com/chihokyo/image_host/develop/image-20230308000846200.png)
+
+写 react 代码和模板
+
+```js
+// src/react/App.jsx
+import { memo, useState } from 'react';
+
+const App = memo((props) => {
+  const [c, setC] = useState(1);
+  return (
+    <div>
+      <h2>{c}</h2>
+      <button onClick={(e) => setC(c + 1)}>+1</button>
+    </div>
+  );
+});
+
+App.propTypes = {};
+
+export default App;
+```
+
+模板
+
+```html
+<!-- src/react/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+```
+
+在入口文件引入
+
+```js
+// main.js是入口文件
+import React from 'react';
+import ReactDom from 'react-dom/client';
+import App from './react/App.jsx';
+
+// 这里开始写react代码
+
+const root = ReactDom.createRoot(document.querySelector('#root'));
+root.render(<App />);
+```
+
+然后这样基本就可以运行了，如果你不想写这个`import App from './react/App.jsx';`而是想写`import App from './react/App';`
+
+那么你要增加一个配置
+
+```js
+// webpack.config.js
+resolve: {
+  // 增加对jsx的支持
+    extensions: ['.js', '.json', '.jsx'],
+  },
 ```

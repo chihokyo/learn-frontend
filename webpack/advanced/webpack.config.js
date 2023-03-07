@@ -1,4 +1,5 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -8,12 +9,20 @@ module.exports = {
     filename: 'bundle.js',
     clean: true,
   },
+  resolve: {
+    extensions: ['.js', '.json', '.jsx'],
+  },
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.jsx?$/, //?表示0个或1个
         use: ['babel-loader'],
       },
     ],
   },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/react/index.html',
+    }),
+  ],
 };
