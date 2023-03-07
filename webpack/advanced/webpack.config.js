@@ -10,12 +10,21 @@ module.exports = {
     clean: true,
   },
   resolve: {
-    extensions: ['.js', '.json', '.jsx'],
+    extensions: ['.js', '.json', '.jsx', '.ts'],
   },
   module: {
     rules: [
       {
         test: /\.jsx?$/, //?表示0个或1个
+        use: ['babel-loader'],
+      },
+
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        // 这里是ts-loader
+        // use: ['ts-loader'],
+        // 这里是babel
         use: ['babel-loader'],
       },
     ],

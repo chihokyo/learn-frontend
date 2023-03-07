@@ -475,3 +475,118 @@ resolve: {
     extensions: ['.js', '.json', '.jsx'],
   },
 ```
+
+## ts
+
+如果你想在 webpack 里使用 ts 有两种方法。一种是 tsloader，一种就是 babel
+
+### ts-loader
+
+下面先写上 tsloader 用法
+
+- 安装 ts-loader （安装 tsloader 会给你自动安装了 typescript
+- 写`webpack.config.js`配置，包括对 ts 的处理
+- 添加 tsconfig.json 文件 `tsc --init`
+
+下面开始具体一股脑的写了。
+
+安装 ts-loader
+
+```js
+npm i ts-loader -D
+
+// 生成tsconfig.json
+tsc --init
+```
+
+写一个 ts 文件并引入到入口文件里
+
+```js
+// ts/math.ts
+type Math = number;
+
+export function sum(x: number, y: number): Math {
+  return x + y;
+}
+
+// main.js
+import { sum } from './ts/math';
+// 使用ts代码
+console.log(sum(2, 8));
+```
+
+增加 webpack.config.js 配置
+
+```js
+  resolve: {
+    // 🆕 增加新的.ts
+    extensions: ['.js', '.json', '.jsx', '.ts'],
+  },
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/, //?表示0个或1个
+        use: ['babel-loader'],
+      },
+      // 🆕 增加新的rule
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: ['ts-loader'],
+      },
+    ],
+  },
+```
+
+### babel
+
+**这个是推荐的！**为什么呢？可以增加 polyfill，并且可以少安装包。既然你都可以用 babel 了，就少用了。
+
+- 安装 ts 预设 `npm i @babel/preset-typescript -D`
+- `bable.config.js`增加新的预设
+
+那么开始写了
+
+```
+npm i @babel/preset-typescript -D
+```
+
+```js
+// webpack.config.js
+{
+  test: /\.ts$/,
+  exclude: /node_modules/,
+  // 这里是ts-loader
+  // use: ['ts-loader'],
+  // 这里是babel
+  use: ['babel-loader'],
+},
+
+// babel.config.js
+[
+  '@babel/preset-typescript',
+  {
+    corejs: 3,
+    useBuiltIns: 'usage',
+  },
+],
+```
+
+> 到底选哪个 loader？
+
+- babel 缺点 无法做类型错误检查
+- ts-loader 没有 polyfill 等功能
+
+最佳实践，在开发的时候做实时的类型校验
+
+```js
+// package.json
+"scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "ts-check": "tsc --noEmit --watch"
+},
+```
+
+然后使用 babel 进行打包。
+
+##
