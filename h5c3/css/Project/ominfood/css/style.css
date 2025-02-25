@@ -1,0 +1,712 @@
+/*这里对文件进行了分割，会把一些通用的放在general*/
+/*具体的样式就留在这里*/
+
+/*
+* ==========================
+*    HEADER
+* ==========================
+*/
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fdf2e9;
+  /* 接下来会做粘性sticky 高度固定会更好*/
+  height: 9.6rem;
+  padding: 0 4.8rem;
+  /* 这个是为了在手机模式下 .main-nav.abslute溢出的问题 */
+  position: relative;
+}
+
+.logo {
+  height: 2.2rem;
+}
+
+/*
+* ==========================
+*    NAVIGATION
+* ==========================
+*/
+
+.main-nav-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 3.2rem;
+}
+
+.main-nav-link:link,
+.main-nav-link:visited {
+  display: inline-block;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  font-size: 1.8rem;
+  transition: all 0.3s;
+}
+
+.main-nav-link:hover,
+.main-nav-link:active {
+  color: #cf711f;
+}
+
+.main-nav-link.nav-cta:link,
+.main-nav-link.nav-cta:visited {
+  padding: 1.2rem 2.4rem;
+  border-radius: 9px;
+  color: #fff;
+  background-color: #e67e22;
+}
+
+.main-nav-link.nav-cta:hover,
+.main-nav-link.nav-cta:active {
+  background-color: #cf711f;
+}
+
+/* MOBILE */
+
+.btn-mobile-nav {
+  border: none;
+  background: none;
+  cursor: pointer;
+  /* 默认情况下不显示的 媒体查询手机模式下会显示 */
+  display: none;
+}
+
+.icon-mobile-nav {
+  height: 4.8rem;
+  width: 4.8rem;
+  color: #333;
+}
+
+/* 类是 .icon-mobile-nav  属性name是 close-outline */
+.icon-mobile-nav[name='close-outline'] {
+  display: none;
+}
+
+/* 这里必须要加上 就是只有当既是 header是 sticky子类的时候 因为这个时候sticky 加到了body*/
+/* 当body 添加了 sticky之后 那么header作为sticky的子类就触发了 主要用于粘性header的 */
+.sticky .header {
+  /* 当一个元素ab 或者 fixed的时候都会脱离文档流 仿佛叠在上面一样  */
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  height: 8rem; /*这里设置80px的原因 主要是js里的 rootMargin: '-80px' 相关联*/
+  padding-top: 0;
+  padding-bottom: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.97);
+  z-index: 999;
+  box-shadow: 0 1.2rem 3.2rem rgba(0, 0, 0, 0.03);
+}
+
+/* 这里和上面 header同理 */
+.sticky .section-hero {
+  margin-top: 9.6rem;
+}
+
+/*
+* ==========================
+*    HERO
+* ==========================
+*/
+
+.hero {
+  display: grid;
+  margin: 0 auto;
+  padding: 0 3.2rem;
+  /*  */
+  max-width: 130rem;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 9.6rem;
+}
+
+.section-hero {
+  background-color: #fdf2e9;
+  padding: 4.8rem 0 9.6rem 0;
+}
+
+.hero-description {
+  font-size: 2rem;
+  line-height: 1.6;
+  letter-spacing: -0.5px;
+  margin-bottom: 4.8rem;
+}
+
+.hero-img {
+  width: 100%;
+}
+
+.delivered-meals {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  margin-top: 8rem;
+}
+
+.delivered-imgs {
+  display: flex;
+}
+
+.delivered-imgs img {
+  height: 4.8rem;
+  width: 4.8rem;
+  border-radius: 50%;
+  margin-right: -1.6rem;
+  border: 3px solid #fdf2e9;
+}
+
+.delivered-imgs img:last-child {
+  margin: 0;
+}
+
+.delivered-text {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.delivered-text span {
+  font-weight: 700;
+  color: #e67e22;
+}
+
+/*
+* ==========================
+*    FEATURE IN
+* ==========================
+*/
+
+.section-featured {
+  padding: 4.8rem 0 3.2rem 0;
+}
+
+.heading-featured-in {
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 2.4rem;
+  color: #888;
+}
+
+.logos {
+  display: flex;
+  justify-content: space-around;
+}
+
+.logos img {
+  height: 3.2rem;
+  /* 这里使用这个 是为了让所有图片都变为黑白 无色 */
+  filter: brightness(0);
+  /* 不只是用于图片 */
+  opacity: 50%;
+}
+
+/*
+* ==========================
+*     HOW IT WORKS
+* ==========================
+*/
+
+/* 摆放的顺序也很重要 */
+.section-how {
+  padding: 9.6rem 0;
+}
+
+.step-number {
+  font-size: 8.6rem; /*这里选择的最大的*/
+  font-weight: 600; /*因为一大加大了 在粗就不好了 所以选择700*/
+  color: #ddd; /*这里用了稍微浅色的 可能对比上打破了原先写的原则 但是有时候原则就是需要打破的*/
+  margin-bottom: 1.2rem;
+}
+
+.step-description {
+  font-size: 1.8rem;
+  line-height: 1.8;
+}
+
+.step-img-box {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-img-box::before,
+.step-img-box::after {
+  position: absolute;
+  content: '';
+  display: block;
+
+  /* 这里利用了一个父类relative 子类绝对定位 设置位置 拿到正方形在元素中间的效果 */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
+/*为了达到2个圈圈的效果 这里伪元素提取了公共的在上面*/
+/*然后可以发现除了位置和颜色不一样 其他都是一样的*/
+.step-img-box::before {
+  width: 60%;
+  /* height: 60%; 因为这里的高度不会youxiao  */
+  /* 这是父类的宽度 利用这个小技巧 可以做一个正方形*/
+  padding-bottom: 60%;
+  background-color: #fdf2e9;
+  z-index: -2;
+}
+
+.step-img-box::after {
+  width: 45%;
+  /* height: 60%; 因为这里的高度不会youxiao  */
+  /* 这是父类的宽度 利用这个小技巧 可以做一个正方形*/
+  padding-bottom: 45%;
+  background-color: #fae5d3;
+  z-index: -1;
+}
+
+.step-img {
+  width: 35%;
+}
+
+/*************************/
+/* MEALS */
+/*************************/
+
+.section-meals {
+  padding: 9.6rem 0;
+}
+
+.meal {
+  box-shadow: 0 2.4rem 4.8rem rgba(0, 0, 0, 0.075);
+  border-radius: 11px;
+  /* 这里会发现一个问题 就是整个卡片虽然是圆角的 但是图片却不是 */
+  /* 因为这里相当于图片溢出到整个卡片外了 因为卡片比图片小
+  我们设置了卡片是带圆角的 所以就缩小了  既然图比卡片大 就发生了溢出
+  溢出的话 需要隐藏掉溢出的部分 所以就隐藏*/
+  overflow: hidden;
+  /* 这个时候会发现一个新问题 就是卡片内容全都是贴边的
+  如果在本身如果设定了padding 那么全部都将会有个间距
+  所以只能给内容设定间距
+  */
+  transition: all 0.4s;
+}
+
+.meal:hover {
+  transform: translateY(-1.2rem);
+  box-shadow: 0 3.2rem 6.4rem rgba(0, 0, 0, 0.06);
+}
+
+.meal-content {
+  padding: 3.2rem 4.8rem 4.8rem 4.8rem;
+}
+
+.meal-tags {
+  margin-bottom: 1.2rem;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 100px;
+  color: #333;
+}
+
+.tag--vegetarian {
+  background-color: #51cf66;
+}
+
+.tag--vegan {
+  background-color: #94d82d;
+}
+
+.tag--paleo {
+  background-color: #ffd43b;
+}
+
+.meal-title {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 3.2rem;
+}
+
+.meal-attributes {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  list-style: none;
+}
+
+.meal-attribute {
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  font-size: 1.8rem;
+}
+
+.meal-icon {
+  height: 2.4rem;
+  width: 2.4rem;
+  color: #e67e22;
+}
+.meal-img {
+  width: 100%;
+}
+
+.all-recipes {
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+/*************************/
+/* TESTIMONIALS */
+/*************************/
+
+.section-testimonials {
+  display: grid;
+  /* 关于fr 相同的fr其实就是1:1比例 这里的fr最终计算的还是比例 */
+  /* 由于这里需要左边要比右边稍微大一点点 所以改成55%:45% */
+  grid-template-columns: 55fr 45fr;
+  align-items: center;
+  background-color: #fdf2e9;
+}
+
+.testimonials-container {
+  padding: 9.6rem;
+}
+
+.testimonials {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 4.8rem;
+  column-gap: 8rem;
+}
+
+.testimonial-img {
+  width: 64px;
+  border-radius: 50%;
+  margin-bottom: 1.2rem;
+}
+
+.testimonial-text {
+  font-size: 1.8rem;
+  line-height: 1.8;
+  margin-bottom: 1.6rem;
+}
+
+.testimonial-name {
+  font-size: 1.6rem;
+  color: #6f6f6f;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.6rem;
+  padding: 1.6rem;
+}
+
+.gallery-item {
+  /* 写这个是为了下面的 gallery-item img:hover 不会溢出 */
+  overflow: hidden;
+}
+
+/* 图像默认情况下也是内联元素 inline 所以需要变成块状元素 */
+.gallery-item img {
+  display: block; /*这样就可以修复了*/
+  width: 100%;
+  transition: all 0.4s;
+}
+
+.gallery-item img:hover {
+  transform: scale(1.1);
+}
+
+/*************************/
+/* PRICING */
+/*************************/
+
+.section-princing {
+  padding: 9.6rem 0;
+}
+
+.pricing-plan {
+  border-radius: 11px;
+  /* 因为每个卡片用的是grid 会撑满整个盒子 所以需要缩小 这样显得没这么宽 */
+  width: 75%;
+}
+
+/* 为了让2个卡片的第一个更靠近中间 看起来是完全居中 */
+/* 这样就会产生第1个是向右剧中 第2个是向左居中的效果 */
+.pricing-plan--starter {
+  justify-self: end;
+  border: 2px solid #fdf2e9;
+  padding: 4.6rem; /*这里1个4.6 1个4，8 是因为border占据了2px*/
+}
+
+.pricing-plan--complete {
+  position: relative;
+  background-color: #fdf2e9;
+  padding: 4.8rem;
+  overflow: hidden; /*把溢出给去掉 否则横条将会很难看 但是这个要写在父元素 ↑*/
+}
+
+.pricing-plan--complete::after {
+  content: 'Best value';
+  position: absolute;
+  top: 8%; /*因为是响应式 所以定位最好用百分比*/
+  right: -20%;
+  /*overflow: hidden; 把溢出给去掉 否则横条将会很难看 但是这个要写在父元素 ↑*/
+  text-transform: uppercase;
+  font-size: 1.4rem;
+  font-weight: 700;
+  background-color: #ffd43b;
+  color: #333;
+  padding: 0.6rem 8rem;
+  transform: rotate(45deg); /*这样只是旋转*/
+}
+
+.pricing-plan--start .plan-header {
+  text-align: center;
+  margin-bottom: 4.8rem;
+}
+
+.plan-name {
+  color: #cf711f;
+  font-weight: 600;
+  font-size: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.75;
+  margin-bottom: 3.2rem;
+}
+
+.plan-price {
+  font-size: 6.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1.6rem;
+}
+
+.plan-price span {
+  font-size: 6.2rem;
+  font-weight: 500;
+  margin-right: 0.8rem;
+}
+
+.plan-text {
+  font-style: 1.6rem;
+  line-height: 1.6;
+  color: #6f6f6f;
+}
+
+.plan-sing-up {
+  text-align: center;
+  margin-top: 4.8rem;
+}
+
+.plan-details {
+  font-size: 1.6rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.feature-icon {
+  color: #e67e22;
+  height: 3.2rem;
+  width: 3.2rem;
+  margin-bottom: 3.2rem;
+  background-color: #fdf2e9;
+  padding: 1.6rem;
+  border-radius: 50%;
+}
+
+.feature-title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 1.6rem;
+}
+
+.feature-text {
+  font-size: 1.8rem;
+  line-height: 1.8;
+}
+
+/*************************/
+/* CTA */
+/*************************/
+
+.section-cta {
+  /* top / right / bottom / left */
+  /* padding: 9.6rem 0 12.8rem 0; */
+
+  /* top / horizontal / left */
+  padding: 4.8rem 0 12.8rem;
+}
+
+.cta {
+  /* 关于这里为什么要用grid 因为整体大的布局倾向于用grid 小地方的布局倾向于flex */
+  display: grid;
+  /* 这里只是占比 */
+  grid-template-columns: 2fr 1fr;
+  /* background-color: #e67e22; */
+  background-image: linear-gradient(to right bottom, #eb884e, #e67e22);
+  box-shadow: 0 2.4rem 4.8rem rgba(0, 0, 0, 0.015);
+  border-radius: 11px;
+  overflow: hidden;
+  /* temp */
+  /* height: 50rem; 这里只是暂时的 最后用的是整体的内容撑起的盒子 */
+}
+
+/* 关于这里为什么要在css里直接加上背景图 而不是直接用img标签 */
+/* 如果你想要加滤镜等效果 直接css里会比较好 */
+.cta-text-box {
+  padding: 4.8rem 6.4rem 6.4rem 6.4rem;
+  color: #45260a;
+}
+
+.cta .heading-secondary {
+  /* color: #45260a; */
+  color: inherit;
+  margin-bottom: 3.2rem;
+}
+
+.cta-text {
+  font-size: 1.8rem;
+  line-height: 1.8;
+}
+
+.cta-img-box {
+  background-image: linear-gradient(
+      to right bottom,
+      hsla(22, 80%, 61%, 0.4),
+      rgba(230, 125, 34, 0.5)
+    ),
+    url(../content/img/eating.jpg);
+  background-size: cover;
+  background-position: center;
+}
+
+/* 虽然用class也可以 但form这里倾向用子类选择器 一体感 */
+
+.cta-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 3.2rem;
+  row-gap: 2.4rem;
+}
+.cta-form label {
+  display: block;
+  font-size: 1.6rem;
+  font-weight: 500;
+  margin-bottom: 1.2rem;
+}
+
+.cta-form input,
+.cta-form select {
+  width: 100%;
+  padding: 1.2rem;
+  font-size: 1.8rem;
+  /* 因为input字体内的默认不会被继承 所以你需要手动进行继承 */
+  font-family: inherit;
+  color: inherit;
+  border: none;
+  background-color: #fdf2e9;
+  border-radius: 9px;
+  /* 输入的时候做阴影 */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.cta-form input::placeholder {
+  color: #aaa;
+}
+
+.cta *:focus {
+  outline: none; /*这里只是去掉的话 对于很多使用键盘的人 没有聚焦了*/
+  box-shadow: 0 0 0 0.8rem rgba(253, 242, 233, 0.5);
+}
+
+/*************************/
+/* FOOTER */
+/*************************/
+
+.footer {
+  padding: 12.8rem 0;
+  border-top: 1px solid #eee;
+}
+
+.grid--footer {
+  grid-template-columns: 1.5fr 1.5fr 1fr 1fr 1fr;
+}
+
+.logo-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-logo {
+  display: block;
+  margin-bottom: 3.2rem;
+}
+
+.social-links {
+  list-style: none;
+  display: flex;
+  gap: 2.4rem;
+}
+
+.social-icon {
+  height: 2.4rem;
+  width: 2.4rem;
+}
+
+.copyright {
+  font-size: 1.4rem;
+  line-height: 1.6;
+  color: #767676;
+  /* 这里用了一个trick 为了让这一行靠近底部 配合上了flex */
+  margin-top: auto;
+}
+
+.footer-heading {
+  font-size: 1.8rem;
+  font-weight: 500;
+  margin-bottom: 4rem;
+}
+
+.contacts {
+  font-style: normal;
+  font-size: 1.6rem;
+  line-height: 1.6;
+}
+
+.address {
+  margin-bottom: 2.4rem;
+}
+
+.footer-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2.4rem;
+  list-style: none;
+}
+
+.footer-link:link,
+.footer-link:visited {
+  text-decoration: none;
+  font-size: 1.6rem;
+  color: #767676;
+  transition: all 0.3s;
+}
+
+.footer-link:hover,
+.footer-link:active {
+  color: #555;
+}

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>选择器</title>
+    <style>
+      /* 只要有title这个属性就可以 */
+      [title] {
+        color: red;
+      }
+
+      /* 必须要等于hello才可以 */
+      [title='hello'] {
+        font-size: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div title="hello">1</div>
+    <div title="me">2</div>
+    <span>111</span>
+    <div>3</div>
+  </body>
+</html>

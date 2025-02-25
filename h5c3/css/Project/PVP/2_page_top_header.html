@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <title>王者荣耀</title>
+    <style>
+      /*=============top-header区域==================*/
+
+      .header {
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+      .header .area {
+        display: flex;
+        justify-content: space-between;
+        height: 84px;
+      }
+      .header .left-area {
+        /* 这里可以把 h1 拉伸起来 */
+        display: flex;
+      }
+      .header .left-area .logo a {
+        /* 居中方案 开始 注意这里因为是   */
+        position: relative;
+        top: 50%; /* h1的高度是a撑起来的 所以只是设置top50%没有用 需要使用df拉伸一下这样h1就有了高度*/
+        transform: translate(0, -50%);
+        /* 居中方案 结束 */
+        display: block;
+        width: 200px;
+        height: 54px;
+        text-indent: -9999px; /*隐藏*/
+        background: url(https://game.gtimg.cn/images/yxzj/web201706/images/comm/logo.png)
+          no-repeat center center;
+      }
+
+      /* ============left区域=========== */
+
+      .header .left-area .nav-list {
+        display: flex;
+        margin-left: 30px;
+      }
+      .header .left-area .nav-list .item {
+        /* height这里可以用默认的不用写  自动会给撑起来*/
+        width: 110px;
+        padding-right: 5px;
+      }
+      .header .left-area .nav-list .item:hover,
+      .header .left-area .nav-list .item:active {
+        background: url(https://game.gtimg.cn/images/yxzj/web201706/images/comm/index.png)
+          no-repeat 0 0;
+      }
+      .header .left-area .nav-list .item:hover a,
+      .header .left-area .nav-list .item:active a {
+        color: #e4b653;
+      }
+      .header .left-area .nav-list .item:hover .desc,
+      .header .left-area .nav-list .item:active .desc {
+        color: #91763f;
+      }
+      .header .left-area .nav-list .item a {
+        display: block; /*设置为占据一整行*/
+        height: 100%; /*为了拉伸起来*/
+        padding-top: 20px;
+        font-size: 18px;
+        color: #c9c9dd;
+        text-align: center;
+      }
+      .header .left-area .nav-list .item a .desc {
+        display: block; /*设置为占据一整行*/
+        margin-top: 5px;
+        font-size: 12px;
+        color: #858792;
+      }
+
+      /* ============right区域=========== */
+
+      .header .right-area {
+        display: flex;
+        align-items: center;
+      }
+      .header .right-area .img-logo img {
+        border: 1px solid #d9ad50;
+        border-radius: 50%;
+      }
+      .header .right-area .info {
+        margin-left: 12px;
+      }
+      .header .right-area .info a {
+        color: #fff;
+      }
+      .header .right-area .info p {
+        font-size: 14x;
+        color: #858792;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="area header_wrapper">
+        <div class="left-area">
+          <h1 class="logo">
+            <a href="#">pvp</a>
+          </h1>
+          <ul class="nav-list">
+            <li class="item">
+              <a href="">
+                游戏资料
+                <span class="desc">DATA</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="">
+                内容中心
+                <span class="desc">CONTENTS</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="">
+                赛事中心
+                <span class="desc">MATCH</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="">
+                百态王者
+                <span class="desc">CULTURE</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="">
+                社区互动
+                <span class="desc">COMMUNITY</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="">
+                玩家支持
+                <span class="desc">PLAYER</span>
+              </a>
+            </li>
+            <li class="item">
+              <a href="">
+                IP新游
+                <span class="desc">NEW GAMES</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="right-area">
+          <a href="#" class="img-logo">
+            <img
+              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACoAAAAqCAMAAADyHTlpAAAABGdBTUEAALGPC/xhBQAAARpQTFRF88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JY88JYAAAA88JYAMCn0QAAAF10Uk5TZBSP1dYNDujnLPuA3/zQAos0UjmnB8KcgZrNkfGwCdhthtnjysFgCFAZSuQWKYNXh9IbREw+9iRhdyPlZRNdvRwnMRrvNf3F3isBtz+eRfPha+v3O+718Gm0eB4AqcfmkwAAAUBJREFUOMvt1FWTg0AMAOCeu7u71t3dFS+FJv//b9wCnbu5YwI83VPzsBvYb2aRbHzgOXxzartTLbGhVPVAN9Z0NurrXVdaE9GkKNZcaFPBVBJ6kEyh0nSksoqYAVgEyCCqsgMdcIjIpxOYSPMs4wYkHY3RiPwSLufNbDyiqIp/Q6Iob6MqRZ9t9ImiNzZ6R9ELG72k6Dl22q1v1mp38JSiE9SgLpR3mNssC3XQ2DVBD62lBR2zRSPR8JiiR9jIrgDEwhiOAazqDTyjaI7trMQhwqYIxBU2XVH01nibCYTYGGIPzuKBLJdrkwb86A9YVCfpI1uNBkHmZAhGDSqQ9MUspwLkwGcV2StJh9bHn8J09hs+Sfo2/EXFd6ezVZB+aP/D+cQebM+odN9z6wPFvkl3ux66y95WBSr7J/NW/F/0C0EhZNPgBN3FAAAAAElFTkSuQmCC"
+              alt=""
+            />
+          </a>
+          <div class="info">
+            <a href="#">欢迎登录</a>
+            <p>登录后查看游戏战绩</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

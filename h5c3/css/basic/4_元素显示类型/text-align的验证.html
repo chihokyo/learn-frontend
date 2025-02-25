@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>验证text-aligh只能居中inline level</title>
+  </head>
+  <style>
+    .demo1 {
+      background-color: yellowgreen;
+      height: 500px;
+      width: 500px;
+      /* text-align */
+      text-align: center;
+    }
+
+    .inline1 {
+      background-color: rebeccapurple;
+      height: 50px;
+      width: 50px;
+    }
+
+    .demo2 {
+      background-color: yellowgreen;
+      height: 500px;
+      width: 500px;
+      /* text-align */
+      text-align: center;
+    }
+
+    .inline2 {
+      background-color: rebeccapurple;
+      height: 50px;
+      width: 50px;
+      /* display: inline-block; 改成这个就能居中了 */
+      /* display: inline; 为什么不能设置inline？因为inline不能设置高度宽度 */
+    }
+  </style>
+  <body>
+    <!-- 可以居中 -->
+    <h2>可以居中</h2>
+    <div class="demo1">
+      <span class="inline1">我是span 是inline level</span>
+    </div>
+    <h2></h2>
+    <!-- 不能居中 -->
+    <h2>不能居中</h2>
+    <div class="demo2">
+      <div class="inline2">我是div 不是inline level</div>
+    </div>
+  </body>
+</html>

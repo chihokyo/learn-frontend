@@ -1066,7 +1066,7 @@ background-image: linear-gradient(
 
 ## 7 footer
 
-关于footer的一些tips
+关于 footer 的一些 tips
 
 ```scss
 .footer {
@@ -1137,4 +1137,4 @@ background-image: linear-gradient(
 }
 ```
 
-基本上没有什么难度，就只是一些基础的css而已。
+基本上没有什么难度，就只是一些基础的 css 而已。

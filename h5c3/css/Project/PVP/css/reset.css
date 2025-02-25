@@ -1,0 +1,27 @@
+body,
+h1,
+h2,
+ul,
+li,
+ol,
+p {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: #333;
+}
+
+/* 对imgvertical-align充值 防止图片行盒间隙 */
+img {
+  vertical-align: top;
+}
+
+ul,
+li,
+ol {
+  list-style: none;
+}

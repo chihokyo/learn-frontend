@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <title>王者荣耀</title>
+
+    <style>
+      /*=============top区域==================*/
+
+      .top {
+        border: 1px solid #f5f5f5;
+      }
+      .top .area {
+        display: flex;
+        justify-content: space-between;
+        /* 为什么会撑满拉伸高度 因为默认align-items: stretch;*/
+        height: 41px;
+        line-height: 41px; /*居中效果*/
+      }
+      .top .area .left-area {
+        display: flex;
+      }
+      .top .area .left-area .logo a {
+        /* 因为a不能设置宽高 为什么不用inline-block 没有一些多出像素问题 */
+        display: block;
+        width: 150px;
+        height: 100%; /*这里可以通过line-height*/
+        text-indent: -9999px; /* 💡 隐藏文字 为了seo才有的文字 */
+        background: url(https://game.gtimg.cn/images/js/title/logo.png)
+          no-repeat center center;
+      }
+      .top .area .right-area {
+        display: flex;
+      }
+      .top .area .right-area .item a {
+        position: relative; /*为了图片的绝对定位*/
+        display: block;
+        font-size: 14px;
+        line-height: 14px;
+        color: #464646;
+      }
+      .top .area .right-area .item a.ranking {
+        margin-left: 20px;
+        padding-right: 30px;
+      }
+      /* 图标方案1 */
+      .top .area .right-area .item a.ranking::after {
+        content: '';
+        position: absolute;
+        height: 30px;
+        width: 30px;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        margin: auto 0;
+        background: url(https://game.gtimg.cn/images/js/title/title_sprite.png)
+          no-repeat 0 0;
+        opacity: 0.1; /*为了让图片透明度*/
+        transform: rotate(90deg);
+      }
+      .top .area .right-area .item a.growth {
+        padding-left: 30px; /*呼应1-b*/
+      }
+      /* 图标方案2 */
+      .top .area .right-area .item a .icon-grow {
+        /* 为了居中做出对齐 */
+        /* display: inline-block; 因为都绝对定位了 自然不用写这个了 */
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        top: 0;
+        bottom: 0;
+        left: 0; /*呼应1-a*/
+        margin: auto 0;
+        background: url(https://game.gtimg.cn/images/js/title/title_sprite.png)
+          no-repeat -30px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top">
+      <div class="top_wrapper area">
+        <div class="left-area">
+          <h2 class="logo">
+            <!-- 这里不会显示 是为了做的优化 -->
+            <a href="#">腾讯游戏</a>
+          </h2>
+          <div class="recommend">
+            <img
+              src="https://tiem-cdn.qq.com/o2/images/9da0cbaea7e4f77f0a037c16c7e432c8.jpg"
+              alt=""
+            />
+          </div>
+        </div>
+        <ul class="right-area">
+          <li class="item">
+            <a class="growth" href="#">
+              <i class="icon-grow"></i>
+              成长守护平台</a
+            >
+          </li>
+          <li class="item">
+            <a class="ranking" href="#">腾讯游戏排行榜 </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

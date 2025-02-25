@@ -1,0 +1,282 @@
+/*
+
+/***排版系统****
+
+■ font size (px) 字体大小系统
+  这些字体也是按照text scale的标准来选的
+  下面在做项目的时候由于事先已经考虑到了做响应式
+  所以先把所有的像素按照比例，转换成了 10px/16px(因为root模式文本就是16px)
+  所以这个比例就是62.5% 可以看到html哪里给搞成了62.5
+  又由于字体是可以被所有子类所继承的，所以接下来在写大小的时候
+  1rem 其实就是10px 2rem其实就是20px 这样更容易计算 也是css界大家经常用的方法之一
+
+  10/12/14/16/18/24/30/36/44/52/62/74/86/98
+  1rem/1.2rem...
+
+■ font weight 字体粗细系统
+    defalut 400
+    medium 500
+    semi-bold 600
+    bold 700
+
+■　line height 行高系统
+    default 1
+    small 1.05 稍微紧密点
+    small 1.05 稍微紧密点
+    写文章用 大段文字 1.6
+
+
+■　letter spaceing 字间距
+    这里越大的字 越需要更大等间距，大概都是有这个倾向的。
+    -0.5px 缩小
+    0.75px 加大 适用于比较大的地方
+
+
+  color 颜色系统
+
+    基础颜色 → primary #e67e22　
+    比基础颜色更浅 → tints #fdf2e9 #fae5d3 #eb884e
+    比基础颜色更深→ shades #cf711f
+    强调色 → accents
+    灰色→greys  （数字越大灰色越浅 #aaa #ddd #eee）
+      #888
+      #767676 (lightest grey allowed on #fff)
+      #6f6f6f (lightest grey allowed on #fdf2e9)
+      #555
+      #333
+
+shadows system
+  box-shadow: 0 2.4rem 4.8rem rgba(0, 0, 0, 0.075);
+
+  border-radius
+  default 9px
+  medium 11px
+*/
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+html {
+  /* font-size 10px
+      10px / 16px  = 0.625 = 62.5%
+    */
+  font-size: 62.5%;
+  /* 这个属性是为了在手机模式下 平滑移动的时候  */
+  /* transform: translateX(100%); 这个不会超出 */
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Rubik', sans-serif;
+  line-height: 1;
+  font-weight: 400;
+  color: #555;
+  /* 这个属性是为了在手机模式下 平滑移动的时候  */
+  /* transform: translateX(100%); 这个不会超出 */
+  overflow-x: hidden;
+}
+
+/*************************/
+/* GENARAL REUSABEL COMPONENTS */
+/* 可以复用的 */
+/*************************/
+
+/* 这里就是把标题重复话的一起选择进行复用 */
+.heading-primary,
+.heading-secondary .heading-tertiary {
+  font-weight: 700;
+  color: #333;
+  letter-spacing: -0.5px;
+}
+
+.heading-primary {
+  font-size: 5.2rem;
+  line-height: 1.05;
+  margin-bottom: 3.2rem;
+}
+
+.heading-secondary {
+  font-size: 4.4rem;
+  line-height: 1.2;
+  margin-bottom: 9.6rem;
+}
+
+.heading-tertiary {
+  font-size: 3rem;
+  line-height: 1.2;
+  margin-bottom: 3.2rem;
+}
+
+.subheading {
+  /* 因为这里是一个span 所以需要转换成块状元素 */
+  display: block;
+  font-size: 2rem;
+  font-weight: 500;
+  /* color: #e67e22; 这里不推荐用maincolor的原因是因为强调对比色 */
+  color: #cf711f; /*用更深的可以增强对比*/
+  text-transform: uppercase;
+  margin-bottom: 1.6rem;
+  letter-spacing: 0.75px;
+}
+
+.btn,/* 所以需要所有的btn按钮都有样式的话 单独写上这个.btn */
+.btn:link, /*这个只是适用于a href的 link*/
+.btn:visited {
+  display: inline-block;
+  font-size: 2rem;
+  font-weight: 600;
+  padding: 1.6rem 3.2rem;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s;
+  /* 只有.btn适用 */
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn--full:link,
+.btn--full:visited {
+  background-color: #e67e22;
+  color: #fff;
+}
+
+.btn--full:hover,
+.btn--full:active {
+  background-color: #cf711f;
+}
+
+.btn--outline:link,
+.btn--outline:visited {
+  background-color: #fff;
+  color: #555;
+}
+
+.btn--outline:hover,
+.btn--outline:active {
+  background-color: #fdf2e9;
+  /* border: 3px solid #fff;
+    这样就会多出来一样
+    */
+  box-shadow: inset 0 0 0 3px #fff;
+}
+
+.btn--form {
+  background-color: #45260a;
+  color: #fdf2e9;
+  align-self: end;
+  padding: 1.2rem; /*这里是因为.btn默认填充的是1.6rem 但是输入框.cta是1.2rem*/
+}
+
+.btn--form:hover {
+  background-color: #fff;
+  color: #555;
+}
+
+.link:link,
+.link:visited {
+  display: inline-block;
+  color: #e67e22;
+  text-decoration: none;
+  /* 默认的下划线距离文本实在太近 我们自己写一个 */
+  /* border-bottom: 1px solid #e67e22; 下面是省略写法 */
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+  transition: all 0.3s;
+}
+
+.link:hover,
+.link:active {
+  color: #cf711f;
+  border-bottom: 1px solid transparent;
+}
+
+.container {
+  /* 1140 虽然是一种约定 但是用1200也没问题*/
+  /* 这里hero是用的130 而这里用120的原因是因为hero为了美观会特殊化一下 */
+  max-width: 120rem;
+  padding: 0 3.2rem;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  row-gap: 9.6rem;
+  column-gap: 6.4rem;
+  /* margin-bottom:9,6rem ; */
+}
+
+/* 这俩和用下面这个本质是一样的
+.grid:last-child {
+  margin-bottom:0rem;
+} */
+
+.grid:not(last-child) {
+  margin-bottom: 9.6rem;
+}
+
+.grid--2-cols {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid--3-cols {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid--4-cols {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.grid--center-v {
+  align-items: center;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+  font-size: 1.6rem;
+}
+
+.list-icon {
+  width: 3rem;
+  height: 3rem;
+  color: #e67e22;
+}
+
+/* 这里适用于所有的聚焦 包括按钮和link */
+*:focus {
+  outline: none; /*这里只是去掉的话 对于很多使用键盘的人 没有聚焦了*/
+  /* 下面的outline 会很丑 */
+  /* outline: 3px dotted #e67e22; */
+  /* outline-offset: 8px; */
+  box-shadow: 0 0 0 0.8rem rgba(232, 127, 36, 0.5);
+}
+
+/* HELPER CLASS */
+.margin-right-sm {
+  margin-right: 1.6rem !important;
+}
+
+.margin-botton-md {
+  margin-bottom: 4.8rem !important;
+}
+
+.center-text {
+  text-align: center;
+}
+
+/* 改变默认strong的粗度 strong { */
+strong {
+  font-weight: 500;
+}
